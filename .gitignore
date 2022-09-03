@@ -1,0 +1,11 @@
+/Writing/Manuscript*/*
+/Writing/Figures/*
+/Writing/*cache/*
+/Writing/*files/*
+/Codes/*cache*/*
+/Codes/*files*/*
+/Codes/*.Rmd
+/Codes/*.html
+/Figures/*
+.Rproj.user/*
+.Rproj.user

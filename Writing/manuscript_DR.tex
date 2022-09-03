@@ -1,0 +1,310 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{lmodern}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\usepackage[margin=1in]{geometry}
+\usepackage{longtable,booktabs,array}
+\usepackage{calc} % for calculating minipage widths
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{5}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{wrapfig}
+\usepackage{float}
+\usepackage{colortbl}
+\usepackage{pdflscape}
+\usepackage{tabu}
+\usepackage{threeparttable}
+\usepackage{threeparttablex}
+\usepackage[normalem]{ulem}
+\usepackage{makecell}
+\usepackage{xcolor}
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\usepackage[]{natbib}
+\bibliographystyle{plainnat}
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same} % disable monospaced font for URLs
+\hypersetup{
+  pdftitle={The Impacts of Aquifer Depletion on the Ability of Groundwater Irrigation to Buffer Against Undesirable Weather},
+  pdfauthor={Taro Mieno; Timothy Foster; Shunkei Kakimoto; Nicholas Brozovic},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\title{The Impacts of Aquifer Depletion on the Ability of Groundwater Irrigation to Buffer Against Undesirable Weather}
+\author{Taro Mieno\footnote{Department of Agricultural Economics, University of Nebraska Lincoln, \href{mailto:tmieno2@unl.edu}{\nolinkurl{tmieno2@unl.edu}}} \and Timothy Foster\footnote{Department of WWW, University of Manchester, \href{mailto:timothy.foster@manchester.ac.uk}{\nolinkurl{timothy.foster@manchester.ac.uk}}} \and Shunkei Kakimoto\footnote{Department of Applied Economics, University of Minnesota} \and Nicholas Brozovic\footnote{Department of Agricultural Economics, University of Nebraska Lincoln, \href{mailto:nbrozovic@nebraska.edu}{\nolinkurl{nbrozovic@nebraska.edu}}}}
+\date{}
+
+\begin{document}
+\maketitle
+\begin{abstract}
+Abstract goes here. It should be a single paragraph of around 200 words.
+\end{abstract}
+
+\hypertarget{introduction}{%
+\section{Introduction}\label{introduction}}
+
+Groundwater-irrigated agriculture supports X\% of crop production worldwide and Y\% in U.S. (citations) It is a vital natural resource that brings tremendous economic and social benefits to the society. However, groundwater has been depleting rapidly all over the world due to intensive groundwater extraction that far exceeds the natural replenishment rate (citation). The importance of irrigation has been consistently growing over the years (Irmak).
+
+\begin{itemize}
+\tightlist
+\item
+  some mentionin of food security issues
+\end{itemize}
+
+The vast majority of studies on the climate change impacts on agricultural productivity focus on dryland production as it is far vulnerable to climate variations than irrigated production is. Another strand of literature seeks to understand the impact of climate change on water demand. Only a small collection of studies estimated the climate change impacts on irrigated production. It first seems that we do not need to understand the impact of climate change on irrigated production because irrigation provide a protection against climate variation. This would be true under the condition that farmer can apply desired amount of water without any physical or economic constraints, in which case, farmers can always take advantage of the benefit of irrigation to its full potential. Unfortunately, that is not the case for groundwater irrigated agriculture. Specifically, the stock of groundwater in the aquifer, measured as saturated thickness, affects the physical and economic constraints under which farmers operate. A decline in saturated thickness place stronger constraints on farmers and hurt the profitability of irrigated production.
+
+There are mainly two reasons that saturated thickness affects the ability of aquifer to protect farmers from undesirable production conditions. First, as saturated thickness goes down due to groundwater depletion, the economic cost of pumping water increases. This affects overall agricultural productivity through two channels: extensive and intensive margins. When the cost of groundwater extraction becomes too high, irrigated production is no longer more profitable than dryland production. In this case, farmers will switch to irrigated production to dryland production even though groundwater still exists in the aquifer, which leads to significant reduction in crop yield (extensive margin). For those who have decided to irrigate, they would use less water as the cost of groundwater pumping is higher, thus lowering crop yield (intensive margin). Second and more important, well yield (a measure of how much water can be pumped per unit of time) declines as saturated thickness goes down (). This physical constraint has been shown to have far greater impacts on irrigation decisions than pumping cost \citep{mieno2021}. Similarly to the rising pumping cost case, declining well yield affects agricultural productivity through two channels. Too low a well yield makes producers shift to dryland production. For those irrigating, a lower well yield would lead to lower crop yield.
+
+\citet{sampson2019} estimated the impact of saturated thickness on land value.
+
+The vast majority of existing body of studies focus on estimating the impact of climate on dryland production. A small amount of studies that look at the impact of climate on irrigated production does not take into account saturated thickness. Our study fills this important gap and sheds light on the value of groundwater by recognizing the importance of saturated thickness and quantifying its ability to protect agricultural production from undesirable weather outcomes.
+
+\citep{rad2020effects}
+\citep{foster2014modeling}
+\citep{foster2015analysis}
+
+\hypertarget{materials-and-method}{%
+\section{Materials and Method}\label{materials-and-method}}
+
+In order to understand the impact of saturated thickness on agricultural production, this study examines the two channels through which saturated thickness affects average corn and soybean yields using econometric analysis. First, we quantify the impact of water deficit (\(WB\)) during the production season (May through September) on irrigated and dryland yields (\(Y\)) differentiated by the level of saturated thickness (\(ST\)). Mathematically, we estimate the expected value of yield conditional on water deficit, saturated thickness, and whether irrigated or not (\(I\)).
+
+\[
+E[Y_{i,t}|WB_{i,t}, ST_{i,t}, I_{i,t}]= f(WB_{i,t}, ST_{i,t}, I_{i,t})
+\]
+
+where \(i\) indicates county and \(t\) indicates year.
+
+\noindent Second, we estimate the expected value of the share of irrigated acres as a function of saturated thickness and average water deficit (averaged over years). Historical average water deficit is used in place of concurrent water deficit \(WB_{i,t}\) because the decision of whether to irrigate or not is made based on what the history of crop water demand rather than the concurrent weather that is yet to unfold at the time of decision making.
+
+\[
+E[S_{i,t}|WB_{i,t}, ST_{i,t}]= g(\overline{WB}_i, ST_{i,t}) 
+\]
+
+\noindent Once they are estimated, we can estimate the average crop yield as the share-weighted average of dryland and irrigated yields as follows:
+
+\[
+\hat{h}(WB_t, St_t)= (1 - \hat{g}(\overline{WB}, ST) )\cdot \hat{f}(WB_t, ST_t, I_t = 0)+ \hat{g}(\overline{WB}, ST) \cdot \hat{f}(WB_t, ST_t, I_t = 1)
+\]
+
+\noindent where \(\hat{f}(\cdot)\) and \(\hat{g}(\cdot)\) are estimated version of \(f(\cdot)\) and \(g(\cdot)\), respectively. For example, the impact of a change in saturate thickness level, say from \(ST_{before}\) to \(ST_{after}\), on crop yield is then \(\hat{h}(WB_t, St_{before})\) - \(\hat{h}(WB_t, St_{before})\).
+
+\hypertarget{econometric-models}{%
+\subsection{Econometric Models}\label{econometric-models}}
+
+We use the same model specification for corn and soybean yield regression analysis. The estimating equation is written as follows:
+
+\[
+y_{i,t} = \sum_{j=1}^4 \sigma_j C_j + \sum_{j=1}^4 \sum_{k}^K \beta_{j,k}\phi_{j,k}(WB_{i,t})\cdot C_j  + \alpha_i + \phi_t + v_{i,t}
+\]
+
+Individual county and year are indicated by \(i\) and \(t\), respectively. In the model, \(y_{i,t}\) is crop yield for county \(i\) in year\(t\). \(C_j\) is a dummy variable that takes 1 if observation \(i\) is under category \(C_j\), 0 otherwise. The observations are grouped into four categories: dryland production, observations with saturated thickness falling under the \([0-33.3\%)\)j, \([33.3-66.7\%)\), and \([66.7\% - 100\%]\) quantile ranges of saturated thickness. The three irrigated production groups have about the same number of observations, which ensures statistical stability in estimating yield response to drought by category. \(\sigma_j\) represents the category specific intercept. \(WB_{i,t}\) is water deficit defined as total reference evapotranspiration less precipitation between May through September. Category-specific impact of water deficit on yield is represented by \(\sum_{k}^K \beta_k\phi_{j,k}(WB_{i,t})\), where \(\phi_{j,k}\) is \(k\)th spline basis function and \(\beta_k\) is its coefficient. Spline functions are used to capture the potential non-linearity of the impact of water deficit on yield in a flexible manner. The model can be interpreted as hierarchical generalized additive model, where each of saturated thickness level category has its own yield response function to drought (cite). To control for time-invariant heterogeneity across counties and yearly shocks, county fixed effects (\(\alpha_i\)) and year fixed effects (\(\phi_t\)) are included. Standard error estimation is clustered by county.
+
+The impact of saturated thickness on the share of irrigated acres is estimated using a fractional logit model under the generalize additive model framework in which the impact of saturated thickness, average water deficit, and their interactions are estimated semi-parametrically, allowing for flexible representation of their impacts. The estimating equation is as follows:
+
+\[
+log(\frac{s_{i,t}}{1-s_{i,t}}) = \beta_0 + h(ST_{i,t}, \overline{WB}_i) + \mu_t + v_{i,t}
+\]
+
+, where \(s_{i,t}\) is the share of irrigated production. \(h(ST_{i,t}, \overline{WB}_i)\) consists of basis functions and their coefficients to repsent the the impact of \(ST_{i,t}\), \(\overline{WB}_i\), and their interactions (see Appendix ?? for further details of how \(h(ST_{i,t}, \overline{WB}_i)\) are mathematically defined).
+
+\hypertarget{data}{%
+\subsection{Data}\label{data}}
+
+Figure \ref{fig:geo-focus} shows the geographical coverage of the data for regression analysis for corn and soybean.
+
+\begin{figure}
+
+{\centering \includegraphics[width=432px]{manuscript_DR_files/figure-latex/geo-focus-1} 
+
+}
+
+\caption{Geographic focus of the study for corn and soybean}\label{fig:geo-focus}
+\end{figure}
+
+First, county-level irrigated and dryland yield data for corn and soybean for 1985 through 2016 were obtained from the USDA NASS QuickStat. Both dryland and irrigated yield observations are used for counties that shares more than 75\% of their area with the Ogallala aquifer. Only dryland yield observations are used for counties that do not satisfy the condition. We use dryland yield data outside of the Ogallala aquifer to supplement dryland yield data for more accurate estimation of the impact of water deficit for dryland production. Daily precipitation and reference ET were obtained from gridMET \citep{Abatzoglou2013}. Water deficit (\(WB_{i,t}\)) was then calculated by subtracting total precipitation from total reference evapotranspiration from May through September. Saturated thickness data were obtained from Dr.~Erin Haacker \citep{haacker2016water}. Observations that have saturated thickness value lower than 12 meter were eliminated as saturated thickness below that is considered not suitable for irrigation (Tim citations here).
+
+Figure \ref{fig:deficit-hist} presents annual water deficit by year for the corn and soybean data. Water deficit is highly variable year to year. Year 2012 in particular stands out as an extremely dry year in the region. We use the year-to-year variations in water deficit to identify its impact on crop yield. Figure \ref{fig:yield-hist} compares historical corn and soybean yields for dryland and irrigated production. The power of irrigation is clearly evident in this figure. First, irrigation provides protection against severe drought years like 2000, 2002, 2012. While the dryland yield dives down in those years, irrigated yields is almost unaffected by the severe droughts. First key objective of our study is to see if and how much the ability of irrigation is diminished when saturated thickness goes down. Figure \ref{fig:sat-dist} presents the distribution of saturated thickness. Saturated thickness vary substantially, but most of the sites have saturated thickness of less than 50 meters. We exploit the observed variations in saturated thickness to identify its influence on the ability of irrigation to drought. Second, irrigated yield is always about 50\% or higher than dryalnd yield irrespective of the degree of water deficit. We will investigate the negative impact of a decline in saturated thickness on the percentage of irrigated fields, thus reducing crop yields.
+
+\begin{figure}
+
+{\centering \includegraphics[width=432px]{manuscript_DR_files/figure-latex/deficit-hist-1} 
+
+}
+
+\caption{Distribution of water deficit for corn and soybean datasets}\label{fig:deficit-hist}
+\end{figure}
+
+\begin{figure}
+
+{\centering \includegraphics[width=432px]{manuscript_DR_files/figure-latex/yield-hist-1} 
+
+}
+
+\caption{Historical dryland and irrigated yields for corn and soybean}\label{fig:yield-hist}
+\end{figure}
+
+\begin{figure}
+
+{\centering \includegraphics[width=432px]{manuscript_DR_files/figure-latex/sat-dist-1} 
+
+}
+
+\caption{Distribution of saturated thickness}\label{fig:sat-dist}
+\end{figure}
+
+\hypertarget{results-and-discussions}{%
+\section{Results and Discussions}\label{results-and-discussions}}
+
+\hypertarget{the-impact-of-drought-on-dryland-and-irrigated-yield}{%
+\subsection{The impact of drought on dryland and irrigated yield}\label{the-impact-of-drought-on-dryland-and-irrigated-yield}}
+
+Regression results are presented graphically rather than in tables because individual coefficients estimates on spline basis functions cannot be readily interpreted and also because visualized results are much easier to interpret. Figure \ref{fig:yield-response} shows yield response to water deficit for dryland production and groundwater-irrigated production at different levels of saturated thickness categories for corn (1st row) and soybean (2nd row).
+
+\begin{figure}
+
+{\centering \includegraphics[width=432px]{manuscript_DR_files/figure-latex/yield-response-1} 
+
+}
+
+\caption{The impact of water deficit on dryland and irrigated yield by crop}\label{fig:yield-response}
+\end{figure}
+
+In a fairly wet year without much water stress, dryland and irrigated production result in very similar crop yields for both soybean and corn yields. Irrigated yields are only slightly higher than dryland yields at a negative value of water deficit (precipitation is greater than reference evapotranspiration). However, dryland yield declines sharply and steadily as water deficit increases. On the contrary, irrigated corn yield actually increase as water deficit increases up to about water deficit of 400mm at all the saturated thickness levels for both corn and soybean. This is because irrigation can turn unfavorable high-heat conditions into favorable growing conditions up to a point (Tim, citations?). However, yield response to water deficit departs after deficit of about 400mm depending on the level of saturated thickness. While higher saturated thickness categories can withstand water deficit and crop yield stays about the same for higher water deficit values, the low saturated thickness category experience non-trivial declines in crop yields as water deficit increases.
+
+While there are some gaps in crop yield between the lowest and the higher saturated thickness categories, the lowest category still performs quite well for both corn and soybean. This is because the samples in irrigation in the regression analysis are those who opted to stay irrigated even when the saturated thickness level is low because irrigation is still powerful enough to provide protections for farmers. So, fields who would have experienced significant declines in crop yield in severe droughts due to low saturated thickness have opted out of irrigation and thus not observable in the data for irrigated production. Therefore, In order to capture the fuller impact of a decline in saturated thickness, it is important to understand how saturated thickness affects the decision of whether to irrigate or not.
+
+\hypertarget{the-impact-of-saturated-thickness-on-the-share-of-irrigated-production}{%
+\subsection{The impact of saturated thickness on the share of irrigated production}\label{the-impact-of-saturated-thickness-on-the-share-of-irrigated-production}}
+
+\begin{figure}
+
+{\centering \includegraphics[width=432px]{manuscript_DR_files/figure-latex/ir-share-1} 
+
+}
+
+\caption{The impact of saturated thickness on the share of irriagate production by crop }\label{fig:ir-share}
+\end{figure}
+
+As shown in \ref{fig:ir-share}, saturated thickness has significant impacts on the share of irrigated production for corn. As saturated thickness declines, the share of irrigated acres for corn decreases. As saturated thickness declines, more land will be under dryland production, which is more vulnerable to drought, damaging average corn yield. Unlike corn, a decline in saturated thickness does not have as large negative impact on the share of irrigated production for soybean as corn. This is likely because soybean is less susceptible to drought compared to corn.
+
+\hypertarget{total-impact-of-decline-in-saturated-thickness}{%
+\subsection{Total impact of decline in saturated thickness}\label{total-impact-of-decline-in-saturated-thickness}}
+
+Taking into account both impacts of saturated thickness, figure \ref{fig:tot-impact} shows how water deficit affects yield at different saturated thickness levels evaluated. For corn, in years with water deficit of 400mm or less saturated thickness does not have economically significant negative impacts because the difference in irrigated and dryland yields are small and also because irrigated yields are similar irrespective of the level of saturated thickness. The same can be said for soybean except that the soybean is more tolerant than corn and the saturated thickness starts to make differences at water deficit of 500mm of higher. In the year with water deficit of 800mm, average corn yield at saturated thickness of 186 meters is about 15\% and 25\% higher than at 75.7 meters and 29.6 meters, respectively. These findings illustrate that vulnerability to drought is heterogeneous among irrigated production depending on the level of saturated thickness. In summary, our studies confirms that a decline in saturated thickness makes yield production much more vulnerable to severe drought, and its negative impact is non-negligible.
+
+It is also noteworthy that the impact of saturated thickness on crop yield in drought years is non-linear. Specifically, according to our estimates, the decline of saturated thickness from 186 meters to 75 meters would cause about one tonne/ha of damage in corn yield at water deficit of 1100mm. However, the decline of saturated thickness from 75 meters to 30 meters would cause about 1.5 tonne/ha of damage in corn yield. This means that the negative impact of a meter of decline in saturated thickness becomes larger as the aquifer depletion progresses. This has an important policy implication. Suppose we intend to limit groundwater pumping to maintain the stable level of groundwater stock by matching the natural replenishment rate for the purpose of sustainable groundwater-irrigated production. Then, we need to act early before saturated thickness becomes too low so that we do not need to product at a less productive steady state. The longer you wait, the harsher damage is going to be when you finally decide to place a policy that limits groundwater pumping.
+
+\begin{figure}
+
+{\centering \includegraphics[width=432px]{manuscript_DR_files/figure-latex/tot-impact-1} 
+
+}
+
+\caption{The impact of water deficit on average crop yield by sturated thickness}\label{fig:tot-impact}
+\end{figure}
+
+\hypertarget{conclusion}{%
+\section{Conclusion}\label{conclusion}}
+
+This article quantified the impact of saturated thickness on average crop yield\ldots{}
+
+\clearpage
+
+\hypertarget{appendix-appendix}{%
+\appendix}
+
+
+\hypertarget{use-spei-in-place-of-water-deficit}{%
+\section{Use SPEI in place of water deficit}\label{use-spei-in-place-of-water-deficit}}
+
+Some studies use SPEI to represent drought severity. We also considered using SPEI, but the regressions with water deficit provides a better fit for both corn and soybean (see \ref{tab:fit-reg}).
+
+\begin{table}[!h]
+
+\caption{\label{tab:fit-reg}Comparison of R-squared of the regressions with water deficit and SPEI for corn and soybean}
+\centering
+\begin{tabular}[t]{lrr}
+\toprule
+Crop & SPEI & Water Deficit\\
+\midrule
+Corn & 0.899 & 0.903\\
+Soybean & 0.840 & 0.846\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Qualitatively, the results with SPEI are similar to the regression results with water deficit as can be seen in \ref{fig:spei}.
+
+\begin{figure}
+
+{\centering \includegraphics[width=360px]{manuscript_DR_files/figure-latex/spei-1} 
+
+}
+
+\caption{The impact of SPEI on crop yield for corn and soybean}\label{fig:spei}
+\end{figure}
+
+\clearpage
+
+  \bibliography{DRA.bib}
+
+\end{document}

@@ -1,0 +1,239 @@
+
+<!-- Geographic focus -->
+
+```{r results = "hide"}
+#=== HPA boundary ===#
+hpa <- st_read(here("Data/RawData/hp_bound2010.shp")) %>% 
+  st_simplify()
+
+us_states_borders <- states(cb = TRUE) %>%
+  st_as_sf() %>%
+  st_transform(st_crs(hpa)) %>% 
+  rename(state_code = STATEFP, state_abb = STUSPS) %>%
+  dplyr::select(state_code, state_abb)  
+
+```
+
+```{r gfocus, fig.cap = "Geographic Focus of the Study by Crop Type", fig.height = 4, fig.width = 6.5}
+
+all_counties <- readRDS(here("Data/ProcessedData/base_counties.rds")) 
+
+# results$states
+
+gfocus_data <- results %>% 
+  dplyr::select(crop_type, states) %>% 
+  mutate(plot_data = list(
+    all_counties[state %in% states, ] 
+  )) %>% 
+  dplyr::select(-states) %>% 
+  unnest() %>% 
+  dplyr::select(crop_type, geometry, state_name) %>% 
+  st_as_sf() 
+
+gfocus_state_borders <- results %>% 
+  dplyr::select(crop_type, states) %>% 
+  mutate(state_data = list(
+    filter(us_states_borders, state_abb %in% states)
+  )) %>% 
+  dplyr::select(-states) %>% 
+  unnest() %>% 
+  st_as_sf()
+
+t_gfocus <- tm_shape(hpa) +
+  tm_polygons(col = "blue", alpha = 0.3) +
+tm_shape(gfocus_data) +
+  tm_borders() +
+tm_shape(gfocus_state_borders) +
+  tm_borders(lwd = 1.5, col = "red") +
+  tm_facets(by = "crop_type", nrow = 1) 
+
+# tmap_save(
+#   t_gfocus,
+#   here("Writing/Figures", "geogprahic_focus.pdf"),
+#   height = 3.5,
+#   width = 6
+# )
+
+t_gfocus
+
+```
+
+`r run_pagebreak()`
+
+<!-- The impact of saturated thickness on yield (Intensive Margin) -->
+
+```{r yield-intensive, fig.cap = "The Impact of Saturated Thickness on Irrigated Yield", fig.height = 4, fig.width = 6.5}
+
+g_intensive$data_for_plot[[1]] %>% 
+  .[days_ab_35 == median(days_ab_35), ]
+
+g_intensive$data_for_plot[[1]] %>% 
+  .[days_ab_35 == median(days_ab_35), ]
+
+g_intensive$data_for_plot[[1]]
+
+str(g_intensive$data_for_plot[[1]])
+
+g_intensive <- reg_results %>% 
+  dplyr::select(crop_type, data_for_plot) %>% 
+  mutate(data_for_plot_balance = list(
+    data_for_plot[days_ab_35 == median(days_ab_35), ]
+  )) 
+  unnest(cols = "data_for_plot") %>% 
+  ggplot(data = .) +
+    geom_ribbon(
+      aes(
+        ymin = yhat_d, 
+        ymax = yhat_u, 
+        x = balance
+      ),
+      alpha = 0.4
+    ) +
+    geom_line(aes(y = y_hat, x = balance)) +
+    facet_grid(crop_type ~ sat, scales = "free_y") +
+    theme_bw()
+
+# ggsave(
+#   here("Writing/Figures", "yield_intensive.pdf"),
+#   g_intensive, 
+#   height = 3.5,
+#   width = 6
+# )
+
+g_intensive
+
+```
+
+`r run_pagebreak()`
+
+<!-- The impact of saturated thickness on Irrigation Share -->
+
+```{r ir-share, fig.cap = "The Impact of Saturated Thickness on Irrigated Yield", fig.height = 4, fig.width = 6.5}
+
+g_ir_share <- results_all %>% 
+  dplyr::select(crop_type, ir_share_eval_data) %>% 
+  unnest() %>% 
+  ggplot(data = .) +
+  geom_line(
+    aes(
+      y = ir_share_hat, 
+      x = sat, 
+      color = factor(balance_avg)
+    )
+  ) +
+  facet_grid(. ~ crop_type) +
+  theme_bw()
+
+# ggsave(
+#   here("Writing/Figures", "ir_share.pdf"),
+#   g_ir_share, 
+#   height = 3.5,
+#   width = 6
+# )
+
+g_ir_share
+```
+
+`r run_pagebreak()`
+
+<!-- The impact of saturated thickness on yield (Combined) -->
+
+```{r yield-combined, fig.cap = "The Impact of Saturated Thickness on Yield", fig.height = 6, fig.width = 6.5}
+
+g_sat_impact <- results_all %>% 
+  dplyr::select(crop_type, sat_sim_data) %>% 
+  unnest() %>% 
+  ggplot(data = .) +
+  geom_line(
+    aes(
+      y = mean_yield, 
+      x = balance, 
+      color = factor(sat)
+    )
+  ) +
+  facet_grid(crop_type ~ ., scales = "free_y") +
+  scale_color_viridis_d(name = "Saturated Thickness") +
+  theme_bw() +
+  theme(
+    legend.position = "bottom"
+  )
+
+# ggsave(
+#   here("Writing/Figures", "yield_combined.pdf"),
+#   g_sat_impact, 
+#   height = 3.5,
+#   width = 6
+# )
+
+g_sat_impact
+```
+
+```{r }
+data_sim_yield <- readRDS(here("Results/simulated_yield_data.rds"))  
+
+cl_data_current <- readRDS(here("Data/ProcessedData", "summrized_gridMET.rds"))  
+
+cl_data_future <- 
+  expand.grid(
+    model = model_ls,
+    rcp = rcp_ls
+  ) %>% 
+  data.table() %>% 
+  rowwise() %>% 
+  #=== define maca data file names ===#
+  mutate(file_name = list(
+    paste0(
+      "Data/ProcessedData/MACA/sum_", 
+      model,
+      "_",
+      rcp,
+      "_county.rds"
+    )  
+  )) %>% 
+  mutate(maca_data = list(
+    #=== read maca data ===#
+    readRDS(file_name) %>% 
+    #=== calculate 10-year balance avg ===#
+    .[, 
+      `:=`(
+        balance_avg = mean(balance), 
+        days_ab_35_avg = mean(days_ab_35)
+      ), 
+      by = .(floor((year - 2020) / 10), sc_code)
+    ] 
+  )) %>% 
+  dplyr::select(model, rcp, maca_data) %>% 
+  unnest() %>% 
+  data.table()
+
+cl_data <- 
+  rbind(
+    cl_data_current[, .(sc_code, year, balance, days_ab_35, model, rcp)],
+    cl_data_future[, .(sc_code, year, balance, days_ab_35, model, rcp)]
+  ) %>% 
+  .[order(sc_code, year), ]
+
+ggplot(data = cl_data_future) +
+  geom_boxplot(aes(y = balance, x = factor(year))) +
+  facet_grid(model ~ rcp) 
+
+felm(balance ~ year , data = cl_data_future) %>% summary()
+
+ 
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
