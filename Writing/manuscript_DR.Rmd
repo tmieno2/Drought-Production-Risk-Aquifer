@@ -3,7 +3,7 @@ title: The Impacts of Aquifer Depletion on the Ability of Groundwater Irrigation
 author:
   - Taro Mieno^[Department of Agricultural Economics, University of Nebraska Lincoln, tmieno2@unl.edu]
   - Timothy Foster^[Department of WWW, University of Manchester, timothy.foster@manchester.ac.uk]
-  - Shunkei Kakimoto^[Department of Applied Economics, University of Minnesota]
+  - Shunkei Kakimoto^[Department of Applied Economics, University of Minnesota, kakim002@umn.edu]
   - Nicholas Brozovic^[Department of Agricultural Economics, University of Nebraska Lincoln, nbrozovic@nebraska.edu]
 abstract: |
   Abstract goes here. It should be a single paragraph of around 200 words.
@@ -221,7 +221,28 @@ As shown in \@ref(fig:ir-share), saturated thickness has significant impacts on 
 
 ## Total impact of decline in saturated thickness
 
-Taking into account both impacts of saturated thickness, figure \@ref(fig:tot-impact) shows how water deficit affects yield at different saturated thickness levels evaluated. For corn, in years with water deficit of 400mm or less saturated thickness does not have economically significant negative impacts because the difference in irrigated and dryland yields are small and also because irrigated yields are similar irrespective of the level of saturated thickness. The same can be said for soybean except that the soybean is more tolerant than corn and the saturated thickness starts to make differences at water deficit of 500mm of higher. In the year with water deficit of 800mm, average corn yield at saturated thickness of 186 meters is about 15% and 25% higher than at 75.7 meters and 29.6 meters, respectively. These findings illustrate that vulnerability to drought is heterogeneous among irrigated production depending on the level of saturated thickness. In summary, our studies confirms that a decline in saturated thickness makes yield production much more vulnerable to severe drought, and its negative impact is non-negligible. 
+
+```{r}
+deficit_2012 <- data_corn[year == 2012, mean(balance)]
+
+#--- corn ---#
+balace_closest <- data_final_corn[which.min(abs(balance - deficit_2012)), balance]
+
+corn_avg_yield_low <- data_final_corn[balance == balace_closest & sat_cat == "[39.4,82]", avg_yield]
+corn_avg_yield_high <- data_final_corn[balance == balace_closest & sat_cat == "(194,708]", avg_yield]
+
+corn_pct_decline <- (corn_avg_yield_high - corn_avg_yield_low) / corn_avg_yield_high * 100
+
+#--- soy ---#
+balace_closest <- data_final_soy[which.min(abs(balance - deficit_2012)), balance]
+
+soy_avg_yield_low <- data_final_soy[balance == balace_closest & sat_cat == "[39.4,82]", avg_yield]
+soy_avg_yield_high <- data_final_soy[balance == balace_closest & sat_cat == "(194,708]", avg_yield]
+
+soy_pct_decline <- (soy_avg_yield_high - soy_avg_yield_low) / soy_avg_yield_high * 100
+```
+
+Taking into account both impacts of saturated thickness, figure \@ref(fig:tot-impact) shows how water deficit affects yield at different saturated thickness levels evaluated. For corn, in years with water deficit of 400mm or less saturated thickness does not have economically significant negative impacts because the difference in irrigated and dryland yields are small and also because irrigated yields are similar irrespective of the level of saturated thickness. The same can be said for soybean except that the soybean is more tolerant than corn and the saturated thickness starts to make differences at water deficit of 500mm of higher. In the year with water deficit of 950mm, average corn yield at saturated thickness of 186 meters is about 15% and 25% higher than at 75.7 meters and 29.6 meters, respectively. These findings illustrate that vulnerability to drought is heterogeneous among irrigated production depending on the level of saturated thickness. In summary, our studies confirms that a decline in saturated thickness makes yield production much more vulnerable to severe drought, and its negative impact is non-negligible. 
 
 It is also noteworthy that the impact of saturated thickness on crop yield in drought years is non-linear. Specifically, according to our estimates, the decline of saturated thickness from 186 meters to 75 meters would cause about one tonne/ha of damage in corn yield at water deficit of 1100mm. However, the decline of saturated thickness from 75 meters to 30 meters would cause about 1.5 tonne/ha of damage in corn yield. This means that the negative impact of a meter of decline in saturated thickness becomes larger as the aquifer depletion progresses. This has an important policy implication. Suppose we intend to limit groundwater pumping to maintain the stable level of groundwater stock by matching the natural replenishment rate for the purpose of sustainable groundwater-irrigated production. Then, we need to act early before saturated thickness becomes too low so that we do not need to product at a less productive steady state. The longer you wait, the harsher damage is going to be when you finally decide to place a policy that limits groundwater pumping.
 

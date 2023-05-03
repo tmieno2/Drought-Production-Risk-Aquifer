@@ -1,8 +1,11 @@
 
-prepare_reg_data <- function(data, sat_thld_m, ir_share_thld, balance_thld, state_ls) {
+prepare_reg_data <- function(data, sat_thld_m, ir_share_thld, balance_thld, sat_cat_num, state_ls) {
 
   # === saturated thickness threshold in meter ===#
   sat_thld <- measurements::conv_unit(sat_thld_m, "m", "ft")
+
+  # data <- reg_data$data[[1]]
+  # sat_breaks <- reg_data$sat_breaks[[1]]
 
   reg_data <-
     data.table(
@@ -35,9 +38,7 @@ prepare_reg_data <- function(data, sat_thld_m, ir_share_thld, balance_thld, stat
     mutate(sat_breaks = list(
       quantile(
         base_data[ir == "ir" & sat >= sat_thld, sat],
-        prob = c(0, 33.3, 66.6, 100) / 100,
-        # prob = c(0, 25, 50, 75, 100) / 100,
-        # prob = c(0, 20, 40, 60, 80, 100) / 100,
+        prob = seq(0, 1, length = sat_cat_num + 1),
         na.rm = TRUE
       )
     )) %>%
@@ -54,17 +55,18 @@ prepare_reg_data <- function(data, sat_thld_m, ir_share_thld, balance_thld, stat
           )
         ] %>%
         .[is.na(sat_cat), sat_cat := "dryland"] %>%
-        .[, sat_cat_i := factor(paste0("sc_", as.numeric(factor(sat_cat))))]
+        .[, sat_cat_i := factor(paste0("sc_", as.numeric(factor(sat_cat))))] %>%
+        .[sat_cat == "dryland" | (ir == "ir" & ir_area_ratio >= ir_share_thld), ]
     )) %>%
     # === prepare irrigation share data ===#
-    mutate(base_data_is = list(
+    mutate(base_data_ir_share = list(
       data[ir == "ir" & ir_area_ratio >= ir_share_thld, ]
     )) %>%
     mutate(cl_vars = list(
       c("balance", "days_ab_30", "gdd")
     )) %>%
     mutate(avg_cl_data = list(
-      base_data_is[,
+      base_data_ir_share[,
         lapply(.SD, mean, na.rm = TRUE),
         .SDcols = cl_vars,
         by = sc_code
@@ -72,12 +74,12 @@ prepare_reg_data <- function(data, sat_thld_m, ir_share_thld, balance_thld, stat
         setnames(cl_vars, paste0(cl_vars, "_avg"))
     )) %>%
     mutate(reg_data_is = list(
-      avg_cl_data[base_data_is, on = "sc_code"]
+      avg_cl_data[base_data_ir_share, on = "sc_code"]
     )) %>%
     dplyr::select(
       -base_data,
       -data,
-      -base_data_is,
+      -base_data_ir_share,
       -avg_cl_data
     )
 
