@@ -1,0 +1,50 @@
+The paper aims to show the impacts of aquifer depletion on irrigated crop yields and production areas in the United States High Plains. To do so, the paper applies a panel data analysis approach to a detailed county-level dataset of saturated thickness, water deficit, yields, and land-use, using a spline model. The authors find that aquifer depletion reduces farmers’ ability to cope with water deficits.
+
+The significance and novelty of the paper stems from the clear and encompassing empirical approach to the subject matter. The depletion of the Ogallala aquifer and implications for irrigated agriculture are not new per se. A compelling quality of the paper is the clear statistical evaluation of a large panel dataset, constructed to show the negative impacts of aquifer depletion on farmer’s ability to cope with water deficits, over a long period of time. To fully harness the potential of this quality for readers, the authors should mainly consider improving the clarity of the figures presented and of their description in the text, and addressing some other points that remained unclear (see details below).
+
+MAIN POINTS:
+
+1. Abstract: 
+1. a.: “We show that aquifer depletion reduces the ability of farmers to sustain irrigated crop yields and production areas in drought years.” - If stated this way, please clarify in the results and/or discussion, how causality (direction of causality, no omitted factors) is established.
+1. b.: “… in drought years” - Please define in the in the main text (or methods) how drought and drought years are defined. E.g. are any effects linked to increasing water deficits considered drought-related or only those above a certain level?
+
+2. Figure 1: This figure does not convey the effects of saturated thickness very clearly, either because the underlying analysis does not produce substantial effects, or because they are not presented in a compelling manner. It might also be helpful to use a visualization that more effectively illustrates the statements in the text. See detailed points below:
+2. a.: Please distinguish more clearly between significant and non-significant results. P. 2 states that “counties with the highest level of saturated thickness … experience … productivity close to rainfed yields”. From the figure it is difficult to tell if the 2nd and 3rd quantile are significantly different for soybean. For corn this does not seem to be the case. Similarly, the text at the bottom of p. 2 states that “saturated thickness has a statistically significant impact on per-area irrigated crop yields in moderate to extreme drought conditions”. Please clarify how the significance is evaluated here. Which range of deficits is meant by “moderate to extreme”? Are the soybean yields considered significantly different between quantiles? Are only the 1st and 3rd quantile considered significantly different for corn? – It could even be of interest to readers which results are not significant here, in contrast to the greater significance of the effects analyzed in Fig. 2 and Fig. 3.
+2. b.: In light of point (1.a), please also consider whether additional panels showing tests for specific hypotheses or other visual aids could make the Fig. 1 more accessible to readers with regards to the statements made. The figure is quite crowded, with many confidence bands overlapping. Currently, it takes time for readers to parse where the confidence bands for some of the plot lines end. The figure could be of greater benefit to readers if it was more accessible.
+2. c.: How were confidence bands determined? Were additional tests performed to evaluate their validity? Please consider showing individual data points.
+2. d.: P. 2 states that “for water deficits above around 400mm, yield changes become negative for counties with the lowest levels of saturated thickness (i.e., 1st quantile in Figure 1). This reflects the restrictions that lower saturated thickness and associated reductions in well yields place on farmers ability to fully meet crop water requirements during periods of more severe or extended precipitation deficits”. How valid is this interpretation in view of the fact that these counties see a similarly large yield decrease below 400mm and that counties with the highest levels of saturated thickness even see a much stronger increase in yields with increasing deficits?
+2. e.: Please clarify in the legend or caption that the quantiles indicate levels of saturated thickness.
+
+3. Figure 2: Please clarify in the text how the significance of reductions in the share of irrigated acres is evaluated (e.g. relative to which aquifer depletion level(s)?), and at which level of aquifer depletion the reduced irrigation share becomes significant for each crop.
+
+4. Figure 3:
+4. a.: Please clarify why this figure has no confidence bands. The text describes it as a combination of the effects shown in Fig. 1 and Fig. 2, which both have confidence bands. Please clarify how significance is evaluated.
+4. b.: Relatedly, the text states that deficits beyond 200mm yield significant reductions in corn production. 200mm is where the curves intersect. Please clarify if this actually is also where significance starts, or if significance starts at a higher deficit.
+4. c.: Please double-check if the y-axis label is correct. The label (“yield (tonne/ha)”) is the same as for Fig. 1, which makes it difficult to distinguish the different results presented in Fig. 1 and 3.
+
+5. Discussion: 
+5. a.: P. 6: “Previous research focused on impacts…” this sentence largely repeats a sentence from the introduction, not in the same words but in content (and using the same references). Please consider removing or modifying the sentence to add new insights for readers.
+5. b.: P. 6: “… demonstrate that the relationship between aquifer saturated thickness and drought impacts is highly nonlinear when accounting for farmers decisions about irrigated production areas. This indicates that sustainable groundwater conservation efforts […] should be targeted in space and time to avoid depletion exceeding critical thresholds …” Is the assumption of non-linearity tested? It is difficult to assess the validity of this statement based on the figures provided. Please clarify (e.g. in the results) what supports this statement.
+
+6. Methods – data sets: 
+6. a.: P. 7: “For counties that do not meet this condition, only rainfed yield observations are obtained to avoid the possibility that irrigated production may be only partly dependent on use of groundwater from the HPA.” – Please consider whether this assumption could bias results and how potential biases can be ruled out.
+6. b.: P. 9: Saturated thickness data – the number of monitoring wells would be of interest for readers to better judge the data, if available.
+
+7. Methods – regression models:
+7. a.: P. 9: If the model includes fixed effects, how are the single plot lines for each category shown in Fig. 1 derived? 
+7. b.: P. 9: Developments over time and independent variables: Please address early in the main text which overall trends shape developments in the aquifer studied. Please include key references about the case study region to inform this, such as Mrad et al. (2020), doi.org/10.1073/pnas.2008383117. In light of this, please discuss the appropriateness of the approach. The model accounts for year-specific “shocks”, but not other developments over time (e.g. lagged effects, gradual depletion trends, the introduction of regulation, etc.). Relatedly, the analysis only saturated thickness and water deficits to explain yields, rather than adding more explanatory variables. The advantage of the approach taken here might be the simplicity and clarity of assumptions. Readers would benefit from a short explicit discussion.
+7. c.: P. 10: Please provide details on the basis functions in the methods section or the supplement.
+
+8. Supplementary information: Please also consider providing additional information to give readers more clarity on the points outlined above in the supplementary information.
+
+MINOR POINTS:
+M1. Please add line numbers.
+M2. P. 2: Missing closing parenthesis after “(i.e., 3rd quantile …”
+M3. Fig. 1, 2, 3, and 5: Please add panel tags (“a”, “b” …) to make it easier for readers to understand the captions.
+M4. Fig. 3: Closing parenthesis of y-axis title missing
+M5. P. 9: “WB” and “ST” should not be in italics, unless “W”, “B”, “S”, and “T” are separate variables
+M6. P. 9: “[0 − 33.3%)j” – the “j” does not seem to belong here
+M7. P. 9: “with sigma_j represents the category specific intercept” should be “with sigma_j representing the category-specific intercept” or something similar
+M8. P. 9: “under the generalize additive model framework” should be “generalized” and “modeling” or something similar
+M9. P. 9: What is “mu_t” in equation 2? Should “theta_t” in equation 1 be “mu_t”? Because “theta_jk” is already the spline basis function.
+M10. P. 9: One reference seems to be missing (the text includes “(REF)”).

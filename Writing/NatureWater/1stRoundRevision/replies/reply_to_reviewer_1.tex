@@ -1,0 +1,196 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\usepackage[margin=1in]{geometry}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\author{}
+\date{\vspace{-2.5em}}
+
+\begin{document}
+
+Reviewer \#1 (Comments for the Author):
+
+This manuscript assesses the impact of aquifer thickness on agricultural
+production during drought in the area overlying the High Plains aquifer
+in the central United States. The authors use crop, meteorological, and
+aquifer thickness data in regressions to develop relationships among
+these quantities. Their most important finding is the impact of aquifer
+thickness on productivity during drought and the ramifications for
+aquifer conservation efforts. I have read this manuscript over a number
+of times and found it of considerable interest and worthy of publication
+in Nature Water. However, I do have a few concerns that I wanted to
+bring to the attention of the authors. My most important concerns are as
+follows (not necessarily in order of importance):
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Aquifer thickness versus saturated thickness -- The authors speak of
+  ``aquifer saturated thickness'', which is a redundant term. Remember,
+  the definition of an aquifer is a saturated unit -- there is no
+  unsaturated aquifer. Please use ``aquifer thickness'' to avoid
+  propagating this confusing usage into the future.
+\end{enumerate}
+
+\textcolor{blue}{ferkjnf}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{1}
+\item
+  Dependence on aquifer thickness -- I had a number of questions about
+  the relationships displayed in Figure 1. First, the regression appears
+  to have been done year by year. Are the quantiles recalculated each
+  year to reflect that there may be changes between categories as time
+  goes on? Second, when the authors state the lowest quantile goes from
+  0 to 33\% are they assuming that the minimum thickness of 9 m is the
+  zero point? Third, I assume that the county and year fixed effects are
+  calculated as part of the regression. Are there any insights that can
+  be gained from the interpretation of those quantities? Fourth, the
+  authors need to point out that the same aquifer thickness can result
+  in dramatically different transmissive characteristics. Thus, a
+  relatively thin aquifer interval composed of coarse sands and gravels
+  may be more resilient to drought than a much thicker aquifer dominated
+  by fine sands and silts. Could that be a major player in the error
+  bars in the plots? Please mention this at some point in the
+  manuscript.
+\item
+  Conditioned on drought risk exposure -- I wasn't sure what the authors
+  meant by this in the second paragraph of Section 2.2. This must be
+  related to the water deficit but the lack of explanation in the main
+  text or the methods section left me wondering. Please clarify at some
+  point in the manuscript.
+\item
+  Equation 2 -- Please define all terms in the equation and provide an
+  explanation of what is meant by ``estimated semi-parametrically''.
+\item
+  Kansas and California efforts -- I've seen a number of papers
+  describing efforts in Kansas and California to address aquifer
+  depletion via LEMAs (Kansas) and SGMA (California). The 1985-2016
+  period examined by the authors was before most of the efforts in
+  Kansas got started. My understanding is that the first LEMA was
+  established in 2013 but then no more were set up until after 2016.
+  This manuscript would be more impactful if the authors could speculate
+  on how their relationships might change with greater attention to
+  groundwater conservation. For example, I would think the decrease in
+  yield the authors observe with negative water deficits would disappear
+  when the irrigators are using soil moisture sensors and are focused on
+  water-use efficiency. I would expect changes as well for tipping
+  points.
+\end{enumerate}
+
+\hypertarget{minor-points}{%
+\subsection{Minor points}\label{minor-points}}
+
+Section 1, 3rd Paragraph -- ``Two aquifer pathways exist through aquifer
+depletion will..'' -- confusing sentence -- please replace ``through''
+with ``by which''.
+
+Section 1, 4th Paragraph -- ``we generate empirical evidence'' seems
+awkward to me. How about replacing with ``we present empirical
+evidence''? Next sentence -- ``Our analysis advances on
+previous\ldots{}'' reads better as ``Our analysis extends
+previous\ldots{}'' There are many issues such as these and the previous
+comment. Please address such issues so that the manuscript is an easier
+read.
+
+Section 2.1 title -- I would delete ``marginally'' as it is not needed
+and some will find it confusing.
+
+Figure 2 - Why do the plots stop at a thickness of about 12 m when you
+had earlier defined the minimum thickness as 9 m and mention 10 m in the
+text when discussing the relationships?
+
+Section 2.3, First Paragraph -- please clarify that ``average per-area
+production'' is a combination of irrigated and rainfed yields. That
+would make the manuscript easier to follow.
+
+Figure 5 -- I assume that the left plot is corn and the right soybean,
+but please clarify.
+
+Data and Code Availability -- Are the data from Dr.~Haacker on the
+Github repository? Please place them there prior to publication so
+future investigators can access them rather than having to track down
+Dr.~Haacker. The data set is over seven years old so it should be made
+available according to the principles of open science.
+
+Line before Equation (2) -- ``REF'' should be replaced with the actual
+reference.
+
+Discussion, First Paragraph -- ``reduction in aquifer depletion'' should
+be ``reduction in aquifer thickness''.
+
+Section 4.2, 3rd Paragraph -- ``the the impact'' -- remember to spell
+and grammar check prior to submission.
+
+Reference in Section 3 -- I doubt that ``Butler Jr'' is the surname,
+please replace with ``Butler''. Suffixes apparently aren't handled well
+by some of the bibliography generation programs.
+
+Please remember to close all parentheses and don't mispair brackets and
+parentheses. Such stuff can raise questions about the care used in the
+analysis.
+
+\end{document}

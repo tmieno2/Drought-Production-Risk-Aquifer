@@ -1,0 +1,19 @@
+\textcolor{blue}{We really appreciate your comments. Addressing them has made our paper significantly stronger. Please find our replies to your comments written in blue.}
+
+This is an interesting paper that asks an important yet answered question in the field of agricultural sustainability - how much is groundwater depletion reducing agricultural productivity in the High Plains region in the United States? While the paper is an important contribution to the literature, there are several issues that need to be addressed prior to acceptance at any journal.
+
++ There needs to be more description about why aquifer saturation thickness is an appropriate proxy for farmers' ability to irrigate from wells. This is particularly true since this is a broad interest journal, and the mechanism for the main independent variable should be very clear to all readers.
+
+\textcolor{blue}{Tim?}
+
++ Though I am not trained as a hydrologist, my understanding is that aquifer saturation thickness is a good measure of general water availability in an aquifer but not necessarily how much water is available at a specific location or point. If this is the case, the authors should make clear why this is an appropriate measure to use in their study and potential limitations of using this approach.
+
+\textcolor{blue}{Tim? this is realted to one of the reviewer1's comments}
+
++ It is unclear to me why county and time fixed effects were not used in every regression. In particular, it does not look like they were included in the regression that modeled irrigated area as a function of saturated thickness and water deficit. Yet, accounting for time-invariant differences across counties is important, especially because this is the regression that showed the largest effect of saturated thickness on a measure of agricultural production (irrigated area). Is there not enough variation within a county through time to pick up the effect of saturated thickness on irrigated area? This should all be made clearer, and a model that better captures the causal relationship between saturated thickness and area irrigated should be used if possible. If it's not possible, the limitations of the current approach should be made very clear and potential issues with inference. 
+
+\textcolor{blue}{}
+
++ There are minor typos (e.g., missing reference listed as REF) that should be corrected prior to resubmission.
+
+\textcolor{blue}{}

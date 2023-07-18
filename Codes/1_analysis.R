@@ -33,24 +33,25 @@ library(scales)
 # here::i_am("GitControlled/Codes/Functions/1_0_functions.R")
 
 #--- source functions ---#
-source(here::here("Codes/Functions/1_0_functions.R"))
-# source("GitControlled/Codes/Functions/1_0_functions.R")
+# source(here::here("Codes/Functions/1_0_functions.R"))
+source("GitControlled/Codes/Functions/1_0_functions.R")
 
 
 ## ----r------------------------------------------------------------------------
 #--- read data ---#
 final_data <-
-  # here("Shared/Data/ProcessedData/final_data.rds") %>%
-  here::here("../Shared/Data/ProcessedData/final_data.rds") %>%
+  here("Shared/Data/ProcessedData/final_data.rds") %>%
+  # here::here("../Shared/Data/ProcessedData/final_data.rds") %>%
   readRDS()
 
 #--- Data used for regression analysis ---#
 reg_data <-
   prepare_reg_data(
     data = final_data,
-    sat_thld = 9, # saturated thickness has to be at least 12 meters
+    sat_thld_m = 12, # saturated thickness has to be at least 12 meters
     ir_share_thld = 0.75, # at least 75% of total county area has to be overlapped with HPA
     balance_thld = c(-1200, 200),
+    sat_cat_num = 3,
     state_ls =
       list(
         corn = c("CO", "KS", "NE", "NM", "SD", "TX", "WY"),
@@ -61,6 +62,7 @@ reg_data <-
 
 
 ## ----r------------------------------------------------------------------------
+
 data_corn <-
   reg_data[crop_type == "corn", reg_data_y][[1]] %>%
   copy() %>%
@@ -121,9 +123,9 @@ data_for_pred_corn <-
   ) %>%
   # .[, sat := parse_number(gsub("\\,.*", "", sat_cat))] %>%
   .[, sat := case_when(
-    sat_cat == "[29.6,75.7]" ~ 30,
-    sat_cat == "(75.7,186]" ~ 100,
-    sat_cat == "(186,708]" ~ 200,
+    sat_cat == "[39.4,82]" ~ 40,
+    sat_cat == "(82,194]" ~ 100,
+    sat_cat == "(194,708]" ~ 200,
     sat_cat == "dryland" ~ 0
   )] %>%
   .[is.na(sat), sat := 0] %>%
@@ -160,30 +162,32 @@ yhat_data_corn[, sat_cat_q :=
 
 
 ## ----r------------------------------------------------------------------------
-g_yield_balance_corn <-
-  ggplot(yhat_data_corn) +
-  geom_ribbon(
-    aes(
-      ymin = y_hat - 1.96 * y_hat_se,
-      ymax = y_hat + 1.96 * y_hat_se,
+(
+  g_yield_balance_corn <-
+    ggplot(yhat_data_corn) +
+    geom_ribbon(
+      aes(
+        ymin = y_hat - 1.96 * y_hat_se,
+        ymax = y_hat + 1.96 * y_hat_se,
+        x = balance,
+        fill = factor(sat_cat_q)
+      ),
+      alpha = 0.3
+    ) +
+    geom_line(aes(
+      y = y_hat,
       x = balance,
-      fill = factor(sat_cat_q)
-    ),
-    alpha = 0.3
-  ) +
-  geom_line(aes(
-    y = y_hat,
-    x = balance,
-    color = factor(sat_cat_q)
-  )) +
-  xlab("Water Balance") +
-  ylab("Yield (tonne/ha)") +
-  scale_color_discrete(name = "") +
-  scale_fill_discrete(guide = "none") +
-  theme(
-    legend.position = "bottom"
-  ) +
-  theme_bw()
+      color = factor(sat_cat_q)
+    )) +
+    xlab("Water Balance") +
+    ylab("Yield (tonne/ha)") +
+    scale_color_discrete(name = "") +
+    scale_fill_discrete(guide = "none") +
+    theme(
+      legend.position = "bottom"
+    ) +
+    theme_bw()
+)
 
 
 ## ----r------------------------------------------------------------------------
@@ -324,28 +328,30 @@ yhat_data_soy[, sat_cat_q :=
 
 
 ## ----r------------------------------------------------------------------------
-g_yield_balance_soy <-
-  ggplot(yhat_data_soy) +
-  geom_ribbon(
-    aes(
-      ymin = y_hat - 1.96 * y_hat_se,
-      ymax = y_hat + 1.96 * y_hat_se,
+(
+  g_yield_balance_soy <-
+    ggplot(yhat_data_soy) +
+    geom_ribbon(
+      aes(
+        ymin = y_hat - 1.96 * y_hat_se,
+        ymax = y_hat + 1.96 * y_hat_se,
+        x = balance,
+        fill = factor(sat_cat_q)
+      ),
+      alpha = 0.3
+    ) +
+    geom_line(aes(
+      y = y_hat,
       x = balance,
-      fill = factor(sat_cat_q)
-    ),
-    alpha = 0.3
-  ) +
-  geom_line(aes(
-    y = y_hat,
-    x = balance,
-    color = factor(sat_cat_q)
-  )) +
-  xlab("balance") +
-  ylab("Yield (tonne/ha)") +
-  scale_color_discrete(name = "") +
-  theme(
-    legend.position = "bottom"
-  )
+      color = factor(sat_cat_q)
+    )) +
+    xlab("balance") +
+    ylab("Yield (tonne/ha)") +
+    scale_color_discrete(name = "") +
+    theme(
+      legend.position = "bottom"
+    )
+)
 
 
 ## ----r------------------------------------------------------------------------

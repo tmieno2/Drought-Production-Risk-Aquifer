@@ -9,3 +9,14 @@
 /Figures/*
 .Rproj.user/*
 .Rproj.user
+*.pdf
+*.log
+*.gz
+*.bbl
+*.png
+*DS_Store
+*.zip
+*.Rhistory
+
+
+
