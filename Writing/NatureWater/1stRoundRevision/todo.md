@@ -6,5 +6,5 @@
 + [ ] within-variation 
 + [ ] add soil characteristics data for share regression?
 + [ ] bootstrap for 
-
++ [ ] create another figure about the impact of saturated thickness (at a given level of water deficit), run tests as well
 + [] mention measurement error

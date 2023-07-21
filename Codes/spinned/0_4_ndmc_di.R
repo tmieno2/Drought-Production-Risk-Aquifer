@@ -30,8 +30,8 @@ drought_county <- DI %>%
   .[, state_code := str_sub(FIPS, 1, 2)] %>%
   .[, county_code := str_sub(FIPS, 3, 5)] %>%
   .[month(end_date) > 4 & month(start_date) < 10, ] %>%
-  # === state-county code ===#
-  .[, sc_code := paste0(state_code, county_code)] %>%
+  #=== state-county code ===#
+  .[, sc_code := paste0(state_code, county_code)] %>% 
   .[, .(
     d0_5_9 = sum(D0) / 100,
     d1_5_9 = sum(D1) / 100,
@@ -42,3 +42,5 @@ drought_county <- DI %>%
   data.table()
 
 saveRDS(drought_county, here("Data/ProcessedData/DI_NDMC.rds"))
+
+
