@@ -1,0 +1,157 @@
+---
+title: Test of the significance of yield difference (intensive)
+---
+
+# Preparation
+
+```{r}
+results <- readRDS("Shared/Results/reg_results_data.rds")
+```
+
+
+# Define the function to test
+
+```{r}
+test_dif_in_yield <- function(crop, balance, base_q, comp_q, results) {
+  #++++++++++++++++++++++++++++++++++++
+  #+ For testing
+  #++++++++++++++++++++++++++++++++++++
+  # crop <- "Corn"
+  # balance <- 1000
+  # base_q <- 1
+  # comp_q <- 3
+
+  #++++++++++++++++++++++++++++++++++++
+  #+ Main
+  #++++++++++++++++++++++++++++++++++++
+  q_data <-
+    data.table(
+      quater = c(1, 2, 3),
+      coef_name = list(
+        c("s_balance_sat_cat_39_4_82__1", "s_balance_sat_cat_39_4_82__2", "sat_cat::[39.4,82]"),
+        c("s_balance_sat_cat_82_194__1", "s_balance_sat_cat_82_194__2", "sat_cat::(82,194]"),
+        c("s_balance_sat_cat_194_708__1", "s_balance_sat_cat_194_708__2", "sat_cat::(194,708]")
+      ),
+      quarter_names = c("[39.4,82]", "(82,194]", "(194,708]")
+    )
+
+  crop_w <- crop
+  results_w <- results[crop == crop_w, ]
+  fe_res <- results_w[, semi_res][[1]]$fe_res
+  vcov <- vcov(fe_res)
+  gam_res <- results_w[, semi_res][[1]]$gam_res
+  data_w <- results_w[, data][[1]]
+  balance_w <- balance
+
+  #--- create data for prediction ---# 
+  data_for_pred <-
+    CJ(
+      balance = balance_w,
+      sat_cat = unique(data_w$sat_cat)
+    ) %>%
+    # === can be any sc_code (need to shift yield for "average" county) ===#
+    # .[, sc_code := data_w$sc_code[2]] %>%
+    .[, sc_code := data_w[sat_cat != "dryland"]$sc_code[1]] %>%
+    .[, sc_dry := paste0(data_w$sc_dry[1])] %>%
+    # === can be any year (need to shift yield for "average" year) ===#
+    .[, year := 2009] %>%
+    # === fake yield data (necessary to take advantage of predict.gam) ===#
+    .[, yield := 0] %>%
+    .[, type := "pred"] %>%
+    .[, dry_or_not := fifelse(sat_cat == "dryland", 1, 0) %>% factor()]
+
+  #--- create bases  ---#
+  yhat_data <-
+    gen_smooth_data(
+      data = data_for_pred,
+      gam_res = gam_res
+    ) %>%
+    .$data
+
+  #++++++++++++++++++++++++++++++++++++
+  #+ point estimate
+  #++++++++++++++++++++++++++++++++++++
+  coef_data <- tidy(fe_res) %>% data.table()
+
+  #--- coefficients ---#
+  base_coef_names <- q_data[quater == base_q, coef_name][[1]]
+  comp_coef_names <- q_data[quater == comp_q, coef_name][[1]]
+
+  base_coefs <- coef_data[term %in% base_coef_names, estimate]
+  comp_coefs <- coef_data[term %in% comp_coef_names, estimate]
+
+  coefs <- c(comp_coefs, base_coefs)
+
+  #--- X ---#
+  base_x_names <- base_coef_names[-3]
+  comp_x_names <- comp_coef_names[-3]
+
+  base_x <-
+    c(
+      yhat_data[balance == balance_w & sat_cat == q_data[quater == base_q, quarter_names], ..base_x_names] %>% unlist(),
+      1
+    )
+
+  comp_x <-
+    c(
+      yhat_data[balance == balance_w & sat_cat == q_data[quater == comp_q, quarter_names], ..comp_x_names] %>% unlist(),
+      1
+    )
+
+  x_vec <- c(comp_x, -base_x)
+
+  #--- difference in yield ---#
+  dif_hat <- sum(coefs * x_vec)
+
+  #++++++++++++++++++++++++++++++++++++
+  #+ SE
+  #++++++++++++++++++++++++++++++++++++
+  coef_names <- c(base_coef_names, comp_coef_names)
+  which_col <- purrr::map_dbl(coef_names, function(x) which(x == colnames(vcov)))
+  rel_vcov <- vcov[which_col, which_col]
+
+  se <- sqrt(t(x_vec) %*% rel_vcov %*% x_vec) %>% .[1, 1]
+
+  test_result <-
+    data.table(
+      crop = crop_w,
+      balance = balance_w,
+      base_q = base_q,
+      comp_q = comp_q,
+      dif_hat = dif_hat,
+      se = se,
+      t = dif_hat / se
+    )
+
+  return(test_result)
+}
+```
+
+# Run tests for a series of values of water deficit
+
+```{r}
+data_for_test <-
+  expand.grid(
+    crop = c("Corn", "Soybean"),
+    balance = seq(-200, 1200, by = 20),
+    comp_q = c(2, 3)
+  ) %>% data.table()
+
+test_results <-
+  lapply(
+    1:nrow(data_for_test),
+    function(x) {
+      test_dif_in_yield(
+        crop = data_for_test[x, crop],
+        balance = data_for_test[x, balance],
+        base_q = 1,
+        comp_q = data_for_test[x, comp_q],
+        results = results
+      )
+    }
+  ) %>%
+  rbindlist()
+
+saveRDS(test_results, "Shared/Results/test_results_intensive.rds")
+```
+
