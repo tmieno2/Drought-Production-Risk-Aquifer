@@ -1,0 +1,465 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{lmodern}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\usepackage[margin=1in]{geometry}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same} % disable monospaced font for URLs
+\hypersetup{
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\author{}
+\date{\vspace{-2.5em}}
+
+\begin{document}
+
+The paper aims to show the impacts of aquifer depletion on irrigated
+crop yields and production areas in the United States High Plains. To do
+so, the paper applies a panel data analysis approach to a detailed
+county-level dataset of saturated thickness, water deficit, yields, and
+land-use, using a spline model. The authors find that aquifer depletion
+reduces farmers' ability to cope with water deficits.
+
+The significance and novelty of the paper stems from the clear and
+encompassing empirical approach to the subject matter. The depletion of
+the Ogallala aquifer and implications for irrigated agriculture are not
+new per se. A compelling quality of the paper is the clear statistical
+evaluation of a large panel dataset, constructed to show the negative
+impacts of aquifer depletion on farmer's ability to cope with water
+deficits, over a long period of time. To fully harness the potential of
+this quality for readers, the authors should mainly consider improving
+the clarity of the figures presented and of their description in the
+text, and addressing some other points that remained unclear (see
+details below).
+
+\textcolor{blue}{We really appreciate your comments. Addressing them has made our paper significantly stronger. Please find our replies to your comments written in blue.}
+
+\hypertarget{main-points}{%
+\section{MAIN POINTS:}\label{main-points}}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\tightlist
+\item
+  Abstract:
+\end{enumerate}
+
+\begin{itemize}
+\tightlist
+\item
+  ``We show that aquifer depletion reduces the ability of farmers to
+  sustain irrigated crop yields and production areas in drought years.''
+  - If stated this way, please clarify in the results and/or discussion,
+  how causality (direction of causality, no omitted factors) is
+  established.
+\end{itemize}
+
+\textcolor{blue}{}
+
+\begin{itemize}
+\tightlist
+\item
+  ``\ldots{} in drought years'' - Please define in the in the main text
+  (or methods) how drought and drought years are defined. E.g. are any
+  effects linked to increasing water deficits considered drought-related
+  or only those above a certain level?
+\end{itemize}
+
+\textcolor{blue}{In this paper, drought is rather loosely defined. Also, it is not a dihcotomous definition of whether it is a drought or not. The water deficit variable is used as a measure of drought and it has a continous scale. For example, water deficit of 1000 mm would be considered a "severe" drought as corn and soybean yields are estimated to be almost zero under rainfed production. Water deficit of -200 mm would be considered no drought because irrigated and rainfed yields are almost the same. We do not see the need to clearly define what drought is as it does not seem to improve our dicussions.}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{1}
+\tightlist
+\item
+  Figure 1: This figure does not convey the effects of saturated
+  thickness very clearly, either because the underlying analysis does
+  not produce substantial effects, or because they are not presented in
+  a compelling manner. It might also be helpful to use a visualization
+  that more effectively illustrates the statements in the text. See
+  detailed points below:
+\end{enumerate}
+
+\textcolor{blue}{We appreciate this comment. In response, we added another figure: Figure 2 in the current manuscript, which shows the difference in yield betwee the 2nd and 3rd quantiles relative to the 1st quantile to illustrate the difference in yield across different awuifer thickness levels. Please see our detailed reponses to your comments below.}
+
+\begin{itemize}
+\tightlist
+\item
+  Please distinguish more clearly between significant and
+  non-significant results. P. 2 states that ``counties with the highest
+  level of saturated thickness \ldots{} experience \ldots{} productivity
+  close to rainfed yields''. From the figure it is difficult to tell if
+  the 2nd and 3rd quantile are significantly different for soybean. For
+  corn this does not seem to be the case. Similarly, the text at the
+  bottom of p.~2 states that ``saturated thickness has a statistically
+  significant impact on per-area irrigated crop yields in moderate to
+  extreme drought conditions''. Please clarify how the significance is
+  evaluated here. Which range of deficits is meant by ``moderate to
+  extreme''? Are the soybean yields considered significantly different
+  between quantiles? Are only the 1st and 3rd quantile considered
+  significantly different for corn? - It could even be of interest to
+  readers which results are not significant here, in contrast to the
+  greater significance of the effects analyzed in Fig. 2 and Fig. 3.
+\end{itemize}
+
+\textcolor{blue}{We break the above comments into manageable pieces and answer them individually.}
+
+Your comment: Please distinguish more clearly between significant and
+non-significant results.
+
+\textcolor{blue}{
+We now have Figure 2, which compares the yield of the second and third aquifer thickness quantiles against the 1st quantile with 95$\%$ confidence interval. So, for a given level of water deficit, it shows whether the difference in yield betwee the 3rd (or 2nd) and 1st quantiles is statistically significantly different from 0 at the 5$\%$ level.
+}
+
+Your comment: P. 2 states that ``counties with the highest level of
+saturated thickness \ldots{} experience \ldots{} productivity close to
+rainfed yields''. From the figure it is difficult to tell if the 2nd and
+3rd quantile are significantly different for soybean. For corn this does
+not seem to be the case.
+
+\textcolor{blue}{
+You are right that there is not much difference between the second and third quantiles. Our intention was not to distinguish the 2nd and 3rd, but rather pointing out the fact that higher aquifer thickness counties (2nd and 3rd) have lower yields than the lowest aquifer thickness (1st quantile), and their yield are comparable to that of dryland production. Therefore, we also added 2nd quantile to our statement. We modify the sentence to make this point clearer.
+}
+
+Your comments: Similarly, the text at the bottom of p.~2 states that
+``saturated thickness has a statistically significant impact on per-area
+irrigated crop yields in moderate to extreme drought conditions''.
+Please clarify how the significance is evaluated here. Which range of
+deficits is meant by ``moderate to extreme''?
+
+\textcolor{blue}{
+We have stopped using vague words like "moderate to extreme", but be more precise. We now say that "in years with water deficit higher than about 800 mm." We also explicitly add "statistically" when we are talking about statistical significance instead of economic or agronomic significance. Previously, we used "significantly" too loosely.
+}
+
+Your comment: Are the soybean yields considered significantly different
+between quantiles? Are only the 1st and 3rd quantile considered
+significantly different for corn? - It could even be of interest to
+readers which results are not significant here, in contrast to the
+greater significance of the effects analyzed in Fig. 2 and Fig. 3.
+
+\textcolor{blue}{After including Figure 2, we believe these points have become clear. We also added a short statement about the insignificance of the impact of saturated thickness for soybean.}
+
+\begin{itemize}
+\tightlist
+\item
+  In light of point (1.a), please also consider whether additional
+  panels showing tests for specific hypotheses or other visual aids
+  could make the Fig. 1 more accessible to readers with regards to the
+  statements made. The figure is quite crowded, with many confidence
+  bands overlapping. Currently, it takes time for readers to parse where
+  the confidence bands for some of the plot lines end. The figure could
+  be of greater benefit to readers if it was more accessible.
+\end{itemize}
+
+\textcolor{blue}{Thank you for the suggestion. As we have discussed above, we added Figure 2, which compares the 2nd and 3rd quantiles to the 1st quantile. We believe this change has made it significantly easier for the readers to understand the impact of saturated thickness, not just the impact of water deficit. For Figure 1, it is important to have all the four curves in the same panel as that would allow the readers to compare them easily. However, with confidence intervals, the figure was too crowded. Therefore, we took out the confidence intervals around the curves. We then put estiamted curves with confidence intervals individually in separate panels as Figure A1 for corn and A2 for soybean in Appendix A.}
+
+\begin{itemize}
+\tightlist
+\item
+  How were confidence bands determined? Were additional tests performed
+  to evaluate their validity? Please consider showing individual data
+  points.
+\end{itemize}
+
+\textcolor{blue}{They are derived from the standard error of the coefficients in the model represented by equation 1, which is the standard in constructing the confidence interval. There is no other way of estimating confidence interval of the estimated curves that come purely from statistically estimated model. Also, there is no way of validating such confidence intervals. The role of confidence interval here is to quantify the uncertainty of the point estimates and nothing more.}
+
+\begin{itemize}
+\tightlist
+\item
+  P. 2 states that ``for water deficits above around 400mm, yield
+  changes become negative for counties with the lowest levels of
+  saturated thickness (i.e., 1st quantile in Figure 1). This reflects
+  the restrictions that lower saturated thickness and associated
+  reductions in well yields place on farmers ability to fully meet crop
+  water requirements during periods of more severe or extended
+  precipitation deficits''. How valid is this interpretation in view of
+  the fact that these counties see a similarly large yield decrease
+  below 400mm and that counties with the highest levels of saturated
+  thickness even see a much stronger increase in yields with increasing
+  deficits?
+\end{itemize}
+
+\textcolor{blue}{We believe, our interpretation is valid. When you mention "similarly large yield decrease," you are talking about "declines" in reponse to the opposite directions of water deficit. Yield increases as water defitic increases at first, and then starts to decline. This can be due to "increased evapotranspiration and associated biomass accumulation, reductions of heat-related stressors" as mentioned in our manuscript. This holds for all the three aquifer thickness categories. However, if aquifer thickness is low and as a consequence well yield is low, farmers cannot cathch up with high water demand, leading to declining yield caused by highr water deficit. The figure shows that lower aquifer thickness quantile starts to experinence a decline in yield at lower water deficits than the second and third.}
+
+\begin{itemize}
+\tightlist
+\item
+  Please clarify in the legend or caption that the quantiles indicate
+  levels of saturated thickness.
+\end{itemize}
+
+\textcolor{blue}{Thank you for this comment. We made changes to all the relevant figures according to this suggestion.}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{2}
+\tightlist
+\item
+  Figure 2: Please clarify in the texthow the significance of reductions
+  in the share of irrigated acres is evaluated (e.g.~relative to which
+  aquifer depletion level(s)?), and at which level of aquifer depletion
+  the reduced irrigation share becomes significant for each crop.
+\end{enumerate}
+
+\textcolor{blue}{}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{3}
+\tightlist
+\item
+  Figure 3:
+\end{enumerate}
+
+\begin{itemize}
+\tightlist
+\item
+  Please clarify why this figure has no confidence bands. The text
+  describes it as a combination of the effects shown in Fig. 1 and Fig.
+  2, which both have confidence bands. Please clarify how significance
+  is evaluated.
+\end{itemize}
+
+\textcolor{blue}{
+We should have had confidence intervals for this figure as well. However, in reponse to your earlier comments, we have decided to not present confidence intervals for this figure just like we did for Figure 1 because the figure would look too busy. Instead, we now have Figure 5, which is similar to Figure 2. It compares average (irrigated and rainfed combined) yield for counties with aquifer thickness of 59.1 and 106.1m against those with 12.2m. 
+}
+
+\begin{itemize}
+\tightlist
+\item
+  Relatedly, the text states that deficits beyond 200mm yield
+  significant reductions in corn production. 200mm is where the curves
+  intersect. Please clarify if this actually is also where significance
+  starts, or if significance starts at a higher deficit.
+\end{itemize}
+
+\textcolor{blue}{We believe Figure 5 clarifies this point.}
+
+\begin{itemize}
+\tightlist
+\item
+  Please double-check if the y-axis label is correct. The label (``yield
+  (tonne/ha)'') is the same as for Fig. 1, which makes it difficult to
+  distinguish the different results presented in Fig. 1 and 3.
+\end{itemize}
+
+\textcolor{blue}{Yield (tonne/ha) is correct. Figures 4 (previously 3) and 5 both report yield. Figures 1 and 2 report "irrigated" yields and Figures 4 and 5 report "average" yields. That is very clear from the title of the figures and the sections where they are presented.}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{4}
+\tightlist
+\item
+  Discussion:
+\end{enumerate}
+
+\begin{itemize}
+\tightlist
+\item
+  P. 6: ``Previous research focused on impacts\ldots{}'' this sentence
+  largely repeats a sentence from the introduction, not in the same
+  words but in content (and using the same references). Please consider
+  removing or modifying the sentence to add new insights for readers.
+\end{itemize}
+
+\textcolor{red}{Tim, they look different enough to me. And who cares if we repated the same thing as long as it is important to emphasize.}
+
+\begin{itemize}
+\tightlist
+\item
+  P. 6: ``\ldots{} demonstrate that the relationship between aquifer
+  saturated thickness and drought impacts is highly nonlinear when
+  accounting for farmers decisions about irrigated production areas.
+  This indicates that sustainable groundwater conservation efforts
+  {[}\ldots{]} should be targeted in space and time to avoid depletion
+  exceeding critical thresholds \ldots{}'' Is the assumption of
+  non-linearity tested? It is difficult to assess the validity of this
+  statement based on the figures provided. Please clarify (e.g.~in the
+  results) what supports this statement.
+\end{itemize}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{5}
+\tightlist
+\item
+  Methods - data sets:
+\end{enumerate}
+
+\begin{itemize}
+\tightlist
+\item
+  P. 7: ``For counties that do not meet this condition, only rainfed
+  yield observations are obtained to avoid the possibility that
+  irrigated production may be only partly dependent on use of
+  groundwater from the HPA.'' - Please consider whether this assumption
+  could bias results and how potential biases can be ruled out.
+\end{itemize}
+
+\textcolor{blue}{
+This will not bias our main part of the regression analysis in any way. Dryland yields are part of the modeling just to illustrate how powerful irrigation is. As you know, this is not our main results. The identification of yield reposne to water deficit for the three awuifer thickness catoegories is coming solely drom the irrigated production data.
+}
+
+\begin{itemize}
+\tightlist
+\item
+  P. 9: Saturated thickness data - the number of monitoring wells would
+  be of interest for readers to better judge the data, if available.
+\end{itemize}
+
+\textcolor{blue}{}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{6}
+\tightlist
+\item
+  Methods - regression models:
+\end{enumerate}
+
+\begin{itemize}
+\tightlist
+\item
+  P. 9: If the model includes fixed effects, how are the single plot
+  lines for each category shown in Fig. 1 derived?
+\end{itemize}
+
+\textcolor{blue}{
+That is because a single county-year was selected in predicting yields. We could pick any county-year without changing any of the conclusions we are drawing. This is because fixed effects are merely a shifter. The relative difference in yield across all the categories is the same no matter what county-year we pick. The curvature will of course be the same as well. So, presenting lines for all the counties unnecessarily crowd the figure without producing any more insights than a single estimated curve for a particular county.
+}
+
+\begin{itemize}
+\tightlist
+\item
+  P. 9: Developments over time and independent variables: Please address
+  early in the main text which overall trends shape developments in the
+  aquifer studied. Please include key references about the case study
+  region to inform this, such as Mrad et al.~(2020),
+  doi.org/10.1073/pnas.2008383117. In light of this, please discuss the
+  appropriateness of the approach. The model accounts for year-specific
+  ``shocks'', but not other developments over time (e.g.~lagged effects,
+  gradual depletion trends, the introduction of regulation, etc.).
+  Relatedly, the analysis only saturated thickness and water deficits to
+  explain yields, rather than adding more explanatory variables. The
+  advantage of the approach taken here might be the simplicity and
+  clarity of assumptions. Readers would benefit from a short explicit
+  discussion.
+\end{itemize}
+
+\textcolor{red}{Tim, I don't know what he wants from the first sentence. I don't really care what he is talking about and I think it is irrelevant. But, if you can somehow address this with some citations including the one he suggested, that would be great. He is probably one of the authors of that paper (he is not an economist, his understanding of the methods and results is not of the one who were trained as an economist.).}
+
+\textcolor{red}{Tim, can you address this? "Relatedly, the analysis only saturated thickness and water deficits to explain yields, rather than adding more explanatory variables. The advantage of the approach taken here might be the simplicity and clarity of assumptions. Readers would benefit from a short explicit discussion.". I believe you already had sound arguments when we zoomed last time.}
+
+\begin{itemize}
+\tightlist
+\item
+  P. 10: Please provide details on the basis functions in the methods
+  section or the supplement.
+\end{itemize}
+
+\textcolor{blue}{We added appendix B in response.}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{7}
+\tightlist
+\item
+  Supplementary information: Please also consider providing additional
+  information to give readers more clarity on the points outlined above
+  in the supplementary information.
+\end{enumerate}
+
+\textcolor{blue}{Thank you for this suggestion. We added Appendix, which we belive made our paper much stronger.}
+
+\hypertarget{minor-points}{%
+\subsection{MINOR POINTS:}\label{minor-points}}
+
+\textcolor{blue}{Thank you for noticing there errors. All of them are fixed in the latest manuscript.}
+
+\begin{itemize}
+\item[$\boxtimes$]
+  M1. Please add line numbers.
+\item[$\boxtimes$]
+  M2. P. 2: Missing closing parenthesis after ``(i.e., 3rd quantile
+  \ldots{}''
+\item[$\square$]
+  M3. Fig. 1, 2, 3, and 5: Please add panel tags (``a'', ``b'' \ldots)
+  to make it easier for readers to understand the captions.
+\item[$\boxtimes$]
+  M4. Fig. 3: Closing parenthesis of y-axis title missing
+\item[$\square$]
+  M5. P. 9: ``WB'' and ``ST'' should not be in italics, unless ``W'',
+  ``B'', ``S'', and ``T'' are separate variables
+\item[$\boxtimes$]
+  M6. P. 9: ``{[}0 - 33.3\(\%\))j'' - the ``j'' does not seem to belong
+  here
+\item[$\boxtimes$]
+  M7. P. 9: ``with sigma\_j represents the category specific intercept''
+  should be ``with sigma\_j representing the category-specific
+  intercept'' or something similar
+\item[$\boxtimes$]
+  M8. P. 9: ``under the generalize additive model framework'' should be
+  ``generalized'' and ``modeling'' or something similar
+\item[$\square$]
+  M9. P. 9: What is ``mu\_t'' in equation 2? Should ``theta\_t'' in
+  equation 1 be ``mu\_t''? Because ``theta\_jk'' is already the spline
+  basis function.
+\item[$\boxtimes$]
+  M10. P. 9: One reference seems to be missing (the text includes
+  ``(REF)'').
+\end{itemize}
+
+\end{document}

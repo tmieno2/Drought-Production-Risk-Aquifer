@@ -1,3 +1,9 @@
+---
+output:
+  pdf_document:
+    keep_tex: true
+---
+
 \textcolor{blue}{We really appreciate your comments. Addressing them has made our paper significantly stronger. Please find our replies to your comments written in blue.}
 
 This is an interesting paper that asks an important yet answered question in the field of agricultural sustainability - how much is groundwater depletion reducing agricultural productivity in the High Plains region in the United States? While the paper is an important contribution to the literature, there are several issues that need to be addressed prior to acceptance at any journal.

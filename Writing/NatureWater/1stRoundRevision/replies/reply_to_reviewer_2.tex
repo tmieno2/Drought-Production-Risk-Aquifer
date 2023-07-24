@@ -1,0 +1,134 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{lmodern}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\usepackage[margin=1in]{geometry}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same} % disable monospaced font for URLs
+\hypersetup{
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\author{}
+\date{\vspace{-2.5em}}
+
+\begin{document}
+
+\textcolor{blue}{We really appreciate your comments. Addressing them has made our paper significantly stronger. Please find our replies to your comments written in blue.}
+
+This is an interesting paper that asks an important yet answered
+question in the field of agricultural sustainability - how much is
+groundwater depletion reducing agricultural productivity in the High
+Plains region in the United States? While the paper is an important
+contribution to the literature, there are several issues that need to be
+addressed prior to acceptance at any journal.
+
+\begin{itemize}
+\tightlist
+\item
+  There needs to be more description about why aquifer saturation
+  thickness is an appropriate proxy for farmers' ability to irrigate
+  from wells. This is particularly true since this is a broad interest
+  journal, and the mechanism for the main independent variable should be
+  very clear to all readers.
+\end{itemize}
+
+\textcolor{blue}{Tim?}
+
+\begin{itemize}
+\tightlist
+\item
+  Though I am not trained as a hydrologist, my understanding is that
+  aquifer saturation thickness is a good measure of general water
+  availability in an aquifer but not necessarily how much water is
+  available at a specific location or point. If this is the case, the
+  authors should make clear why this is an appropriate measure to use in
+  their study and potential limitations of using this approach.
+\end{itemize}
+
+\textcolor{blue}{Tim? this is realted to one of the reviewer 1's comments}
+
+\begin{itemize}
+\tightlist
+\item
+  It is unclear to me why county and time fixed effects were not used in
+  every regression. In particular, it does not look like they were
+  included in the regression that modeled irrigated area as a function
+  of saturated thickness and water deficit. Yet, accounting for
+  time-invariant differences across counties is important, especially
+  because this is the regression that showed the largest effect of
+  saturated thickness on a measure of agricultural production (irrigated
+  area). Is there not enough variation within a county through time to
+  pick up the effect of saturated thickness on irrigated area? This
+  should all be made clearer, and a model that better captures the
+  causal relationship between saturated thickness and area irrigated
+  should be used if possible. If it's not possible, the limitations of
+  the current approach should be made very clear and potential issues
+  with inference.
+\end{itemize}
+
+\textcolor{blue}{Thank you for this comment, which we believe led to a slighly better model and acknowledgin important limitations of our methods. County and year fixed effects were included in equation (1), but only year fixed effects were included in equation (2). As you gueesed, the problem of including county FEs lies in the massive elimination of variation in aquifer thickness. Please see Figure 6 in Appendix A for the histogram of (1) aquifer thickness demeaned by the county average, (2) aquifer thickness demeaned by the state average, and (3) aquifer thickness without demeaning. As you can see in the figure, inclusion of county FEs (mathematically equivalent to regression using county-demeaned aquifer thickness) dramatically reduces the total variation in aquifer thickness and not enough variations are left for accurately estimating its impact of the share of irrigated acres. The inclusion of State FEs does not diminish the variation in aquifer thickness. Therefore, while the inclusion of State FEs certainly does not provide as tight of a control as county FEs, we have decided to include State FEs for both corn and soybean irrigated share regrssions as it is better than not including them. Figure 7 compares the estiamted impacts of aquifer thickness with or without State FEs. The negative impact of reduction in aquifer thickness on the share of irrigated acres is slightly greater when state fixed effects are included. Therefore, it may be that aquifer thickness is not very highly correlated with important unobservable variables that are affecting irrigated share significantly. Given the direction of potential bias, providing tighter controls with county fixed effects may result in even more significant drop in the share of irrigated acres (we may be underestimating the impact of aquifer thickness.). All the discussion we are providing here is now seen in Appenddix A.
+}
+
+\begin{itemize}
+\tightlist
+\item
+  There are minor typos (e.g., missing reference listed as REF) that
+  should be corrected prior to resubmission.
+\end{itemize}
+
+\textcolor{blue}{}
+
+\end{document}

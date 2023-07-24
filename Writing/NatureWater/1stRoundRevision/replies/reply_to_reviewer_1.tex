@@ -5,19 +5,16 @@
 \documentclass[
 ]{article}
 \usepackage{amsmath,amssymb}
+\usepackage{lmodern}
 \usepackage{iftex}
 \ifPDFTeX
   \usepackage[T1]{fontenc}
   \usepackage[utf8]{inputenc}
   \usepackage{textcomp} % provide euro and other symbols
 \else % if luatex or xetex
-  \usepackage{unicode-math} % this also loads fontspec
+  \usepackage{unicode-math}
   \defaultfontfeatures{Scale=MatchLowercase}
   \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
-\fi
-\usepackage{lmodern}
-\ifPDFTeX\else
-  % xetex/luatex font selection
 \fi
 % Use upquote if available, for straight quotes in verbatim environments
 \IfFileExists{upquote.sty}{\usepackage{upquote}}{}
@@ -59,7 +56,7 @@
 \fi
 \IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
 \IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
-\urlstyle{same}
+\urlstyle{same} % disable monospaced font for URLs
 \hypersetup{
   hidelinks,
   pdfcreator={LaTeX via pandoc}}
@@ -83,6 +80,8 @@ in Nature Water. However, I do have a few concerns that I wanted to
 bring to the attention of the authors. My most important concerns are as
 follows (not necessarily in order of importance):
 
+\textcolor{blue}{We really appreciate your comments. Addressing them has made our paper significantly stronger. Please find our replies to your comments written in blue.}
+
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
 \tightlist
@@ -94,11 +93,12 @@ follows (not necessarily in order of importance):
   propagating this confusing usage into the future.
 \end{enumerate}
 
-\textcolor{blue}{ferkjnf}
+\textcolor{blue}{All the instances of "saturated thickness" and "aquifer saturated thickness" have been replaced by "aquifer thickness".}
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
 \setcounter{enumi}{1}
+\tightlist
 \item
   Dependence on aquifer thickness -- I had a number of questions about
   the relationships displayed in Figure 1. First, the regression appears
@@ -116,15 +116,53 @@ follows (not necessarily in order of importance):
   by fine sands and silts. Could that be a major player in the error
   bars in the plots? Please mention this at some point in the
   manuscript.
+\end{enumerate}
+
+\begin{itemize}
+\tightlist
+\item
+  First point:
+  \textcolor{blue}{Quantiles are not recalculated each each. If we do so, then the same quantile would represent different aquifer thickness range every year. When modeling the impact of aquifer thickness, this is not desirable because we are implicitly making assumptions that different ranges of aquifer thickness would have the same impact.}
+\item
+  Second point: \textbackslash textcolor\{blue\}\{Actually, 0\% quntile
+  is 12 m. ``9m'' was repalced with ``12m'' in the current manuscript.\}
+\item
+  Third point:
+  \textcolor{blue}{No interesting insights will be gained from them because they are merely shifters without any intractions with aquifer thickness. They tell us how much higher yield in a single county relative to another county on average. But, we do not beleive that is useful information at least in this artcile.}
+\item
+  Fourth point:
+  \textcolor{blue}{This is a very important point. We have added texts describing the implications of this fact in page xx.}
+\end{itemize}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{2}
+\tightlist
 \item
   Conditioned on drought risk exposure -- I wasn't sure what the authors
   meant by this in the second paragraph of Section 2.2. This must be
   related to the water deficit but the lack of explanation in the main
   text or the methods section left me wondering. Please clarify at some
   point in the manuscript.
+\end{enumerate}
+
+\textcolor{blue}{What we meant by "conditiond on drought risk exposure" is "after taking into account the impact of climate variables." In order to avoid confusion, we simply removed it from the sentence in the current manuscript.}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{3}
+\tightlist
 \item
   Equation 2 -- Please define all terms in the equation and provide an
   explanation of what is meant by ``estimated semi-parametrically''.
+\end{enumerate}
+
+\textcolor{blue}{We now have a more detailed mathematical expressions of the model with all the terms explained. We eliminated the word semi-parametrically as it is not ncecessary. Generalized additive model that estiamtes the impact of a variable using splines without functional form assumption are sometimes referred to semi-parametric regression. That's what we meant by "estimate semi-parametrically" in our previous manuscript.}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{4}
+\tightlist
 \item
   Kansas and California efforts -- I've seen a number of papers
   describing efforts in Kansas and California to address aquifer
@@ -141,56 +179,128 @@ follows (not necessarily in order of importance):
   points.
 \end{enumerate}
 
+\textcolor{blue}{Tim?}
+
 \hypertarget{minor-points}{%
 \subsection{Minor points}\label{minor-points}}
 
-Section 1, 3rd Paragraph -- ``Two aquifer pathways exist through aquifer
-depletion will..'' -- confusing sentence -- please replace ``through''
-with ``by which''.
+\begin{itemize}
+\tightlist
+\item
+  Section 1, 3rd Paragraph -- ``Two aquifer pathways exist through
+  aquifer depletion will..'' -- confusing sentence -- please replace
+  ``through'' with ``by which''.
+\end{itemize}
 
-Section 1, 4th Paragraph -- ``we generate empirical evidence'' seems
-awkward to me. How about replacing with ``we present empirical
-evidence''? Next sentence -- ``Our analysis advances on
-previous\ldots{}'' reads better as ``Our analysis extends
-previous\ldots{}'' There are many issues such as these and the previous
-comment. Please address such issues so that the manuscript is an easier
-read.
+\textcolor{blue}{Corrected.}
 
-Section 2.1 title -- I would delete ``marginally'' as it is not needed
-and some will find it confusing.
+\begin{itemize}
+\tightlist
+\item
+  Section 1, 4th Paragraph -- ``we generate empirical evidence'' seems
+  awkward to me. How about replacing with ``we present empirical
+  evidence''? Next sentence -- ``Our analysis advances on
+  previous\ldots{}'' reads better as ``Our analysis extends
+  previous\ldots{}'' There are many issues such as these and the
+  previous comment. Please address such issues so that the manuscript is
+  an easier read.
+\end{itemize}
 
-Figure 2 - Why do the plots stop at a thickness of about 12 m when you
-had earlier defined the minimum thickness as 9 m and mention 10 m in the
-text when discussing the relationships?
+\textcolor{blue}{We completely agree. Both of the suggested changes have been made.}
 
-Section 2.3, First Paragraph -- please clarify that ``average per-area
-production'' is a combination of irrigated and rainfed yields. That
-would make the manuscript easier to follow.
+\begin{itemize}
+\tightlist
+\item
+  Section 2.1 title -- I would delete ``marginally'' as it is not needed
+  and some will find it confusing.
+\end{itemize}
 
-Figure 5 -- I assume that the left plot is corn and the right soybean,
-but please clarify.
+\textcolor{blue}{Tim, any thoughts on this. I feel like it is still important to say the increase is not much.}
 
-Data and Code Availability -- Are the data from Dr.~Haacker on the
-Github repository? Please place them there prior to publication so
-future investigators can access them rather than having to track down
-Dr.~Haacker. The data set is over seven years old so it should be made
-available according to the principles of open science.
+\begin{itemize}
+\tightlist
+\item
+  Figure 2 - Why do the plots stop at a thickness of about 12 m when you
+  had earlier defined the minimum thickness as 9 m and mention 10 m in
+  the text when discussing the relationships?
+\end{itemize}
 
-Line before Equation (2) -- ``REF'' should be replaced with the actual
-reference.
+\textcolor{blue}{Thank you for catching this. 9m and 10m should have been 12m.}
 
-Discussion, First Paragraph -- ``reduction in aquifer depletion'' should
-be ``reduction in aquifer thickness''.
+\begin{itemize}
+\tightlist
+\item
+  Section 2.3, First Paragraph -- please clarify that ``average per-area
+  production'' is a combination of irrigated and rainfed yields. That
+  would make the manuscript easier to follow.
+\end{itemize}
 
-Section 4.2, 3rd Paragraph -- ``the the impact'' -- remember to spell
-and grammar check prior to submission.
+\textcolor{blue}{We added "(weighted-average of irrigated and rainfed yields, where weights are production area shares)" so that it is clear what average per-area production means.}
 
-Reference in Section 3 -- I doubt that ``Butler Jr'' is the surname,
-please replace with ``Butler''. Suffixes apparently aren't handled well
-by some of the bibliography generation programs.
+\begin{itemize}
+\tightlist
+\item
+  Figure 5 -- I assume that the left plot is corn and the right soybean,
+  but please clarify.
+\end{itemize}
 
-Please remember to close all parentheses and don't mispair brackets and
-parentheses. Such stuff can raise questions about the care used in the
-analysis.
+\textcolor{blue}{Thanks for noticing this. Fixed.}
+
+\begin{itemize}
+\tightlist
+\item
+  Data and Code Availability -- Are the data from Dr.~Haacker on the
+  Github repository? Please place them there prior to publication so
+  future investigators can access them rather than having to track down
+  Dr.~Haacker. The data set is over seven years old so it should be made
+  available according to the principles of open science.
+\end{itemize}
+
+\textcolor{blue}{Yes, we will make the data available online.}
+
+\begin{itemize}
+\tightlist
+\item
+  Line before Equation (2) -- ``REF'' should be replaced with the actual
+  reference.
+\end{itemize}
+
+\textcolor{blue}{Tim?}
+
+\begin{itemize}
+\tightlist
+\item
+  Discussion, First Paragraph -- ``reduction in aquifer depletion''
+  should be ``reduction in aquifer thickness''.
+\end{itemize}
+
+\textcolor{blue}{Thank you for catching this. Fixed.}
+
+\begin{itemize}
+\tightlist
+\item
+  Section 4.2, 3rd Paragraph -- ``the the impact'' -- remember to spell
+  and grammar check prior to submission.
+\end{itemize}
+
+\textcolor{blue}{Thank you for catching this. Fixed.}
+
+\begin{itemize}
+\tightlist
+\item
+  Reference in Section 3 -- I doubt that ``Butler Jr'' is the surname,
+  please replace with ``Butler''. Suffixes apparently aren't handled
+  well by some of the bibliography generation programs.
+\end{itemize}
+
+\textcolor{blue}{}
+
+\begin{itemize}
+\tightlist
+\item
+  Please remember to close all parentheses and don't mispair brackets
+  and parentheses. Such stuff can raise questions about the care used in
+  the analysis.
+\end{itemize}
 
 \end{document}

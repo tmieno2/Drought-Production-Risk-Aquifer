@@ -66,16 +66,16 @@ bootstrap <- function(i, data, sc_base, sc_dry_base) {
   data_for_pred <-
     CJ(
       balance = seq(min(data_boot$balance), max(data_boot$balance), length = 50),
-      sat_cat = unique(data_boot$sat_cat)
+      sat = c(0, 40, 194, 348, 602)
     ) %>%
     # .[, sat := parse_number(gsub("\\,.*", "", sat_cat))] %>%
-    .[, sat := case_when(
-      sat_cat == "[39.4,82]" ~ 40,
-      sat_cat == "(82,194]" ~ 194,
-      sat_cat == "(194,708]" ~ 348,
-      sat_cat == "dryland" ~ 0
+    .[, sat_cat := case_when(
+      sat == 40 ~ "[39.4,82]",
+      sat == 194 ~ "(82,194]",
+      sat == 348 ~ "(194,708]",
+      sat == 602 ~ "(194,708]",
+      sat == 0 ~ "dryland"
     )] %>%
-    .[is.na(sat), sat := 0] %>%
     # === can be any sc_code (need to shift yield for "average" county) ===#
     .[, sc_code := sc_base] %>%
     .[, sc_dry := sc_dry_base] %>%
@@ -117,14 +117,13 @@ bootstrap <- function(i, data, sc_base, sc_dry_base) {
       acres_ratio ~
         s(sat, k = 3, m = 2) +
         s(balance_avg, k = 3, m = 2) +
-        factor(state_name) +
-        factor(year),
+        factor(state_year),
       data = ir_share_data,
       # weight = ~acres,
       family = binomial
     )
 
-  share_pred_data_corn <-
+  share_pred_data <-
     CJ(
       sat = seq(
         min(ir_share_data$sat),
@@ -133,13 +132,13 @@ bootstrap <- function(i, data, sc_base, sc_dry_base) {
       ),
       balance_avg = mean(ir_share_data$balance_avg),
       year = 2016,
-      state_name = "Nebraska"
+      state_year = "Nebraska_2009"
     )
 
   ir_share_hat_data <-
     predict(
       ir_share_res,
-      newdata = share_pred_data_corn,
+      newdata = share_pred_data,
       type = "response",
       se.fit = TRUE
     )
@@ -184,7 +183,7 @@ boot_results_data <-
     parallel::mclapply(
       1:1000,
       function(i) bootstrap(i, data, sc_base, sc_dry_base),
-      mc.cores = 12
+      mc.cores = parallel::detectCores() - 2
     ) %>%
       rbindlist()
   })) %>%

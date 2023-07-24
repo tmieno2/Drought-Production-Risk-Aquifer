@@ -1,6 +1,4 @@
-
 prepare_reg_data <- function(data, sat_thld_m, ir_share_thld, balance_thld, sat_cat_num, state_ls) {
-
   # === saturated thickness threshold in meter ===#
   sat_thld <- measurements::conv_unit(sat_thld_m, "m", "ft")
 
@@ -149,386 +147,310 @@ semi_ols <- function(semi_formula, c_formula, cluster, data) {
   # cor(reg_data$model_X)
 }
 
+reg_yield <- function(yield_data) {
+  #++++++++++++++++++++++++++++++++++++
+  #+ For Debugging
+  #++++++++++++++++++++++++++++++++++++
+  # yield_data <- all_results[crop == "corn", data][[1]]
 
-# /*=================================================*/
-#' # Prepare a data set
-# /*=================================================*/
-#' used in 1_regression_analysis.R
+  #++++++++++++++++++++++++++++++++++++
+  #+ Main
+  #++++++++++++++++++++++++++++++++++++
 
-# vars <- c("balance", "et0")
+  #---------------------
+  #- Regression
+  #---------------------
+  #--- define the semi-parametric portion of the model ---#
+  semi_formula <-
+    formula(yield ~ s(balance, by = sat_cat, k = 3, m = 2))
 
-gen_pred_data <- function(data, vars, sat_ls) {
-  var_1 <- vars[1]
-  var_2 <- vars[2]
-
-  return_data <-
-    expand.grid(
-      var_1 =
-        seq(
-          min(data[, ..var_1], na.rm = TRUE),
-          max(data[, ..var_1], na.rm = TRUE),
-          length = 50
-        ),
-      var_2 =
-        seq(
-          min(data[, ..var_2], na.rm = TRUE),
-          max(data[, ..var_2], na.rm = TRUE),
-          length = 50
-        ),
-      sat = sat_ls
-    ) %>%
-    data.table() %>%
-    .[
-      ,
-      sat_cat := cut(
-        sat,
-        breaks = sat_breaks,
-        include.lowest = TRUE
-      )
-    ] %>%
-    .[is.na(sat_cat), sat_cat := "dryland"] %>%
-    setnames(
-      c("var_1", "var_2"),
-      vars
+  #--- semi-parametric FE wih fixest ---#
+  semi_res_corn <-
+    semi_ols(
+      semi_formula = semi_formula,
+      c_formula = "i(sat_cat, ref = 'dryland') + i(year) + i(sc_dry)",
+      # fe = "",
+      cluster = "sc_dry",
+      data = yield_data
     )
 
-  return(return_data)
-}
+  #--- main regression results ---#
+  y_res_int <- semi_res_corn$fe_res
 
-# /*=================================================*/
-#' # Run regressions and predict yields
-# /*=================================================*/
+  #---------------------
+  #- Prediction
+  #---------------------
+  gam_y_res <- semi_res_corn$gam_res
 
-run_analysis <- function(crop, voi, model) {
-  temp_data <- reg_data[crop_type == crop, ]
+  sc_dry_base <- yield_data[sc_code == "31011", sc_dry][1]
+  sc_base <- "31011"
 
-  data_y <-
-    data.table::copy(temp_data$reg_data_y[[1]]) %>%
-    setnames(voi, "voi") %>%
-    .[, type := "reg"]
-
-  # === data for prediction ===#
-  #' This is created and combined to the data for regression to
-  #' use the same knots for both sets of datasets.
-  #' This operation is done even though the model is not `semi`
-  data_for_pred <-
+  #--- raw data for prediction ---#
+  data_for_pred_corn <-
     CJ(
-      voi =
-        seq(
-          min(data_y$voi),
-          max(data_y$voi),
-          length = 50
-        ),
-      sat_cat = unique(data_y$sat_cat),
-      # sat = c(0, sat_breaks[-6], 400),
-      gdd = median(data_y$gdd),
-      edd = median(data_y$edd)
+      balance = seq(min(yield_data$balance), max(yield_data$balance), length = 50),
+      sat = c(0, 40, 194, 348, 602)
     ) %>%
-    .[, sat := parse_number(gsub("\\,.*", "", sat_cat))] %>%
-    .[is.na(sat), sat := 0] %>%
+    # .[, sat := parse_number(gsub("\\,.*", "", sat_cat))] %>%
+    .[, sat_cat := case_when(
+      sat == 40 ~ "[39.4,82]",
+      sat == 194 ~ "(82,194]",
+      sat == 348 ~ "(194,708]",
+      sat == 602 ~ "(194,708]",
+      sat == 0 ~ "dryland"
+    )] %>%
     # === can be any sc_code (need to shift yield for "average" county) ===#
-    .[, sc_code := data_y$sc_code[20]] %>%
+    .[, sc_code := sc_base] %>%
+    .[, sc_dry := sc_dry_base] %>%
     # === can be any year (need to shift yield for "average" year) ===#
     .[, year := 2009] %>%
     # === fake yield data (necessary to take advantage of predict.gam) ===#
     .[, yield := 0] %>%
-    .[, type := "pred"]
+    .[, type := "pred"] %>%
+    .[, dry_or_not := fifelse(sat_cat == "dryland", 1, 0) %>% factor()]
 
-  if (model == "semi") {
+  #--- create bases  ---#
+  yield_hat_data <-
+    gen_smooth_data(
+      data = data_for_pred_corn,
+      gam_res = gam_y_res
+    ) %>%
+    .$data
 
-    #--------------------------
-    # Semi-parametric FE
-    #--------------------------
-    semi_formula <-
-      formula(
-        yield
-        ~ s(voi, by = sat_cat, k = 4, m = 2)
-          + s(edd, k = 4)
-          + s(gdd, k = 4)
-      )
+  y_hat_with_se <- predict(y_res_int, newdata = yield_hat_data, se.fit = TRUE)
 
-    #' sat_continuous
-    # semi_formula <-
-    #   formula(
-    #     yield
-    #     ~ s(voi, k = 3)
-    #     + s(sat, k = 3)
-    #     + ti(voi, sat, k = c(3, 3))
-    #     + s(edd, k = 3)
-    #     + s(gdd, k = 3)
-    #   )
+  yield_hat_data[, `:=`(
+    y_hat = y_hat_with_se$fit,
+    y_hat_se = y_hat_with_se$se.fit
+  )]
 
-    semi_res <-
-      semi_ols(
-        semi_formula = semi_formula,
-        c_formula = "i(sat_cat, ref = 'dryland')",
-        fe = c("sc_code", "year"),
-        cluster = "sc_code",
-        data = data_y
-      )
+  yield_hat_data[, q1_yield := .SD[sat_cat == "[39.4,82]", y_hat], by = balance]
 
-    y_res_int <- semi_res$fe_res
-    gam_y_res <- semi_res$gam_res
+  yield_hat_data[, dif_y_hat := y_hat - q1_yield]
 
-    yhat_data <-
-      gen_smooth_data(
-        data = data_for_pred,
-        gam_res = gam_y_res
-      ) %>%
-      .$data
-  } else {
-    #--------------------------
-    # Quadratic (sat category)
-    #--------------------------
-    y_res_int <-
-      feols(
-        yield
-        # ~ balance + I(balance ^ 2)
-        ~ i(sat_cat, ref = "dryland")
-          + i(sat_cat, voi)
-            + i(sat_cat, I(voi^2))
-            + gdd + I(gdd^2) + edd + I(edd^2) |
-            sc_code + year,
-        cluster = ~sc_code,
-        data = data_y
-      )
+  return(yield_hat_data[, .(balance, sat, sat_cat, y_hat, y_hat_se, dif_y_hat)])
+}
 
-    # y_res_int <-
-    #   feols(
-    #     yield
-    #     ~ i(sat_cat, ref = "dryland")
-    #     + i(sat_cat, prcp)
-    #     + i(sat_cat, I(prcp ^ 2))
-    #     + gdd + edd + et0
-    #     | sc_code + year,
-    #     cluster = ~ sc_code,
-    #     data = data_y
-    #   )
+reg_share <- function(share_data) {
+  #++++++++++++++++++++++++++++++++++++
+  #+ Debug
+  #++++++++++++++++++++++++++++++++++++
+  # share_data <- ir_share_data
 
-    yhat_data <- data_for_pred
-    gam_y_res <- NULL
-  }
-
-
-
-  # etable(quad_fe)
-
-  # #--------------------------
-  # # Quad (sat continuous)
-  # #--------------------------
-  # quad_fe_sc <-
-  #   feols(
-  #     yield
-  #     ~ voi + I(voi ^ 2)
-  #     + sat + I(sat ^ 2)
-  #     + I(sat * voi) + I(sat * voi ^ 2)
-  #     + I(sat ^ 2 * voi) + I(sat ^2 * voi ^ 2)
-  #     + gdd + I(gdd ^ 2) + edd +I(edd ^ 2)
-  #     | sc_code + year,
-  #     cluster = ~ sc_code,
-  #     data = data_y
-  #   )
-
-  # /*=================================================*/
-  #' # Prediction of yield (intensive margin)
-  # /*=================================================*/
-  yhat_data[, y_hat := predict(y_res_int, newdata = yhat_data)]
-  yhat_data[, sat_cat_q :=
-    as.numeric(sat_cat) %>%
-    ordinal() %>%
-    paste0(., " quintile")]
-  yhat_data[sat_cat == "dryland", sat_cat_q := "dryland"]
-
-  g_yield_i <-
-    ggplot(yhat_data) +
-    geom_line(aes(y = y_hat * 12.553 / 200, x = voi, color = factor(sat_cat_q))) +
-    xlab(
-      if (voi == "balance") {
-        "Balance (Precipitation - ET0)"
-      } else {
-        "SPEI"
-      }
-    ) +
-    ylab("Yield (tonne/ha)") +
-    scale_color_discrete(name = "") +
-    theme(
-      legend.position = "bottom"
+  #++++++++++++++++++++++++++++++++++++
+  #+ Main
+  #++++++++++++++++++++++++++++++++++++
+  #---------------------
+  #- define the formula for the flexible part
+  #---------------------
+  gam_formula_ir_share <-
+    formula(
+      acres_ratio ~
+        s(sat, k = 4, m = 2) +
+        s(balance_avg, k = 3, m = 2)
+    )
+  #---------------------
+  #- Run preliminary gam estimation
+  #---------------------
+  #* model data
+  #* gam reg data to replicate
+  reg_data_ir_share <-
+    gen_smooth_data(
+      data = share_data,
+      gam_formula = gam_formula_ir_share
     )
 
-  ggsave(
-    paste0(
-      here("Shared/Results/Figures/"),
-      "gy_int",
-      "_crop_", crop,
-      "_voi_", voi,
-      "_model_", model,
-      ".pdf"
-    ),
-    g_yield_i,
-    height = 12 / 2.54,
-    width = 10 / 2.54
-  )
+  #---------------------
+  #- define formula for the fe-logit
+  #---------------------
+  formula_feols <-
+    names(reg_data_ir_share$model_X) %>%
+    paste0(., collapse = "+") %>%
+    paste0("acres_ratio ~ ", .) %>%
+    # paste0(., "+", ) %>%
+    #--- add state-year FE ---#
+    paste0(., " | ", "state_year") %>%
+    formula()
 
-  # /*=================================================*/
-  #' # IR-share
-  # /*=================================================*/
+  #---------------------
+  #- Run FE-logit
+  #---------------------
+  share_res <-
+    feglm(
+      formula_feols,
+      cluster = "sc_code",
+      data = reg_data_ir_share$data,
+      family = binomial()
+    )
+
+  share_pred_data_corn <-
+    CJ(
+      sat =
+        c(
+          seq(
+            min(share_data$sat),
+            max(share_data$sat),
+            length = 100
+          ),
+          c(40, 194, 348, 602)
+        ),
+      balance_avg =
+        c(
+          seq(
+            min(share_data$balance_avg),
+            max(share_data$balance_avg),
+            length = 2
+          ),
+          mean(share_data$balance_avg)
+        ),
+      state_year = "Nebraska_2009"
+    ) %>%
+    .[, acres_ratio := 0]
+
+  share_hat_data <-
+    gen_smooth_data(
+      data = share_pred_data_corn,
+      gam_res = reg_data_ir_share$gam_res
+    ) %>%
+    .$data %>%
+    .[balance_avg == mean(share_data$balance_avg), ]
+
+  share_hat <-
+    predict(
+      share_res,
+      newdata = share_hat_data
+    )
+
+  share_hat_data[, `:=`(
+    ir_share_hat = share_hat
+  )]
+
+  return(list(
+    share_res = share_res,
+    share_hat_data = share_hat_data[, .(
+      sat, balance_avg, ir_share_hat
+    )]
+  ))
+}
+
+get_average_yield <- function(yield_pred_data, share_pred_data) {
+  #++++++++++++++++++++++++++++++++++++
+  #+ Debug
+  #++++++++++++++++++++++++++++++++++++
+  # yield_pred_data <- all_results[1, yield_response][[1]]
+  # share_pred_data <- share_hat_data
+
+  #++++++++++++++++++++++++++++++++++++
+  #+ Main
+  #++++++++++++++++++++++++++++++++++++
+  data_total <-
+    yield_pred_data[, .(y_hat, y_hat_se, balance, sat_cat, sat)] %>%
+    .[, state_year := "Nebraska_2009"] %>%
+    share_pred_data[, .(sat, ir_share_hat)][., on = "sat"]
+
+  data_ir <-
+    data_total[sat_cat != "dryland"] %>%
+    setnames(c("y_hat", "y_hat_se"), c("y_hat_ir", "y_hat_se_ir"))
+
+  data_dry <-
+    data_total[sat_cat == "dryland"] %>%
+    .[, .(y_hat, y_hat_se, balance)] %>%
+    setnames(c("y_hat", "y_hat_se"), c("y_hat_dry", "y_hat_se_dry"))
+
+  data_avg_yield <-
+    data_dry[data_ir, on = "balance"] %>%
+    .[, avg_yield := ir_share_hat * y_hat_ir + (1 - ir_share_hat) * y_hat_dry] %>%
+    .[, q1_yield := .SD[sat == 40, avg_yield], by = balance] %>%
+    .[, dif_avg_yield := avg_yield - q1_yield] %>%
+    .[, .(balance, sat, sat_cat, ir_share_hat, sat_cat, state_year, avg_yield, dif_avg_yield)]
+
+  return(data_avg_yield)
+}
+
+run_analysis <- function(data) {
+  #++++++++++++++++++++++++++++++++++++
+  #+ Debug
+  #++++++++++++++++++++++++++++++++++++
+  # data <- all_results[1, data][[1]]
+
+  #++++++++++++++++++++++++++++++++++++
+  #+ Main
+  #++++++++++++++++++++++++++++++++++++
+  yield_pred_data <- reg_yield(data)
 
   ir_share_data <-
-    data_y %>%
+    data %>%
     .[ir == "ir" & ir_area_ratio >= 0.75, ] %>%
-    .[, `:=`(
-      voi_avg = mean(voi),
-      edd_avg = mean(edd),
-      gdd_avg = mean(gdd)
-    ), by = sc_code]
+    .[, balance_avg := mean(balance), by = sc_code]
 
-  ir_share_res <-
-    feglm(
-      acres_ratio
-      ~ sat + I(sat^2)
-          + voi_avg + I(voi_avg^2)
-          + edd_avg + I(edd_avg^2)
-          + gdd_avg + I(gdd_avg^2)
-          + sat * voi_avg + sat * edd_avg + sat * gdd_avg |
-          year,
-      data = ir_share_data,
-      family = quasibinomial(link = "logit")
+  share_pred_data <- reg_share(ir_share_data)
+
+  avg_yield_data <- get_average_yield(yield_pred_data, share_pred_data$share_hat_data)
+
+  return(list(
+    yield_pred_data = yield_pred_data,
+    share_pred_data = share_pred_data$share_hat_data,
+    avg_yield_data = avg_yield_data
+  ))
+}
+
+boot <- function(data) {
+  sc_ls <- data[, sc_code] %>% unique()
+
+  data_boot <-
+    rbind(
+      data[sc_code %in% sample(sc_ls, length(sc_ls) - 1, replace = TRUE), ],
+      data[sc_code == sc_base, ],
+      data[sat_cat == "dryland", ]
     )
+  return(data_boot)
+}
 
-  share_pred_data <-
-    CJ(
-      sat = seq(min(ir_share_data$sat), max(ir_share_data$sat), length = 100),
-      # voi_avg = quantile(ir_share_data$voi_avg, prob = seq(0, 1, by = 0.2)),
-      voi_avg = mean(ir_share_data$voi_avg),
-      edd_avg = mean(ir_share_data$edd_avg),
-      gdd_avg = mean(ir_share_data$gdd_avg),
-      sc_code = unique(ir_share_data$sc_code)[1:5],
-      year = 2012
-    ) %>%
-    .[, ir_share_hat := predict(ir_share_res, newdata = .)]
-
-  g_ir_share <-
-    ggplot(share_pred_data[sat <= 600, ]) +
-    geom_line(aes(y = ir_share_hat, x = sat * 0.3048)) +
-    ylim(0, NA) +
-    xlab("Saturated Thickness (meter)") +
-    ylab("Share of Irrigated Acres")
-
-  ggsave(
-    paste0(
-      here("Shared/Results/Figures/"),
-      "g_irshare",
-      "_crop_", crop,
-      ".pdf"
-    ),
-    g_ir_share,
-    height = 12 / 2.54,
-    width = 10 / 2.54
+# !===========================================================
+# ! ggplot theme for publication
+# !===========================================================
+theme_fig <-
+  theme_bw() +
+  theme(
+    axis.title.x =
+      element_text(
+        size = 9, angle = 0, hjust = .5, vjust = -0.3, family = "Times"
+      ),
+    axis.title.y =
+      element_text(
+        size = 9, angle = 90, hjust = .5, vjust = .9, family = "Times"
+      ),
+    axis.text.x =
+      element_text(
+        size = 8, angle = 0, hjust = .5, vjust = 1.5, family = "Times"
+      ),
+    axis.text.y =
+      element_text(
+        size = 8, angle = 0, hjust = 1, vjust = 0, family = "Times"
+      ),
+    axis.ticks =
+      element_line(
+        linewidth = 0.3, linetype = "solid"
+      ),
+    axis.ticks.length = unit(.15, "cm"),
+    #--- legend ---#
+    legend.text =
+      element_text(
+        size = 9, angle = 0, hjust = 0, vjust = 0.5, family = "Times"
+      ),
+    legend.title =
+      element_text(
+        size = 9, angle = 0, hjust = 0, vjust = 0, family = "Times"
+      ),
+    legend.key.size = unit(0.5, "cm"),
+    #--- strip (for faceting) ---#
+    strip.text = element_text(size = 9, family = "Times"),
+    #--- plot title ---#
+    plot.title = element_text(family = "Times", face = "bold", size = 9),
+    #--- margin ---#
+    # plot.margin = margin(0, 0, 0, 0, "cm"),
+    #--- panel ---#
+    panel.grid.minor = element_blank(),
+    panel.background = element_blank(),
+    panel.border = element_rect(fill = NA)
   )
-
-  # /*=================================================*/
-  #' # Total average impact
-  # /*=================================================*/
-
-  ir_y_hat <-
-    yhat_data[sat_cat != "dryland", ] %>%
-    .[, sat_low := parse_number(gsub(",.*", "", sat_cat))] %>%
-    # .[, sat_high := parse_number(gsub(".*,", "", sat_cat))] %>%
-    # .[, sat := (sat_low + sat_high) / 2]
-    .[, sat := sat_low] %>%
-    .[, `:=`(
-      voi_avg = mean(ir_share_data$voi_avg),
-      edd_avg = mean(ir_share_data$edd_avg),
-      gdd_avg = mean(ir_share_data$gdd_avg)
-    )] %>%
-    .[, ir_share_hat := predict(ir_share_res, newdata = .)]
-
-  dr_y_hat <-
-    yhat_data[sat_cat == "dryland", ] %>%
-    setnames("y_hat", "dr_y_hat") %>%
-    .[, .(voi, gdd, edd, dr_y_hat)] %>%
-    .[dr_y_hat < 0, dr_y_hat := 0]
-
-  avg_y_hat_ir <-
-    dr_y_hat[ir_y_hat, on = c("voi", "gdd", "edd")] %>%
-    .[, avg_yield := ir_share_hat * y_hat + (1 - ir_share_hat) * dr_y_hat] %>%
-    .[gdd == median(gdd) & edd == median(edd), ] %>%
-    .[, .(voi, gdd, edd, sat, avg_yield)]
-
-  avg_y_hat_dry <-
-    dr_y_hat %>%
-    setnames("dr_y_hat", "avg_yield") %>%
-    .[, sat := "Dryland"]
-
-  pred_data <- rbind(avg_y_hat_ir, avg_y_hat_dry)
-
-  g_avg_y <-
-    ggplot(pred_data) +
-    geom_line(aes(y = avg_yield, x = voi, color = factor(sat))) +
-    xlab(voi) +
-    ylab("Average Yield (bu/acre)")
-
-  return_data <-
-    tibble(
-      crop = crop,
-      voi = voi,
-      model = model,
-      y_res_int = list(y_res_int),
-      data_int = list(data_y),
-      gam_y_res = list(gam_y_res), # for creating model matrix
-      yhat_data = list(yhat_data), # for creating model matrix
-      ir_share_res = list(ir_share_res),
-      ir_share_data = list(ir_share_data),
-      pred_data = list(pred_data),
-      share_pred_data = list(share_pred_data),
-      g_yield_i = list(g_yield_i),
-      g_avg_y = list(g_avg_y),
-      g_ir_share = list(g_ir_share)
-    )
-
-  return(return_data)
-}
-
-
-
-predict_yield_i <- function(data_for_plot, est_methods, est_model) {
-
-  # x <- 2
-  data_for_plot <- all_results$data_for_plot[[x]]
-  est_model <- all_results$est_model[[x]]
-  est_method <- all_results$est_method[[x]]
-  sat_ls <- all_results$sat_ls[[x]]
-  sat_breaks <- all_results$sat_breaks[[x]]
-
-  if (est_methods == "gam_results") {
-    return_data <-
-      data_for_plot %>%
-      # === use 2012 as the year for prediction ===#
-      .[, year := 2012] %>%
-      # === use the first county in the data as the year for prediction ===#
-      .[, sc_code := data$sc_code[1]] %>%
-      .[, ir := "ir"] %>%
-      .[, y_hat := predict(est_model, newdata = .)] %>%
-      .[, y_hat_se := predict(est_model, newdata = ., se = TRUE)$se.fit] %>%
-      .[, `:=`(
-        yhat_u = y_hat + y_hat_se * 1.96,
-        yhat_d = y_hat - y_hat_se * 1.96
-      )]
-  } else if (est_methods == "feq_results") {
-    FEs <- fixef(est_model)
-    sc_avg <- mean(FEs$sc_code)
-    year_avg <- mean(FEs$year)
-    int_avg <- sc_avg + year_avg
-
-    data_for_plot[, sc_code := data$sc_code[1]]
-    data_for_plot[, year := 2009]
-
-    data_for_plot[, y_hat := predict(est_model, newdata = data_for_plot)]
-
-    ggplot(data_for_plot[days_ab_30 == 0, ]) +
-      geom_line(aes(y = y_hat, x = balance, color = factor(sat)))
-
-    ggplot(data_for_plot[balance == 1242.2021, ]) +
-      geom_line(aes(y = y_hat, x = days_ab_30, color = factor(sat)))
-  }
-}

@@ -4,7 +4,6 @@
 /Writing/*files/*
 /Codes/*cache*/*
 /Codes/*files*/*
-/Codes/*.Rmd
 /Codes/*.html
 /Figures/*
 .Rproj.user/*

@@ -27,6 +27,9 @@ knitr::opts_chunk$set(
 
 ```{r}
 results <- readRDS("Shared/Results/reg_results_data.rds")
+all_results <- readRDS("Shared/Results/all_results.rds")
+
+
 ```
 
 ## Set themes
@@ -343,7 +346,10 @@ g_corn <-
   theme_void() +
   theme(
     legend.position = "bottom",
-    legend.key.width = unit(1, "cm")
+    legend.key.width = unit(1, "cm"),
+    plot.title = element_text(size = 9, family = "Times"),
+    legend.title = element_text(family = "Times"),
+    legend.text = element_text(family = "Times")
   ) +
   ggtitle("A. Corn")
 
@@ -362,7 +368,10 @@ g_soy <-
   theme_void() +
   theme(
     legend.position = "bottom",
-    legend.key.width = unit(1, "cm")
+    legend.key.width = unit(1, "cm"),
+    plot.title = element_text(size = 9, family = "Times"),
+    legend.title = element_text(family = "Times"),
+    legend.text = element_text(family = "Times")
   ) +
   ggtitle("B. Soybean")
 
@@ -376,22 +385,22 @@ ggsave(file = "GitControlled/Writing/Figures/g_map.pdf", g_map, height = 7, widt
 
 ```{r}
 g_ir_yield_both <-
-  results[, .(crop, yhat_data)] %>%
-  dplyr::mutate(plot_data = purrr::map2(yhat_data, crop, \(yhat_data, crop) {
-    yhat_data[, sat_cat_text := case_when(
-      sat_cat == "[39.4,82]" ~ "1st quantile - [12, 25]",
-      sat_cat == "(82,194]" ~ "2nd quantile - (25, 59.1]",
-      sat_cat == "(194,708]" ~ "3rd quantile - (59.1, 215]",
+  all_results[, .(crop, yield_response_sum)] %>%
+  dplyr::mutate(plot_data = purrr::map2(yield_response_sum, crop, \(x, crop) {
+    x[, sat_cat_text := case_when(
+      sat_cat == "[39.4,82]" ~ "1st quantile: [12m, 25m]",
+      sat_cat == "(82,194]" ~ "2nd quantile: (25m, 59.1m]",
+      sat_cat == "(194,708]" ~ "3rd quantile: (59.1m, 215m]",
       sat_cat == "dryland" ~ "Rainfed"
     )] %>%
       .[, sat_cat_text := factor(
         sat_cat_text,
-        levels = c("Rainfed", "1st quantile - [12, 25]", "2nd quantile - (25, 59.1]", "3rd quantile - (59.1, 215]")
+        levels = c("Rainfed", "1st quantile: [12m, 25m]", "2nd quantile: (25m, 59.1m]", "3rd quantile: (59.1m, 215m]")
       )] %>%
       .[, crop_type := crop] %>%
       .[, crop_type := case_when(
-        crop_type == "Corn" ~ "A. Corn",
-        crop_type == "Soybean" ~ "(b) Sybean"
+        crop_type == "corn" ~ "A. Corn",
+        crop_type == "soy" ~ "(b) Sybean"
       )]
   })) %>%
   dplyr::mutate(g_yield = purrr::map(plot_data, \(plot_data) {
@@ -427,7 +436,7 @@ g_ir_yield_corn <- g_ir_yield_both$g_yield[[1]] + theme(legend.position = "none"
 g_ir_yield_soy <- g_ir_yield_both$g_yield[[2]]
 
 g_wds <-
-  results[, .(crop, data)] %>%
+  all_results[, .(crop, data)] %>%
   dplyr::mutate(g_fig = purrr::map(
     data,
     function(data) {
@@ -464,22 +473,22 @@ cowplot::ggsave2("GitControlled/Writing/Figures/g_yield_intensive.pdf", g_yield_
 #+ With confidence interval (seprately)
 #++++++++++++++++++++++++++++++++++++
 g_yield_with_conf <-
-  results[, .(crop, yhat_data)] %>%
-  dplyr::mutate(plot_data = purrr::map2(yhat_data, crop, \(yhat_data, crop) {
-    yhat_data[, sat_cat_text := case_when(
-      sat_cat == "[39.4,82]" ~ "1st quantile - [12, 25]",
-      sat_cat == "(82,194]" ~ "2nd quantile - (25, 59.1]",
-      sat_cat == "(194,708]" ~ "3rd quantile - (59.1, 215]",
+  all_results[, .(crop, yield_response_sum)] %>%
+  dplyr::mutate(plot_data = purrr::map2(yield_response_sum, crop, \(x, crop) {
+    x[, sat_cat_text := case_when(
+      sat_cat == "[39.4,82]" ~ "1st quantile: [12m, 25m]",
+      sat_cat == "(82,194]" ~ "2nd quantile: (25m, 59.1m]",
+      sat_cat == "(194,708]" ~ "3rd quantile: (59.1m, 215m]",
       sat_cat == "dryland" ~ "Rainfed"
     )] %>%
       .[, sat_cat_text := factor(
         sat_cat_text,
-        levels = c("Rainfed", "1st quantile - [12, 25]", "2nd quantile - (25, 59.1]", "3rd quantile - (59.1, 215]")
+        levels = c("Rainfed", "1st quantile: [12m, 25m]", "2nd quantile: (25m, 59.1m]", "3rd quantile: (59.1m, 215m]")
       )] %>%
       .[, crop_type := crop] %>%
       .[, crop_type := case_when(
-        crop_type == "Corn" ~ "A. Corn",
-        crop_type == "Soybean" ~ "(b) Sybean"
+        crop_type == "corn" ~ "A. Corn",
+        crop_type == "soy" ~ "(b) Sybean"
       )]
   })) %>%
   mutate(g_fig = purrr::map(
@@ -488,8 +497,8 @@ g_yield_with_conf <-
       ggplot(plot_data) +
         geom_ribbon(
           aes(
-            ymin = y_hat - 1.96 * y_hat_se,
-            ymax = y_hat + 1.96 * y_hat_se,
+            ymin = lower,
+            ymax = upper,
             x = balance
           ),
           alpha = 0.3
@@ -518,20 +527,20 @@ g_yield_with_conf <-
   data.table()
 
 
-ggsave("Shared/Results/g_yield_with_conf_corn.pdf", g_yield_with_conf[crop == "Corn", g_fig][[1]], width = 6, height = 3.5)
-ggsave("Shared/Results/g_yield_with_conf_soy.pdf", g_yield_with_conf[crop == "Soybean", g_fig][[1]], width = 6, height = 3.5)
+ggsave("Shared/Results/g_yield_with_conf_corn.pdf", g_yield_with_conf[crop == "corn", g_fig][[1]], width = 6, height = 3.5)
+ggsave("Shared/Results/g_yield_with_conf_soy.pdf", g_yield_with_conf[crop == "soy", g_fig][[1]], width = 6, height = 3.5)
 ```
 
 # The impact of saturated thickness on the share of irrigated production
 
 ```{r}
 plot_data_ir_share <-
-  results[, .(crop, share_pred_data)] %>%
-  unnest(cols = share_pred_data) %>%
+  all_results[, .(crop, share_sum)] %>%
+  unnest(cols = share_sum) %>%
   data.table() %>%
   .[, crop_type := case_when(
-    crop == "Corn" ~ "A. Corn",
-    crop == "Soybean" ~ "B. Soybean"
+    crop == "corn" ~ "A. Corn",
+    crop == "soy" ~ "B. Soybean"
   )]
 
 g_share <-
@@ -539,8 +548,8 @@ g_share <-
   geom_line(aes(y = ir_share_hat, x = sat * 0.3048)) +
   geom_ribbon(
     aes(
-      ymin = ir_share_hat - 1.96 * ir_share_hat_se,
-      ymax = ir_share_hat + 1.96 * ir_share_hat_se,
+      ymin = lower,
+      ymax = upper,
       x = sat * 0.3048
     ),
     alpha = 0.4
@@ -569,10 +578,12 @@ ggsave(
 
 ```{r}
 g_total_both <-
-  rbindlist(results$avg_yield_data) %>%
+  all_results[, .(crop, avg_yield_sum)] %>%
+  unnest() %>%
+  data.table() %>%
   .[, crop_type := case_when(
-    type == "Corn" ~ "A. Corn",
-    type == "Soybean" ~ "B. Soybean"
+    crop == "corn" ~ "A. Corn",
+    crop == "soy" ~ "B. Soybean"
   )] %>%
   .[, sat_m := measurements::conv_unit(sat, "ft", "m") %>% format(digits = 3)] %>%
   nest_by(crop_type) %>%
@@ -726,7 +737,7 @@ g_avg_yield_dif <-
   .[, sat_text := paste0(
     "Aquifer Thickness = ",
     measurements::conv_multiunit(sat, "ft", "m") %>% format(digits = 3),
-    " meter"
+    "m"
   )] %>%
   .[sat != 40, ] %>%
   nest_by(crop) %>%
@@ -800,7 +811,7 @@ g_ay_response <-
   .[, sat_text := paste0(
     "Aquifer Thickness = ",
     measurements::conv_multiunit(sat, "ft", "m") %>% format(digits = 3),
-    " meter"
+    "m"
   )] %>%
   nest_by(crop) %>%
   data.table() %>%

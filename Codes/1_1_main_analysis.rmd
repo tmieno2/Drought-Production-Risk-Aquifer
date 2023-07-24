@@ -64,6 +64,7 @@ data_corn <-
   .[, type := "Corn"] %>%
   .[, dry_or_not := fifelse(sat_cat == "dryland", 1, 0)] %>%
   .[, sc_dry := paste0(sc_code, "_", dry_or_not)] %>%
+  .[, state_year := paste0(state_name, "_", year)] %>%
   .[, balance := -balance]
 
 #--- define the semi-parametric portion of the model ---#
@@ -98,16 +99,16 @@ sc_base <- "31011"
 data_for_pred_corn <-
   CJ(
     balance = seq(min(data_corn$balance), max(data_corn$balance), length = 50),
-    sat_cat = unique(data_corn$sat_cat)
+    sat = c(0, 40, 194, 348, 602)
   ) %>%
   # .[, sat := parse_number(gsub("\\,.*", "", sat_cat))] %>%
-  .[, sat := case_when(
-    sat_cat == "[39.4,82]" ~ 40,
-    sat_cat == "(82,194]" ~ 194,
-    sat_cat == "(194,708]" ~ 348,
-    sat_cat == "dryland" ~ 0
+  .[, sat_cat := case_when(
+    sat == 40 ~ "[39.4,82]",
+    sat == 194 ~ "(82,194]",
+    sat == 348 ~ "(194,708]",
+    sat == 602 ~ "(194,708]",
+    sat == 0 ~ "dryland"
   )] %>%
-  .[is.na(sat), sat := 0] %>%
   # === can be any sc_code (need to shift yield for "average" county) ===#
   .[, sc_code := sc_base] %>%
   .[, sc_dry := sc_dry_base] %>%
@@ -132,14 +133,9 @@ yhat_data_corn[, `:=`(
   y_hat = y_hat_with_se$fit,
   y_hat_se = y_hat_with_se$se.fit
 )]
-
-yhat_data_corn[, sat_cat_q :=
-  as.numeric(sat_cat) %>%
-  ordinal() %>%
-  paste0(., " quintile")]
 ```
 
-```{r}
+```{r, eval = FALSE}
 (
   g_yield_balance_corn <-
     ggplot(yhat_data_corn) +
@@ -148,14 +144,14 @@ yhat_data_corn[, sat_cat_q :=
         ymin = y_hat - 1.96 * y_hat_se,
         ymax = y_hat + 1.96 * y_hat_se,
         x = balance,
-        fill = factor(sat_cat_q)
+        fill = factor(sat)
       ),
       alpha = 0.3
     ) +
     geom_line(aes(
       y = y_hat,
       x = balance,
-      color = factor(sat_cat_q)
+      color = factor(sat)
     )) +
     xlab("Water Balance") +
     ylab("Yield (tonne/ha)") +
@@ -177,17 +173,89 @@ ir_share_data_corn <-
   .[, balance_avg := mean(balance), by = sc_code] %>%
   .[, type := "Corn"]
 
+
 ir_share_res_corn <-
   gam(
     acres_ratio ~
       s(sat, k = 3, m = 2) +
       s(balance_avg, k = 3, m = 2) +
-      factor(state_name) +
-      factor(year),
+      factor(state_year),
     data = ir_share_data_corn,
     # weight = ~acres,
     family = binomial
   )
+```
+
+```{r}
+gam_formula_ir_share <-
+  formula(
+    acres_ratio ~
+      s(sat, k = 4, m = 2) +
+      s(balance_avg, k = 3, m = 2)
+  )
+
+reg_data_ir_share <-
+  gen_smooth_data(
+    data = ir_share_data_corn,
+    gam_formula = gam_formula_ir_share
+  )
+
+formula_feols <-
+  names(reg_data_ir_share$model_X) %>%
+  paste0(., collapse = "+") %>%
+  paste0("acres_ratio ~ ", .) %>%
+  # paste0(., "+", ) %>%
+  paste0(., " | ", "state_year") %>%
+  formula()
+
+share_res <-
+  feglm(
+    formula_feols,
+    cluster = "sc_code",
+    data = reg_data_ir_share$data,
+    family = binomial()
+  )
+
+share_pred_data_corn <-
+  CJ(
+    sat = seq(
+      min(ir_share_data_corn$sat),
+      max(ir_share_data_corn$sat),
+      length = 100
+    ),
+    balance_avg =
+      c(
+        seq(
+          min(ir_share_data_corn$balance_avg),
+          max(ir_share_data_corn$balance_avg),
+          length = 20
+        ),
+        mean(ir_share_data_corn$balance_avg)
+      ),
+    state_year = "Nebraska_2009"
+  ) %>%
+  .[, acres_ratio := 0]
+
+share_hat_data <-
+  gen_smooth_data(
+    data = share_pred_data_corn,
+    gam_res = reg_data_ir_share$gam_res
+  ) %>%
+  .$data %>%
+  .[balance_avg == mean(ir_share_data_corn$balance_avg), ]
+
+share_hat <- 
+  predict(
+    share_res, 
+    newdata = share_hat_data
+  )
+
+share_hat_data[, `:=`(
+  share_hat = share_hat
+)]
+
+ggplot(share_hat_data) +
+  geom_line(aes(y = share_hat, x = sat))
 ```
 
 ### Prediction
@@ -201,8 +269,7 @@ share_pred_data_corn <-
       length = 100
     ),
     balance_avg = mean(ir_share_data_corn$balance_avg),
-    year = 2016,
-    state_name = "Nebraska"
+    state_year = "Nebraska_2009"
   )
 
 ir_share_hat_data <-
@@ -216,19 +283,19 @@ ir_share_hat_data <-
 share_pred_data_corn[, ir_share_hat := ir_share_hat_data$fit]
 share_pred_data_corn[, ir_share_hat_se := ir_share_hat_data$se.fit]
 
-ggplot(share_pred_data_corn[sat <= 600, ]) +
-  geom_line(aes(y = ir_share_hat, x = sat * 0.3048)) +
-  geom_ribbon(
-    aes(
-      ymin = ir_share_hat - 1.96 * ir_share_hat_se,
-      ymax = ir_share_hat + 1.96 * ir_share_hat_se,
-      x = sat * 0.3048
-    ),
-    alpha = 0.4
-  ) +
-  ylim(0, NA) +
-  xlab("Saturated Thickness (meter)") +
-  ylab("Share of Irrigated Acres")
+# ggplot(share_pred_data_corn[sat <= 600, ]) +
+#   geom_line(aes(y = ir_share_hat, x = sat * 0.3048)) +
+#   geom_ribbon(
+#     aes(
+#       ymin = ir_share_hat - 1.96 * ir_share_hat_se,
+#       ymax = ir_share_hat + 1.96 * ir_share_hat_se,
+#       x = sat * 0.3048
+#     ),
+#     alpha = 0.4
+#   ) +
+#   ylim(0, NA) +
+#   xlab("Saturated Thickness (meter)") +
+#   ylab("Share of Irrigated Acres")
 ```
 
 ## Average (rainfed and irrigated combined)
@@ -236,7 +303,7 @@ ggplot(share_pred_data_corn[sat <= 600, ]) +
 ```{r}
 data_corn_total <-
   yhat_data_corn[, .(y_hat, y_hat_se, balance, sat_cat, sat, type, year)] %>%
-  .[, state_name := "Nebraska"] %>%
+  .[, state_year := "Nebraska_2009"] %>%
   .[, balance_avg := mean(balance)] %>%
   .[, c("ir_share_hat", "ir_share_hat_se") := predict(ir_share_res_corn, newdata = ., type = "response", se.fit = TRUE)]
 
@@ -270,6 +337,7 @@ data_soy <-
   .[, type := "Soybean"] %>%
   .[, dry_or_not := fifelse(sat_cat == "dryland", 1, 0)] %>%
   .[, sc_dry := paste0(sc_code, "_", dry_or_not)] %>%
+  .[, state_year := paste0(state_name, "_", year)] %>%
   .[, balance := -balance]
 
 #--- define the semi-parametric portion of the model ---#
@@ -303,15 +371,16 @@ sc_base <- "31011"
 data_for_pred_soy <-
   CJ(
     balance = seq(min(data_soy$balance), max(data_soy$balance), length = 50),
-    sat_cat = unique(data_soy$sat_cat)
+    sat = c(0, 40, 194, 348, 602)
   ) %>%
-  .[, sat := case_when(
-    sat_cat == "[39.4,82]" ~ 40,
-    sat_cat == "(82,194]" ~ 194,
-    sat_cat == "(194,708]" ~ 348,
-    sat_cat == "dryland" ~ 0
+  # .[, sat := parse_number(gsub("\\,.*", "", sat_cat))] %>%
+  .[, sat_cat := case_when(
+    sat == 40 ~ "[39.4,82]",
+    sat == 194 ~ "(82,194]",
+    sat == 348 ~ "(194,708]",
+    sat == 602 ~ "(194,708]",
+    sat == 0 ~ "dryland"
   )] %>%
-  .[is.na(sat), sat := 0] %>%
   # === can be any sc_code (need to shift yield for "average" county) ===#
   .[, sc_code := data_soy$sc_code[1]] %>%
   .[, sc_dry := data_soy$sc_dry[1]] %>%
@@ -336,39 +405,34 @@ yhat_data_soy[, `:=`(
   y_hat = y_hat_with_se$fit,
   y_hat_se = y_hat_with_se$se.fit
 )]
-
-yhat_data_soy[, sat_cat_q :=
-  as.numeric(sat_cat) %>%
-  ordinal() %>%
-  paste0(., " quintile")]
 ```
 
 
 ```{r}
-(
-  g_yield_balance_soy <-
-    ggplot(yhat_data_soy) +
-    geom_ribbon(
-      aes(
-        ymin = y_hat - 1.96 * y_hat_se,
-        ymax = y_hat + 1.96 * y_hat_se,
-        x = balance,
-        fill = factor(sat_cat_q)
-      ),
-      alpha = 0.3
-    ) +
-    geom_line(aes(
-      y = y_hat,
-      x = balance,
-      color = factor(sat_cat_q)
-    )) +
-    xlab("balance") +
-    ylab("Yield (tonne/ha)") +
-    scale_color_discrete(name = "") +
-    theme(
-      legend.position = "bottom"
-    )
-)
+# (
+#   g_yield_balance_soy <-
+#     ggplot(yhat_data_soy) +
+#     geom_ribbon(
+#       aes(
+#         ymin = y_hat - 1.96 * y_hat_se,
+#         ymax = y_hat + 1.96 * y_hat_se,
+#         x = balance,
+#         fill = factor(sat_cat_q)
+#       ),
+#       alpha = 0.3
+#     ) +
+#     geom_line(aes(
+#       y = y_hat,
+#       x = balance,
+#       color = factor(sat_cat_q)
+#     )) +
+#     xlab("balance") +
+#     ylab("Yield (tonne/ha)") +
+#     scale_color_discrete(name = "") +
+#     theme(
+#       legend.position = "bottom"
+#     )
+# )
 ```
 
 ## Extensive Margin (acreage share)
@@ -385,8 +449,7 @@ ir_share_res_soy <-
     acres_ratio ~
       s(sat, k = 4, m = 2) +
       s(balance_avg, k = 3, m = 2) +
-      factor(state_name) +
-      factor(year),
+      factor(state_year),
     data = ir_share_data_soy,
     # weight = ~acres,
     family = binomial
@@ -405,7 +468,7 @@ share_pred_data_soy <-
     ),
     balance_avg = mean(ir_share_data_soy$balance_avg),
     year = 2016,
-    state_name = "Nebraska"
+    state_year = "Nebraska_2009"
   )
 
 ir_share_hat_data <-
@@ -419,19 +482,19 @@ ir_share_hat_data <-
 share_pred_data_soy[, ir_share_hat := ir_share_hat_data$fit]
 share_pred_data_soy[, ir_share_hat_se := ir_share_hat_data$se.fit]
 
-ggplot(share_pred_data_soy[sat <= 600, ]) +
-  geom_line(aes(y = ir_share_hat, x = sat * 0.3048)) +
-  geom_ribbon(
-    aes(
-      ymin = ir_share_hat - 1.96 * ir_share_hat_se,
-      ymax = ir_share_hat + 1.96 * ir_share_hat_se,
-      x = sat * 0.3048
-    ),
-    alpha = 0.4
-  ) +
-  ylim(0, NA) +
-  xlab("Saturated Thickness (meter)") +
-  ylab("Share of Irrigated Acres")
+# ggplot(share_pred_data_soy[sat <= 600, ]) +
+#   geom_line(aes(y = ir_share_hat, x = sat * 0.3048)) +
+#   geom_ribbon(
+#     aes(
+#       ymin = ir_share_hat - 1.96 * ir_share_hat_se,
+#       ymax = ir_share_hat + 1.96 * ir_share_hat_se,
+#       x = sat * 0.3048
+#     ),
+#     alpha = 0.4
+#   ) +
+#   ylim(0, NA) +
+#   xlab("Saturated Thickness (meter)") +
+#   ylab("Share of Irrigated Acres")
 ```
 
 ## Average (rainfed and irrigated combined)
@@ -439,7 +502,7 @@ ggplot(share_pred_data_soy[sat <= 600, ]) +
 ```{r}
 data_soy_total <-
   yhat_data_soy[, .(y_hat, y_hat_se, balance, sat_cat, sat, type, year)] %>%
-  .[, state_name := "Nebraska"] %>%
+  .[, state_year := "Nebraska_2009"] %>%
   .[, balance_avg := mean(balance)] %>%
   .[, c("ir_share_hat", "ir_share_hat_se") := predict(ir_share_res_soy, newdata = ., type = "response", se.fit = TRUE)]
 
