@@ -95,7 +95,7 @@ We should have had confidence intervals for this figure as well. However, in rep
 
 + P. 6: "... demonstrate that the relationship between aquifer saturated thickness and drought impacts is highly nonlinear when accounting for farmers decisions about irrigated production areas. This indicates that sustainable groundwater conservation efforts [...] should be targeted in space and time to avoid depletion exceeding critical thresholds ..." Is the assumption of non-linearity tested? It is difficult to assess the validity of this statement based on the figures provided. Please clarify (e.g. in the results) what supports this statement.
 
-
+\textcolor{blue}{We now have statements that clarify this point at the end of the subsection of average yield. We do not believe that we need a formal statistical test of non-linearity here.} 
 
 6. Methods - data sets: 
 

@@ -66,7 +66,7 @@
 
 \begin{document}
 
-\textcolor{blue}{We really appreciate your comments. Addressing them has made our paper significantly stronger. Please find our replies to your comments written in blue.}
+\textcolor{blue}{Thank you for the detailed and constructive feedback on our manuscript. We have endeavoured to address all your comments and suggestions, and our replies to your comments can found in blue below (original comments in black).}
 
 This is an interesting paper that asks an important yet answered
 question in the field of agricultural sustainability - how much is
@@ -75,7 +75,8 @@ Plains region in the United States? While the paper is an important
 contribution to the literature, there are several issues that need to be
 addressed prior to acceptance at any journal.
 
-\begin{itemize}
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
 \tightlist
 \item
   There needs to be more description about why aquifer saturation
@@ -83,11 +84,27 @@ addressed prior to acceptance at any journal.
   from wells. This is particularly true since this is a broad interest
   journal, and the mechanism for the main independent variable should be
   very clear to all readers.
-\end{itemize}
+\end{enumerate}
 
-\textcolor{blue}{Tim?}
+\textcolor{blue}{Saturated thickness affects farmers ability to meet the water requirements of their crops due to its impacts on the pumping yields (or capacities) of groundwater irrigation wells. As the saturated thickness of an aquifer declines, the rate at which water can flow from the aquifer to the pumping well is reduced proportionally to the aquifer's transmissivity (equal to the hydraulic conductivity of the aquifer geology multiplied by the saturated thickness of that aquifer geology). For small relative changes in saturated thickness (e.g. for initial depletion of an aquifer with large initial saturated thickness), the change in well yield is small and unlikely to have substantial negative impacts on drought risk exposure as a farmer could simply run their pump for slightly longer to compensate for the small reduction in instantaneous well yield. However, for larger relative changes in saturated thickness (e.g. due to significant aquifer depletion and/or thinner aquifer bodies), the magnitude of well yield reductions will be much larger. These reductions in water supply capacity cannot be mitigated by changes to irrigation scheduling or management practices. The farmer will often be unable to keep up with crop water demands during the peak of the growing season in the absence of rainfall, even if running their system continually. This effect can also typically not be mitigated by drilling additional or deeper wells, due to a combination of both regulatory moratoriums on well drilling - which are common across the HPA - and high costs of deep well construction. To more clearly highlight for non-specialist readers these connections between saturated thickness, well yields, and drought resilience of agriculture, we have added the following text on page X lines X-X of our revised manuscript. We note that we are limited in elaborating further on background information given journal word constraints, and hence provide key supporting studies in citations for readers interested in deepening understanding of these dynamics.}
+
+\textcolor{blue}{``...depletion also reduces the saturated thickness of an aquifer, lowering the aquifer's transmissivity (i.e., the potential rate of water supply to wells). This latter effect reduces the rate at which water can be pumped and applied to a field as irrigation (Konikow and Kendy, 2005; Foster et al., 2015; Hrozencik et al., 2017). If the reduction in well yields is substantial - for example as would occur when a large proportion of aquifer saturated thickness is depleted (Hecox et al., 2002; Korus and Hensen, 2020) - then a farmer may be unable to extract sufficient water to meet crop water demands, in particular during periods of limited rainfall and in the peak of the growing season when crops are most sensitive to water deficits (Foster et al., 2015a; Rouhi-Rad et al., 2020).''
+}
+
+\textcolor{blue}{Additional references added:}
 
 \begin{itemize}
+\item
+  \textcolor{blue}{Hecox, G.R., Macfarlane, P.A., and Wilson B.B. (2002). Calculation of yield for High Plains wells: relationship between saturated thickness and well yield. Open file report 2002–25C, Kansas Geological Survey: Lawrence, Kansas, USA.}
+\item
+  \textcolor{blue}{Korus, J. T., and Hensen, H. J. (2020). Depletion percentage and nonlinear transmissivity as design criteria for groundwater-level observation networks. Environmental Earth Sciences, 79(16), 382.}
+\item
+  \textcolor{blue}{Rouhi-Rad, M., Araya, A., and Zambreski, Z. T. (2020). Downside risk of aquifer depletion. Irrigation Science, 38, 577-591.}
+\end{itemize}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{1}
 \tightlist
 \item
   Though I am not trained as a hydrologist, my understanding is that
@@ -96,11 +113,13 @@ addressed prior to acceptance at any journal.
   available at a specific location or point. If this is the case, the
   authors should make clear why this is an appropriate measure to use in
   their study and potential limitations of using this approach.
-\end{itemize}
+\end{enumerate}
 
 \textcolor{blue}{Tim? this is realted to one of the reviewer 1's comments}
 
-\begin{itemize}
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{2}
 \tightlist
 \item
   It is unclear to me why county and time fixed effects were not used in
@@ -117,17 +136,19 @@ addressed prior to acceptance at any journal.
   should be used if possible. If it's not possible, the limitations of
   the current approach should be made very clear and potential issues
   with inference.
-\end{itemize}
+\end{enumerate}
 
 \textcolor{blue}{Thank you for this comment, which we believe led to a slighly better model and acknowledgin important limitations of our methods. County and year fixed effects were included in equation (1), but only year fixed effects were included in equation (2). As you gueesed, the problem of including county FEs lies in the massive elimination of variation in aquifer thickness. Please see Figure 6 in Appendix A for the histogram of (1) aquifer thickness demeaned by the county average, (2) aquifer thickness demeaned by the state average, and (3) aquifer thickness without demeaning. As you can see in the figure, inclusion of county FEs (mathematically equivalent to regression using county-demeaned aquifer thickness) dramatically reduces the total variation in aquifer thickness and not enough variations are left for accurately estimating its impact of the share of irrigated acres. The inclusion of State FEs does not diminish the variation in aquifer thickness. Therefore, while the inclusion of State FEs certainly does not provide as tight of a control as county FEs, we have decided to include State FEs for both corn and soybean irrigated share regrssions as it is better than not including them. Figure 7 compares the estiamted impacts of aquifer thickness with or without State FEs. The negative impact of reduction in aquifer thickness on the share of irrigated acres is slightly greater when state fixed effects are included. Therefore, it may be that aquifer thickness is not very highly correlated with important unobservable variables that are affecting irrigated share significantly. Given the direction of potential bias, providing tighter controls with county fixed effects may result in even more significant drop in the share of irrigated acres (we may be underestimating the impact of aquifer thickness.). All the discussion we are providing here is now seen in Appenddix A.
 }
 
-\begin{itemize}
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{3}
 \tightlist
 \item
   There are minor typos (e.g., missing reference listed as REF) that
   should be corrected prior to resubmission.
-\end{itemize}
+\end{enumerate}
 
 \textcolor{blue}{}
 

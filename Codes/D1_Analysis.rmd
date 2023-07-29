@@ -59,10 +59,13 @@ reg_data <-
 ## Yield
 
 ```{r}
+
+#--- global parameters ---#
+
+
 main_analysis <-
   reg_data %>%
   rowwise() %>%
-  dplyr::mutate(sc_base = "31011") %>%
   #--- the same sequence used for all the bootstrap iterations ---#
   dplyr::mutate(balance_seq = list(
     seq(
@@ -96,29 +99,8 @@ main_analysis <-
   #++++++++++++++++++++++++++++++++++++
   #+ Main analysis
   #++++++++++++++++++++++++++++++++++++
-  dplyr::mutate(yield_analysis_results = list(
-    yield_analysis(data, balance_seq, sat_seq_eval, sat_breaks, sat_text_data, sc_base)
-  )) %>%
-  dplyr::mutate(
-    yield_pred_data = list(yield_analysis_results$yield_pred_data),
-    yield_semi_res = list(yield_analysis_results$semi_res)
-  ) %>%
-  dplyr::mutate(yield_dif_test = list(
-    lapply(
-      2:3,
-      \(x) {
-        test_dif_in_yield(
-          balance_ls = seq(min(data$balance), max(data$balance), length = 50),
-          base_q = 1,
-          comp_q = x,
-          yield_semi_res,
-          sat_text_data,
-          sc_base
-        ) %>%
-          .[, comp_q := x]
-      }
-    ) %>%
-      rbindlist()
+  dplyr::mutate(yield_pred_data = list(
+    yield_analysis(data, balance_seq, sat_seq_eval, sat_breaks, sat_text_data)
   )) %>%
   dplyr::mutate(share_pred_data = list(
     share_analysis(share_reg_data, sat_seq, sandtotal_med, silttotal_med, awc_med)
@@ -126,105 +108,177 @@ main_analysis <-
   dplyr::mutate(avg_yield_pred_data = list(
     get_average_yield(yield_pred_data, share_pred_data)
   ))
-
-saveRDS(main_analysis, "Shared/Results/main_analysis.rds")
 ```
 
+```{r}
+set.seed(837943)
+
+boot_results_added$yield_pred_data_boot[[1]] %>% 
+  rbindlist() %>%
+  .[, .(
+      # y_hat_boot = median(y_hat, na.rm = TRUE),
+      y_hat_se = sd(y_hat, na.rm = TRUE),
+      # dif_y_hat_boot = mean(dif_y_hat, na.rm = TRUE),
+      dif_y_hat_se = sd(dif_y_hat, na.rm = TRUE)
+    ),
+    by = .(balance, sat, sat_cat)
+    ] 
+
+boot_results_added <-
+  main_analysis[1, ]  %>%
+  #--- bootsrap data ---#
+  dplyr::mutate(boot_data = list(
+    replicate(1000, boot(data), simplify = FALSE)
+  )) %>%
+  #--- get share data ---#
+  dplyr::mutate(share_boot_data = list(
+    lapply(
+      1:length(boot_data),
+      \(x) {
+        boot_data[[x]] %>%
+          .[ir == "ir" & ir_area_ratio >= 0.75, ] %>%
+          .[, balance_avg := mean(balance), by = sc_code]
+      }
+    )
+  )) %>%
+  #--- yield analysis ---#
+  dplyr::mutate(yield_pred_data_boot = list(
+    parallel::mclapply(
+      1:length(boot_data),
+      \(x) {
+        print(x)
+        yield_analysis_manual(boot_data[[x]], balance_seq, sat_seq_eval, sat_breaks, sat_text_data)
+      },
+      mc.cores = parallel::detectCores() - 2
+    )
+  ))
+
+
+
+```
 ```{r}
 #++++++++++++++++++++++++++++++++++++
 #+ Bootstrap
 #++++++++++++++++++++++++++++++++++++
-set.seed(383954)
+set.seed(837943)
 
-# data <- main_analysis$data[[1]]
-# yield_pred_data <- main_analysis$yield_pred_data[[1]]
-# sat_seq <- main_analysis$sat_seq[[1]]
-# silttotal_med <- main_analysis$silttotal_med[[1]]
-# sandtotal_med <- main_analysis$sandtotal_med[[1]]
-# awc_med <- main_analysis$awc_med[[1]]
-# sc_base <- main_analysis$sc_base[[1]]
+balance_seq <- main_analysis$balance_seq[[1]]
+  balance_seq <- main_analysis$balance_seq[[1]]
+  sat_seq_eval <- main_analysis$sat_seq_eval[[1]]
+  sat_breaks <- main_analysis$sat_breaks[[1]]
+  sat_text_data <- main_analysis$sat_text_data[[1]]
 
-boot_results_added <-
+temp <- lapply(1:500, get_coef) %>% rbindlist
+
+main_analysis$data[[1]][sc_dry == "56031_1", ]
+
+get_coef <- function(i) {
+
+yield_data <- main_analysis$boot_data[[1]][[i]]
+semi_res_corn <-
+    semi_ols(
+      semi_formula = semi_formula,
+      c_formula = paste0("i(sat_cat, ref = 'dryland') + i(year, ref = 2009) + i(sc_dry, ref = '", sc_dry_base, "')"),
+      # fe = "",
+      cluster = "sc_dry",
+      data = yield_data
+    )
+
+y_res_int <- semi_res_corn$fe_res
+
+return_data[, mean(y_hat), by = sat_cat]
+yield_data[, mean(yield), by = sat_cat]
+
+return(
+tidy(y_res_int) %>%
+data.table() %>%
+.[term %in% c("sat_cat::[9.01,23.1]", "sat_cat::(23.1,56.8]", "sat_cat::(56.8,216]"), estimate]
+)
+
+}
+  
+
+
+main_analysis <-
   main_analysis %>%
   #--- bootsrap data ---#
-  dplyr::mutate(avg_yield_pred_data_boot = list(
-    parallel::mclapply(
-      1:18,
+  dplyr::mutate(boot_data = list(
+    replicate(1000, boot(data), simplify = FALSE)
+  )) %>%
+  #--- get share data ---#
+  dplyr::mutate(share_boot_data = list(
+    lapply(
+      1:length(boot_data),
       \(x) {
-        print(x)
-
-        #--- bootstrap data ---#
-        boot_data <- boot(data, sc_base)
-
-        #--- yield analysis ---#
-        yield_pred_data <-
-          yield_analysis(
-            boot_data,
-            balance_seq,
-            sat_seq_eval,
-            sat_breaks,
-            sat_text_data,
-            sc_base,
-            boot = TRUE
-          )
-
-        #--- share analysis ---#
-        share_boot_data <-
-          boot_data %>%
+        boot_data[[x]] %>%
           .[ir == "ir" & ir_area_ratio >= 0.75, ] %>%
           .[, balance_avg := mean(balance), by = sc_code]
-
-        share_pred_data <-
-          share_analysis(
-            ir_share_data = share_boot_data,
-            sat_seq,
-            sandtotal_med,
-            silttotal_med,
-            awc_med
-          )
-        #--- average yield ---#
-        avg_yield_pred_data <- get_average_yield(yield_pred_data, share_pred_data)
-        
-        return(avg_yield_pred_data)
-      },
-      mc.cores = parallel::detectCores() - 2
-    ) %>%
-      rbindlist()
-  )) %>%
-  dplyr::mutate(avg_yield_sum = list(
-    avg_yield_pred_data_boot[, .(
-      avg_yield_se = sd(avg_yield, na.rm = TRUE),
-      dif_avg_yield_se = sd(dif_avg_yield, na.rm = TRUE)
-    ),
-    by = .(balance, sat)
-    ] %>%
-      .[avg_yield_pred_data, on = c("balance", "sat")] %>%
-      .[, `:=`(
-        upper = avg_yield + 1.96 * avg_yield_se,
-        lower = avg_yield - 1.96 * avg_yield_se,
-        dif_upper = dif_avg_yield + 1.96 * dif_avg_yield_se,
-        dif_lower = dif_avg_yield - 1.96 * dif_avg_yield_se
-      )]
-  )) %>%
-  data.table() %>%
-  dplyr::select(
-    crop, data, sat_seq, sat_text_data,
-    yield_pred_data,
-    yield_dif_test,
-    share_pred_data,
-    avg_yield_pred_data,
-    avg_yield_pred_data_boot,
-    avg_yield_sum
-  )
-
-saveRDS(boot_results_added, "Shared/Results/boot_results_added.rds")
+      }
+    )
+  ))
 ```
 
+```{r}
+boot_data <- boot_results_added$boot_data[[1]]
+
+balance_seq <- boot_results_added$balance_seq[[1]]
+sat_seq_eval <- boot_results_added$sat_seq_eval[[1]]
+sat_breaks <- boot_results_added$sat_breaks[[1]]
+sat_text_data <- boot_results_added$sat_text_data[[1]]
+
+temp <- yield_analysis(boot_data[[200]], balance_seq, sat_seq_eval, sat_breaks, sat_text_data)
+
+ggplot(temp[sat == 50, ]) +
+  geom_point(aes(y = y_hat, x = balance)) +
+  ylim(0, 15)
+
+all_results$yield_pred_data_boot[[1]][sat == 50, sd(y_hat), by = balance]
+
+all_results$yield_pred_data_boot[[1]][sat == 10, ]
+
+all_results$yield_pred_data_boot[[1]][sat == 10, ] %>%
+ggplot(.) +
+  geom_point(aes(y = y_hat, x = balance))
+
+boot_corn <- 
+  boot_results_added$yield_pred_data_boot[[1]] %>%
+  rbindlist(idcol = "boot") %>%
+  .[, mean(y_hat), by = .(boot, sat)]
+
+boot_ids <- boot_corn[V1 < 11 & sat == 10, boot]
+
+boot_results_added$boot_data[[1]][[11]] %>%
+  .[, .N, by = sat_cat]
+
+ggplot(data = boot_results_added$boot_data[[1]][[12]]) +
+  geom_point(aes(y = yield, x = balance)) +
+  facet_grid(sat_cat ~ .)
+
+boot_corn[sat %in% c(10, 50), ] %>%
+  dcast(boot ~ sat, value.var = "V1") %>%
+  ggplot() + 
+  geom_point(aes(y = `50`, x = `10`))
+
+  ggplot(boot_corn) +
+    geom_histogram(aes(x = V1)) +
+    facet_grid(sat ~ .)
+
+
+Check if the average yield and predicted average yield are similar.
+  
+
+
+```
 ```{r}
 #++++++++++++++++++++++++++++++++++++
 #+ Summarize
 #++++++++++++++++++++++++++++++++++++
 boot_results_added <- readRDS("Shared/Results/boot_results_added.rds")
+
+# all_results[, data][[1]] %>%
+#   ggplot() +  
+#   geom_point(aes(y = yield, x = balance)) +
+#   facet_grid(sat_cat ~ .)
 
 all_results <-
   boot_results_added %>%

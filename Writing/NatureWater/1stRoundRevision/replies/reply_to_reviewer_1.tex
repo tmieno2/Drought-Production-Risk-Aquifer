@@ -80,20 +80,19 @@ in Nature Water. However, I do have a few concerns that I wanted to
 bring to the attention of the authors. My most important concerns are as
 follows (not necessarily in order of importance):
 
-\textcolor{blue}{We really appreciate your comments. Addressing them has made our paper significantly stronger. Please find our replies to your comments written in blue.}
+\textcolor{blue}{Thank you for the detailed and constructive feedback on our manuscript. We have endeavoured to address all your comments and suggestions, and our replies to your comments can found in blue below (original comments in black)}
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
 \tightlist
 \item
   Aquifer thickness versus saturated thickness -- The authors speak of
-  ``aquifer saturated thickness'', which is a redundant term. Remember,
-  the definition of an aquifer is a saturated unit -- there is no
-  unsaturated aquifer. Please use ``aquifer thickness'' to avoid
-  propagating this confusing usage into the future.
+  \texttt{aquifer\ saturated\ thickness\textquotesingle{}\textquotesingle{},\ which\ is\ a\ redundant\ term.\ Remember,\ the\ definition\ of\ an\ aquifer\ is\ a\ saturated\ unit\ –\ there\ is\ no\ unsaturated\ aquifer.\ Please\ use}aquifer
+  thickness'\,' to avoid propagating this confusing usage into the
+  future.
 \end{enumerate}
 
-\textcolor{blue}{All the instances of "saturated thickness" and "aquifer saturated thickness" have been replaced by "aquifer thickness".}
+\textcolor{blue}{We agree that there is some redundant use of words here. All the instances of ``saturated thickness'' and ``aquifer saturated thickness'' have been replaced by ``aquifer thickness'' in the revised manuscript.}
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
@@ -119,19 +118,29 @@ follows (not necessarily in order of importance):
 \end{enumerate}
 
 \begin{itemize}
-\tightlist
 \item
   First point:
-  \textcolor{blue}{Quantiles are not recalculated each each. If we do so, then the same quantile would represent different aquifer thickness range every year. When modeling the impact of aquifer thickness, this is not desirable because we are implicitly making assumptions that different ranges of aquifer thickness would have the same impact.}
+  \textcolor{blue}{Quantiles are not recalculated each each. If we do so, then the same quantile would represent different aquifer thickness range every year. When modeling the impact of aquifer thickness, this is not desirable because it would be expected that different ranges of aquifer thickness would have the same impact on a farmer's ability to buffer drought risk.}
 \item
-  Second point: \textbackslash textcolor\{blue\}\{Actually, 0\% quntile
-  is 12 m. ``9m'' was repalced with ``12m'' in the current manuscript.\}
+  Second point:
+  \textcolor{blue}{Thank you for highlighting this point. For the 0\% quantile, we assume a saturated thickness of 9m. This minimum of saturated thickness was selected based on REF, which defines 9m as the minimum aquifer thickness needed to provide a functioning water supply. We have modified the text on page X lines X-X of the revised manuscript to note these points.}
 \item
   Third point:
-  \textcolor{blue}{No interesting insights will be gained from them because they are merely shifters without any intractions with aquifer thickness. They tell us how much higher yield in a single county relative to another county on average. But, we do not beleive that is useful information at least in this artcile.}
+  \textcolor{blue}{Yes, country and year fixed effects are calculated as part of the regressions. However, these variables can be thought of simply as shifters that tell us how much higher average yields are in a single county relative to another county and to account for trends in yields over time. As these variables do not interact with aquifer thickness in our analysis, there would be little insights gained from analysing these variables - and indeed it is standard to not report and analyse fixed effects terms in econometric regressions used in statistical crop-climate modeling.}
 \item
   Fourth point:
-  \textcolor{blue}{This is a very important point. We have added texts describing the implications of this fact in page xx.}
+  \textcolor{blue}{This is an important point, which we thank the reviewer for highlighting. The reviewer is correct that unobserved factors, such as aquifer heterogeneity influencing well yield response to changes in saturated thickness, are a likely underlying cause of the uncertainty ranges found in our analyses. Variations in aquifer conductivity would alter the relationship between saturated thickness and well capacity, thereby adding noise to the relationship between saturated thickness and drought risk exposure that would contribute to uncertainty in our estimates of observed relationships between drought impacts and aquifer conditions. Importantly though, our analysis shows that - even in the presence of these uncertainties - we are still able to identify statistically significant increases in drought risk exposure for irrigated agriculture as a function of declining saturated thickness. This further reinforces the importance of aquifer conditions as a determinant of adaptive capacity to drought. To highlight these points, we have added the following text on page X lines X-X of our revised manuscript:}
+\end{itemize}
+
+\textcolor{blue}{``Similarly, unobserved variations in aquifer properties will also introduce noise into the relationships between aquifer saturated thickness, well yields, and drought risk exposure. For example, a thinner aquifer interval composed of coarse sands and gravels may be able to supply comparable or higher well yields than a thicker aquifer dominated by fine sands and silt deposits, and hence offer greater resilience to drought despite similar or larger saturated thickness (Butler et al., 2013; Korus and Hensen, 2020). While we identify statistically robust impacts of saturated thickness on drought risk despite these uncertainties, improved data on spatial variations in aquifer properties and greater monitoring of real-world changes in well capacities alongside traditional water level measurements would help to refine understanding of patterns of drought vulnerability across the HPA.''}
+
+\textcolor{blue}{New references added:}
+
+\begin{itemize}
+\item
+  \textcolor{blue}{Butler, J. J., Stotler, R. L., Whittemore, D. O., and Reboulet, E. C. (2013). Interpretation of water level changes in the High Plains aquifer in western Kansas. Groundwater, 51(2), 180-190.}
+\item
+  \textcolor{blue}{Korus, J. T., and Hensen, H. J. (2020). Depletion percentage and nonlinear transmissivity as design criteria for groundwater-level observation networks. Environmental Earth Sciences, 79(16), 382.}
 \end{itemize}
 
 \begin{enumerate}
@@ -146,7 +155,7 @@ follows (not necessarily in order of importance):
   point in the manuscript.
 \end{enumerate}
 
-\textcolor{blue}{What we meant by "conditiond on drought risk exposure" is "after taking into account the impact of climate variables." In order to avoid confusion, we simply removed it from the sentence in the current manuscript.}
+\textcolor{blue}{By ``conditioned on drought risk exposure'', we were referring to the fact that Figure 4 displays the relationship between saturated thickness and the share of production area that is irrigated while also accounting for variations in climate across the aquifer. I.e. that the Figure shows the impact of saturated thickness on share of production irrigated after removing the effects of climate on share of production irrigated. To improve clarity, we have modified this phrase to now state ``...after accounting for spatio-temporal variations in drought risk exposure across the aquifer''.}
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
@@ -154,10 +163,10 @@ follows (not necessarily in order of importance):
 \tightlist
 \item
   Equation 2 -- Please define all terms in the equation and provide an
-  explanation of what is meant by ``estimated semi-parametrically''.
+  explanation of what is meant by ``estimated semi-parametrically'\,'.
 \end{enumerate}
 
-\textcolor{blue}{We now have a more detailed mathematical expressions of the model with all the terms explained. We eliminated the word semi-parametrically as it is not ncecessary. Generalized additive model that estiamtes the impact of a variable using splines without functional form assumption are sometimes referred to semi-parametric regression. That's what we meant by "estimate semi-parametrically" in our previous manuscript.}
+\textcolor{blue}{We now have a more detailed mathematical expressions of the model with all the terms explained in Section 4.2 of our revised manuscript. The word semi-parametrically refers to the fact that generalized additive models, such as used in our analysis, estimate the impact of a variable using splines without functional form assumption. These are sometimes referred to as semi-parametric regression methods. However, we agree that the term is potentially confusing, and therefore have removed the term ``semi-parametrically'' in our revised manuscript.}
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
@@ -179,7 +188,22 @@ follows (not necessarily in order of importance):
   points.
 \end{enumerate}
 
-\textcolor{blue}{Tim?}
+\textcolor{blue}{This is an interesting idea - thank you for raising it. We agree that efforts to improve aquifer management could help to mitigate some of the changes in productivity driven by climate and aquifer conditions in our analysis. Greater attention to groundwater conservation, and use of improved scheduling technologies such as soil moisture probes, would be expected to mitigate production losses in years with negative water deficits (i.e. wetter years) which we attribute to increased possibility for over-irrigation when well capacities are high (and hence when farmers do not face or observe physical scarcity). In years with large positive water deficits (i.e. drought years), improved irrigation water management would also be expected to mitigate some of the additional production risk caused by lower saturated thickness. However, we would still expect lower saturated thickness to result in elevated exposure to drought risk even in these circumstances, as declining well yields would create a physical limit to water supply which would stop farmers being able to fully meet crop water needs in these years. Formally testing these effects is beyond the scope and data of our study, but we agree that these are valuable areas for future work and have added the following text to the discussion of our revised manuscript on page X lines X-X:}
+
+\textcolor{blue}{``Improvements to irrigation scheduling and water management practices, such as have been implemented as part of the SD6-LEMA (Local Enhanced Management Area) in Kansas (Deines et al., 2019; Glose et al., 2022) and proposed as part of California's SGMA (Sustainable Groundwater Management Act) (Berbel and Esteban, 2019; Lubell et al., 2020), could also play an important role in improving the efficiency of irrigation and, hence, the ability to more effectively meet crop water demands with lower well capacities. These kinds of interventions would be likely to reduce - but not eliminate - the increases in drought risk caused by declining aquifer saturated thickness, and could bring additional benefits of reducing over-use of water in wetter years through greater awareness of efficiency saving potentials (Foster et al., 2019) and the importance of conservation (Marston et al., 2022) amongst growers.''}
+
+\textcolor{blue}{New references added:}
+
+\begin{itemize}
+\item
+  \textcolor{blue}{Glose, T. J., Zipper, S., Hyndman, D. W., Kendall, A. D., Deines, J. M., and Butler, J. J. (2022). Quantifying the impact of lagged hydrological responses on the effectiveness of groundwater conservation. Water Resources Research, 58(7), e2022WR032295.}
+\item
+  \textcolor{blue}{Berbel, J., and Esteban, E. (2019). Droughts as a catalyst for water policy change. Analysis of Spain, Australia (MDB), and California. Global Environmental Change, 58, 101969.}
+\item
+  \textcolor{blue}{Lubell, M., Blomquist, W., and Beutler, L. (2020). Sustainable groundwater management in California: A grand experiment in environmental governance. Society and Natural Resources, 33(12), 1447-1467.}
+\item
+  \textcolor{blue}{Marston, L. T., Zipper, S., Smith, S. M., Allen, J. J., Butler, J. J., Gautam, S., and David, J. Y. (2022). The importance of fit in groundwater self-governance. Environmental Research Letters, 17(11), 111001.}
+\end{itemize}
 
 \hypertarget{minor-points}{%
 \subsection{Minor points}\label{minor-points}}
@@ -187,9 +211,9 @@ follows (not necessarily in order of importance):
 \begin{itemize}
 \tightlist
 \item
-  Section 1, 3rd Paragraph -- ``Two aquifer pathways exist through
-  aquifer depletion will..'' -- confusing sentence -- please replace
-  ``through'' with ``by which''.
+  Section 1, 3rd Paragraph --
+  \texttt{Two\ aquifer\ pathways\ exist\ through\ aquifer\ depletion\ will..\textquotesingle{}\textquotesingle{}\ –\ confusing\ sentence\ –\ please\ replace}through'\,'
+  with ``by which'\,'.
 \end{itemize}
 
 \textcolor{blue}{Corrected.}
@@ -197,13 +221,13 @@ follows (not necessarily in order of importance):
 \begin{itemize}
 \tightlist
 \item
-  Section 1, 4th Paragraph -- ``we generate empirical evidence'' seems
-  awkward to me. How about replacing with ``we present empirical
-  evidence''? Next sentence -- ``Our analysis advances on
-  previous\ldots{}'' reads better as ``Our analysis extends
-  previous\ldots{}'' There are many issues such as these and the
-  previous comment. Please address such issues so that the manuscript is
-  an easier read.
+  Section 1, 4th Paragraph --
+  \texttt{we\ generate\ empirical\ evidence\textquotesingle{}\textquotesingle{}\ seems\ awkward\ to\ me.\ How\ about\ replacing\ with}we
+  present empirical evidence'`? Next sentence --
+  \texttt{Our\ analysis\ advances\ on\ previous\ \$\textbackslash{}dots\$\textquotesingle{}\textquotesingle{}\ reads\ better\ as}Our
+  analysis extends previous \(\dots\)'' There are many issues such as
+  these and the previous comment. Please address such issues so that the
+  manuscript is an easier read.
 \end{itemize}
 
 \textcolor{blue}{We completely agree. Both of the suggested changes have been made.}
@@ -211,8 +235,8 @@ follows (not necessarily in order of importance):
 \begin{itemize}
 \tightlist
 \item
-  Section 2.1 title -- I would delete ``marginally'' as it is not needed
-  and some will find it confusing.
+  Section 2.1 title -- I would delete ``marginally'\,' as it is not
+  needed and some will find it confusing.
 \end{itemize}
 
 \textcolor{blue}{Tim, any thoughts on this. I feel like it is still important to say the increase is not much.}
@@ -231,11 +255,11 @@ follows (not necessarily in order of importance):
 \tightlist
 \item
   Section 2.3, First Paragraph -- please clarify that ``average per-area
-  production'' is a combination of irrigated and rainfed yields. That
+  production'\,' is a combination of irrigated and rainfed yields. That
   would make the manuscript easier to follow.
 \end{itemize}
 
-\textcolor{blue}{We added "(weighted-average of irrigated and rainfed yields, where weights are production area shares)" so that it is clear what average per-area production means.}
+\textcolor{blue}{We added ``weighted-average of irrigated and rainfed yields, where weights are production area shares'' so that it is clear what average per-area production means.}
 
 \begin{itemize}
 \tightlist
@@ -261,8 +285,8 @@ follows (not necessarily in order of importance):
 \begin{itemize}
 \tightlist
 \item
-  Line before Equation (2) -- ``REF'' should be replaced with the actual
-  reference.
+  Line before Equation (2) -- ``REF'\,' should be replaced with the
+  actual reference.
 \end{itemize}
 
 \textcolor{blue}{Tim?}
@@ -270,8 +294,9 @@ follows (not necessarily in order of importance):
 \begin{itemize}
 \tightlist
 \item
-  Discussion, First Paragraph -- ``reduction in aquifer depletion''
-  should be ``reduction in aquifer thickness''.
+  Discussion, First Paragraph --
+  \texttt{reduction\ in\ aquifer\ depletion\textquotesingle{}\textquotesingle{}\ should\ be}reduction
+  in aquifer thickness'\,'.
 \end{itemize}
 
 \textcolor{blue}{Thank you for catching this. Fixed.}
@@ -279,8 +304,8 @@ follows (not necessarily in order of importance):
 \begin{itemize}
 \tightlist
 \item
-  Section 4.2, 3rd Paragraph -- ``the the impact'' -- remember to spell
-  and grammar check prior to submission.
+  Section 4.2, 3rd Paragraph -- ``the the impact'\,' -- remember to
+  spell and grammar check prior to submission.
 \end{itemize}
 
 \textcolor{blue}{Thank you for catching this. Fixed.}
@@ -288,9 +313,10 @@ follows (not necessarily in order of importance):
 \begin{itemize}
 \tightlist
 \item
-  Reference in Section 3 -- I doubt that ``Butler Jr'' is the surname,
-  please replace with ``Butler''. Suffixes apparently aren't handled
-  well by some of the bibliography generation programs.
+  Reference in Section 3 -- I doubt that
+  \texttt{Butler\ Jr\textquotesingle{}\textquotesingle{}\ is\ the\ surname,\ please\ replace\ with}Butler'\,'.
+  Suffixes apparently aren't handled well by some of the bibliography
+  generation programs.
 \end{itemize}
 
 \textcolor{blue}{}

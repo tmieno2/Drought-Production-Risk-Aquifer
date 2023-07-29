@@ -179,7 +179,7 @@ semi_ols_fe <- function(semi_formula, c_formula, fe, cluster, data) {
   # cor(reg_data$model_X)
 }
 
-yield_analysis <- function(yield_data, balance_seq, sat_seq_eval, sat_breaks, sat_text_data, sc_base, bootstrap = FALSE) {
+yield_analysis <- function(yield_data, balance_seq, sat_seq_eval, sat_breaks, sat_text_data, sc_base) {
   #++++++++++++++++++++++++++++++++++++
   #+ For Debugging
   #++++++++++++++++++++++++++++++++++++
@@ -205,7 +205,7 @@ yield_analysis <- function(yield_data, balance_seq, sat_seq_eval, sat_breaks, sa
     formula(yield ~ s(balance, by = sat_cat, k = 3, m = 2))
 
   #--- semi-parametric FE wih fixest ---#
-  semi_res <-
+  semi_res_corn <-
     semi_ols(
       semi_formula = semi_formula,
       c_formula = paste0("i(sat_cat, ref = 'dryland') + i(year, ref = 2009) + i(sc_dry)"),
@@ -215,12 +215,12 @@ yield_analysis <- function(yield_data, balance_seq, sat_seq_eval, sat_breaks, sa
     )
 
   #--- main regression results ---#
-  y_res_int <- semi_res$fe_res
+  y_res_int <- semi_res_corn$fe_res
 
   #---------------------
   #- Prediction
   #---------------------
-  gam_y_res <- semi_res$gam_res
+  gam_y_res <- semi_res_corn$gam_res
 
   #--- raw data for prediction ---#
   data_for_pred_corn <-
@@ -259,7 +259,7 @@ yield_analysis <- function(yield_data, balance_seq, sat_seq_eval, sat_breaks, sa
 
   yield_hat_data[, `:=`(
     y_hat = y_hat_with_se$fit,
-    y_hat_se_modeled = y_hat_with_se$se.fit
+    y_hat_se = y_hat_with_se$se.fit
   )]
 
   return_data <-
@@ -269,16 +269,7 @@ yield_analysis <- function(yield_data, balance_seq, sat_seq_eval, sat_breaks, sa
 
   return_data[, dif_y_hat := y_hat - q1_yield]
 
-  if (bootstrap == TRUE) {
-    return(
-     yield_pred_data = return_data[, .(balance, sat, sat_cat, sat_cat_text, sat_rank, y_hat, y_hat_se_modeled, dif_y_hat)]
-    )
-  } else {
-    return(list(
-      yield_pred_data = return_data[, .(balance, sat, sat_cat, sat_cat_text, sat_rank, y_hat, y_hat_se_modeled, dif_y_hat)],
-      semi_res = semi_res
-    ))
-  }
+  return(return_data[, .(balance, sat, sat_cat, sat_cat_text, sat_rank, y_hat, y_hat_se, dif_y_hat)])
 }
 
 share_analysis <- function(ir_share_data, sat_seq, sandtotal_e, silttotal_e, awc_e) {
@@ -511,7 +502,7 @@ yield_analysis_boot <- function(yield_data, balance_seq, sat_seq_eval, sat_break
     formula(yield ~ s(balance, by = sat_cat, k = 3, m = 2))
 
   #--- semi-parametric FE wih fixest ---#
-  semi_res <-
+  semi_res_corn <-
     semi_ols_fe(
       semi_formula = semi_formula,
       c_formula = "",
@@ -521,13 +512,13 @@ yield_analysis_boot <- function(yield_data, balance_seq, sat_seq_eval, sat_break
     )
 
   #--- main regression results ---#
-  y_res_int <- semi_res$fe_res
+  y_res_int <- semi_res_corn$fe_res
   # fixef(y_res_int)
 
   #---------------------
   #- Prediction
   #---------------------
-  gam_y_res <- semi_res$gam_res
+  gam_y_res <- semi_res_corn$gam_res
 
   #--- raw data for prediction ---#
   data_for_pred_corn <-
@@ -623,16 +614,25 @@ boot <- function(data, sc_base) {
   return(data_boot)
 }
 
-test_dif_in_yield <- function(balance_ls, base_q, comp_q, yield_semi_res, sat_text_data, sc_base) {
+yield_analysis_gam <- function(yield_data, balance_seq, sat_seq_eval, sat_breaks, sat_text_data, sc_base) {
   #++++++++++++++++++++++++++++++++++++
-  #+ For testing
+  #+ For Debugging
   #++++++++++++++++++++++++++++++++++++
-  # crop_w <- "corn"
-  # balance <- 1000
-  # base_q <- 1
-  # comp_q <- 3
+  # yield_data <- all_results[crop == "corn", data][[1]]
+  # balance_seq <- all_results[crop == "corn", balance_seq][[1]]
+  # yield_data <- main_analysis$data[[1]]
 
-  # balance_ls <- c(200, 300, 400)
+  # yield_data <- main_analysis$data[[1]]
+  # balance_seq <- main_analysis$balance_seq[[1]]
+  # sat_seq_eval <- main_analysis$sat_seq_eval[[1]]
+  # sat_breaks <- main_analysis$sat_breaks[[1]]
+  # sat_text_data <- main_analysis$sat_text_data[[1]]
+
+  # yield_data <- boot_results_added$boot_data[[1]][[1]]
+  # balance_seq <- boot_results_added$balance_seq[[1]]
+  # sat_seq_eval <- boot_results_added$sat_seq_eval[[1]]
+  # sat_breaks <- boot_results_added$sat_breaks[[1]]
+  # sat_text_data <- boot_results_added$sat_text_data[[1]]
 
   #++++++++++++++++++++++++++++++++++++
   #+ Main
@@ -640,116 +640,47 @@ test_dif_in_yield <- function(balance_ls, base_q, comp_q, yield_semi_res, sat_te
   sc_dry_0 <- paste0(sc_base, "_1")
   sc_dry_ir <- paste0(sc_base, "_0")
 
-  q_data <-
-    sat_text_data %>%
-    .[, coef_name := paste0("s_balance_sat_cat", sat_cat)] %>%
-    .[, coef_name := gsub("\\[", "_", coef_name)] %>%
-    .[, coef_name := gsub("\\]", "", coef_name)] %>%
-    .[, coef_name := gsub("\\(", "_", coef_name)] %>%
-    .[, coef_name := gsub("\\,", "_", coef_name)] %>%
-    .[, coef_name := gsub("\\.", "_", coef_name)] %>%
-    rowwise() %>%
-    dplyr::mutate(coef_name = list(
-      c(
-        paste0(coef_name, "__", c(1, 2)),
-        paste0("sat_cat::", sat_cat)
-      )
-    )) %>%
-    data.table()
+  #---------------------
+  #- Regression
+  #---------------------
+  #--- semi-parametric FE wih fixest ---#
+  gam_res <-
+    gam(
+      yield ~ s(balance, by = sat_cat, k = 3, m = 2) + factor(sc_dry) + factor(year) + factor(sat_cat),
+      data = yield_data
+    )
 
-  fe_res <- yield_semi_res$fe_res
-  vcov <- vcov(fe_res)
-  gam_res <- yield_semi_res$gam_res
-
-  #--- create data for prediction ---#
-  data_for_pred <-
+  #---------------------
+  #- Prediction
+  #---------------------
+  #--- raw data for prediction ---#
+  data_for_pred_corn <-
     CJ(
-      balance = balance_ls,
-      sat_cat = unique(q_data$sat_cat)
+      balance = balance_seq,
+      sat = c(0, sat_seq_eval)
     ) %>%
+    .[balance >= min(yield_data$balance), ] %>%
+    .[balance <= max(yield_data$balance), ] %>%
+    .[
+      ,
+      sat_cat := cut(
+        sat,
+        breaks = sat_breaks,
+        include.lowest = TRUE
+      )
+    ] %>%
+    .[is.na(sat_cat), sat_cat := "dryland"] %>%
     # === can be any sc_code (need to shift yield for "average" county) ===#
-    # .[, sc_code := data_w$sc_code[2]] %>%
-    .[, sc_dry := sc_dry_ir] %>%
+    .[, sc_dry := sc_dry_0] %>%
+    .[sat != 0, sc_dry := sc_dry_ir] %>%
     # === can be any year (need to shift yield for "average" year) ===#
     .[, year := 2009] %>%
     # === fake yield data (necessary to take advantage of predict.gam) ===#
-    .[, yield := 0]
+    .[, yield := 0] %>%
+    .[, y_hat := predict(gam_res, newdata = .)] %>%
+    sat_text_data[., on = "sat_cat"] %>%
+    .[, q1_yield := .SD[sat_rank == 1, y_hat], by = balance] %>%
+    .[, dif_y_hat := y_hat - q1_yield]
 
-  #--- create bases  ---#
-  yhat_data <-
-    gen_smooth_data(
-      data = data_for_pred,
-      gam_res = gam_res
-    ) %>%
-    .$data
-
-
-  #++++++++++++++++++++++++++++++++++++
-  #+ Coefficients
-  #++++++++++++++++++++++++++++++++++++
-  coef_data <- tidy(fe_res) %>% data.table()
-
-  #--- coefficients ---#
-  base_coef_names <- q_data[sat_rank == base_q, coef_name][[1]]
-  comp_coef_names <- q_data[sat_rank == comp_q, coef_name][[1]]
-
-  base_coefs <- coef_data[term %in% base_coef_names, estimate]
-  comp_coefs <- coef_data[term %in% comp_coef_names, estimate]
-
-  coefs <- c(comp_coefs, base_coefs)
-
-  #--- X ---#
-  base_x_names <- base_coef_names[-3]
-  comp_x_names <- comp_coef_names[-3]
-
-  #++++++++++++++++++++++++++++++++++++
-  #+ loop over balance
-  #++++++++++++++++++++++++++++++++++++
-  lapply(
-    1:length(balance_ls),
-    \(x) {
-      balance_w <- balance_ls[x]
-      #---------------------
-      #- point estimate
-      #---------------------
-      base_x <-
-        c(
-          yhat_data[balance == balance_w & sat_cat == q_data[sat_rank == base_q, sat_cat], ..base_x_names] %>% unlist(),
-          1
-        )
-
-      comp_x <-
-        c(
-          yhat_data[balance == balance_w & sat_cat == q_data[sat_rank == comp_q, sat_cat], ..comp_x_names] %>% unlist(),
-          1
-        )
-
-      x_vec <- c(comp_x, -base_x)
-
-      #--- difference in yield ---#
-      dif_hat <- sum(coefs * x_vec)
-
-      #++++++++++++++++++++++++++++++++++++
-      #+ SE
-      #++++++++++++++++++++++++++++++++++++
-      coef_names <- c(base_coef_names, comp_coef_names)
-      which_col <- purrr::map_dbl(coef_names, function(x) which(x == colnames(vcov)))
-      rel_vcov <- vcov[which_col, which_col]
-
-      se <- sqrt(t(x_vec) %*% rel_vcov %*% x_vec) %>% .[1, 1]
-
-      test_result <-
-        data.table(
-          balance = balance_w,
-          base_q = base_q,
-          comp_q = comp_q,
-          dif_hat = dif_hat,
-          se = se,
-          t = dif_hat / se
-        )
-
-      return(test_result)
-    }
-  ) %>%
-    rbindlist()
+  return(data_for_pred_corn[, .(balance, sat, sat_cat, sat_cat_text, sat_rank, y_hat, dif_y_hat)])
 }
