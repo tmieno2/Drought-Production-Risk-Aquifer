@@ -1,9 +1,9 @@
 prepare_reg_data <- function(data, sat_thld_m, ir_share_thld, balance_thld, sat_cat_num, state_ls) {
   # === saturated thickness threshold in meter ===#
-  sat_thld <- measurements::conv_unit(sat_thld_m, "m", "ft")
-
   # data <- reg_data$data[[1]]
   # sat_breaks <- reg_data$sat_breaks[[1]]
+
+  # reg_data_y <- reg_data$reg_data_y[[1]]
 
   reg_data <-
     data.table(
@@ -16,7 +16,9 @@ prepare_reg_data <- function(data, sat_thld_m, ir_share_thld, balance_thld, sat_
         # === lower bound ===#
         .[balance >= balance_thld[1], ] %>%
         # === upper bound ===#
-        .[balance <= balance_thld[2], ]
+        .[balance <= balance_thld[2], ] %>%
+        #--- unit conversion ---#
+        .[, sat := measurements::conv_unit(sat, "ft", "m")]
     )) %>%
     # === select observations for each crop type ===#
     mutate(data = list(
@@ -29,13 +31,13 @@ prepare_reg_data <- function(data, sat_thld_m, ir_share_thld, balance_thld, sat_
         # 0: dryland
         # If irrigated, sat is set to be at least 0.01.
         # See 0_6_merge_datasets.R
-        .[sat >= sat_thld | sat == 0, ]
+        .[sat >= sat_thld_m | sat == 0, ]
     )) %>%
     # === sat breaks for grouping ===#
     #' dryland production will have NA
     mutate(sat_breaks = list(
       quantile(
-        base_data[ir == "ir" & sat >= sat_thld, sat],
+        base_data[ir == "ir" & sat >= sat_thld_m, sat],
         prob = seq(0, 1, length = sat_cat_num + 1),
         na.rm = TRUE
       )
@@ -53,32 +55,30 @@ prepare_reg_data <- function(data, sat_thld_m, ir_share_thld, balance_thld, sat_
           )
         ] %>%
         .[is.na(sat_cat), sat_cat := "dryland"] %>%
-        .[, sat_cat_i := factor(paste0("sc_", as.numeric(factor(sat_cat))))] %>%
+        .[, sat_q_rank := as.numeric(factor(sat_cat))] %>%
         .[sat_cat == "dryland" | (ir == "ir" & ir_area_ratio >= ir_share_thld), ]
     )) %>%
+    dplyr::mutate(sat_text_data = list(
+      data.table(sat = zoo::rollmean(sat_breaks, 2)) %>%
+        .[, sat_cat := cut(
+          sat,
+          breaks = sat_breaks,
+          include.lowest = TRUE
+        )] %>%
+        .[, sat_rank := 1:.N] %>%
+        .[, low := sat_breaks[-length(sat_breaks)] %>% round(digits = 1)] %>%
+        .[, up := round(sat_breaks[-1], digits = 1)] %>%
+        .[, sat_cat_text := paste0(
+          nombre::ordinal(sat_rank) %>% stringr::str_to_title(),
+          " Quantile: [", low, "m, ", up, "m]"
+        )] %>%
+        .[, sat := NULL] %>%
+        .[, ]
+    )) %>%
     # === prepare irrigation share data ===#
-    mutate(base_data_ir_share = list(
-      data[ir == "ir" & ir_area_ratio >= ir_share_thld, ]
-    )) %>%
-    mutate(cl_vars = list(
-      c("balance", "days_ab_30", "gdd")
-    )) %>%
-    mutate(avg_cl_data = list(
-      base_data_ir_share[,
-        lapply(.SD, mean, na.rm = TRUE),
-        .SDcols = cl_vars,
-        by = sc_code
-      ] %>%
-        setnames(cl_vars, paste0(cl_vars, "_avg"))
-    )) %>%
-    mutate(reg_data_is = list(
-      avg_cl_data[base_data_ir_share, on = "sc_code"]
-    )) %>%
     dplyr::select(
       -base_data,
-      -data,
-      -base_data_ir_share,
-      -avg_cl_data
+      -data
     )
 
   return(reg_data)
@@ -147,11 +147,17 @@ semi_ols <- function(semi_formula, c_formula, cluster, data) {
   # cor(reg_data$model_X)
 }
 
-reg_yield <- function(yield_data) {
+yield_analysis <- function(yield_data, balance_seq, sat_seq_eval, sat_breaks, sat_text_data) {
   #++++++++++++++++++++++++++++++++++++
   #+ For Debugging
   #++++++++++++++++++++++++++++++++++++
   # yield_data <- all_results[crop == "corn", data][[1]]
+  # balance_seq <- all_results[crop == "corn", balance_seq][[1]]
+  # yield_data <- main_analysis$data[[1]]
+  # balance_seq <- main_analysis$balance_seq[[1]]
+  # sat_seq_eval <- main_analysis$sat_seq_eval[[1]]
+  # sat_breaks <- main_analysis$sat_breaks[[1]]
+  # sat_text_data <- main_analysis$sat_text_data[[1]]
 
   #++++++++++++++++++++++++++++++++++++
   #+ Main
@@ -182,23 +188,23 @@ reg_yield <- function(yield_data) {
   #---------------------
   gam_y_res <- semi_res_corn$gam_res
 
-  sc_dry_base <- yield_data[sc_code == "31011", sc_dry][1]
-  sc_base <- "31011"
-
   #--- raw data for prediction ---#
   data_for_pred_corn <-
     CJ(
-      balance = seq(min(yield_data$balance), max(yield_data$balance), length = 50),
-      sat = c(0, 40, 194, 348, 602)
+      balance = balance_seq,
+      sat = c(0, sat_seq_eval)
     ) %>%
-    # .[, sat := parse_number(gsub("\\,.*", "", sat_cat))] %>%
-    .[, sat_cat := case_when(
-      sat == 40 ~ "[39.4,82]",
-      sat == 194 ~ "(82,194]",
-      sat == 348 ~ "(194,708]",
-      sat == 602 ~ "(194,708]",
-      sat == 0 ~ "dryland"
-    )] %>%
+    .[balance >= min(yield_data$balance), ] %>%
+    .[balance <= max(yield_data$balance), ] %>%
+    .[
+      ,
+      sat_cat := cut(
+        sat,
+        breaks = sat_breaks,
+        include.lowest = TRUE
+      )
+    ] %>%
+    .[is.na(sat_cat), sat_cat := "dryland"] %>%
     # === can be any sc_code (need to shift yield for "average" county) ===#
     .[, sc_code := sc_base] %>%
     .[, sc_dry := sc_dry_base] %>%
@@ -224,18 +230,20 @@ reg_yield <- function(yield_data) {
     y_hat_se = y_hat_with_se$se.fit
   )]
 
-  yield_hat_data[, q1_yield := .SD[sat_cat == "[39.4,82]", y_hat], by = balance]
+  return_data <-
+    yield_hat_data %>%
+    sat_text_data[., on = "sat_cat"] %>%
+    .[, q1_yield := .SD[sat_rank == 1, y_hat], by = balance]
 
-  yield_hat_data[, dif_y_hat := y_hat - q1_yield]
+  return_data[, dif_y_hat := y_hat - q1_yield]
 
-  return(yield_hat_data[, .(balance, sat, sat_cat, y_hat, y_hat_se, dif_y_hat)])
+  return(return_data[, .(balance, sat, sat_cat, sat_cat_text, sat_rank, y_hat, y_hat_se, dif_y_hat)])
 }
 
-reg_share <- function(share_data) {
+share_analysis <- function(ir_share_data, sat_seq, sandtotal_e, silttotal_e, awc_e) {
   #++++++++++++++++++++++++++++++++++++
   #+ Debug
   #++++++++++++++++++++++++++++++++++++
-  # share_data <- ir_share_data
 
   #++++++++++++++++++++++++++++++++++++
   #+ Main
@@ -246,8 +254,8 @@ reg_share <- function(share_data) {
   gam_formula_ir_share <-
     formula(
       acres_ratio ~
-        s(sat, k = 4, m = 2) +
-        s(balance_avg, k = 3, m = 2)
+        s(sat, k = 5, m = 2) +
+        s(balance_avg, k = 5, m = 2)
     )
   #---------------------
   #- Run preliminary gam estimation
@@ -256,7 +264,7 @@ reg_share <- function(share_data) {
   #* gam reg data to replicate
   reg_data_ir_share <-
     gen_smooth_data(
-      data = share_data,
+      data = ir_share_data,
       gam_formula = gam_formula_ir_share
     )
 
@@ -267,9 +275,10 @@ reg_share <- function(share_data) {
     names(reg_data_ir_share$model_X) %>%
     paste0(., collapse = "+") %>%
     paste0("acres_ratio ~ ", .) %>%
-    # paste0(., "+", ) %>%
+    paste0(., "+ sandtotal_r + silttotal_r + awc_r") %>%
     #--- add state-year FE ---#
     paste0(., " | ", "state_year") %>%
+    # paste0(., " | ", "state_name") %>%
     formula()
 
   #---------------------
@@ -285,26 +294,16 @@ reg_share <- function(share_data) {
 
   share_pred_data_corn <-
     CJ(
-      sat =
-        c(
-          seq(
-            min(share_data$sat),
-            max(share_data$sat),
-            length = 100
-          ),
-          c(40, 194, 348, 602)
-        ),
-      balance_avg =
-        c(
-          seq(
-            min(share_data$balance_avg),
-            max(share_data$balance_avg),
-            length = 2
-          ),
-          mean(share_data$balance_avg)
-        ),
-      state_year = "Nebraska_2009"
+      sat = sat_seq,
+      balance_avg = median(ir_share_data$balance_avg),
+      sandtotal_r = sandtotal_e,
+      silttotal_r = silttotal_e,
+      awc_r = awc_e,
+      state_year = "Nebraska_2009",
+      state_name = "Nebraska"
     ) %>%
+    .[sat >= min(ir_share_data$sat), ] %>%
+    .[sat <= max(ir_share_data$sat), ] %>%
     .[, acres_ratio := 0]
 
   share_hat_data <-
@@ -312,8 +311,7 @@ reg_share <- function(share_data) {
       data = share_pred_data_corn,
       gam_res = reg_data_ir_share$gam_res
     ) %>%
-    .$data %>%
-    .[balance_avg == mean(share_data$balance_avg), ]
+    .$data
 
   share_hat <-
     predict(
@@ -325,26 +323,23 @@ reg_share <- function(share_data) {
     ir_share_hat = share_hat
   )]
 
-  return(list(
-    share_res = share_res,
-    share_hat_data = share_hat_data[, .(
-      sat, balance_avg, ir_share_hat
-    )]
-  ))
+  return(
+    share_hat_data = share_hat_data[, .(sat, ir_share_hat)]
+  )
 }
 
 get_average_yield <- function(yield_pred_data, share_pred_data) {
   #++++++++++++++++++++++++++++++++++++
   #+ Debug
   #++++++++++++++++++++++++++++++++++++
-  # yield_pred_data <- all_results[1, yield_response][[1]]
-  # share_pred_data <- share_hat_data
+  # yield_pred_data <- main_analysis[1, ]$yield_pred_data[[1]]
+  # share_pred_data <- main_analysis[1, ]$share_pred_data[[1]]
 
   #++++++++++++++++++++++++++++++++++++
   #+ Main
   #++++++++++++++++++++++++++++++++++++
   data_total <-
-    yield_pred_data[, .(y_hat, y_hat_se, balance, sat_cat, sat)] %>%
+    yield_pred_data[, .(y_hat, y_hat_se, balance, sat_cat, sat, sat_rank)] %>%
     .[, state_year := "Nebraska_2009"] %>%
     share_pred_data[, .(sat, ir_share_hat)][., on = "sat"]
 
@@ -360,38 +355,11 @@ get_average_yield <- function(yield_pred_data, share_pred_data) {
   data_avg_yield <-
     data_dry[data_ir, on = "balance"] %>%
     .[, avg_yield := ir_share_hat * y_hat_ir + (1 - ir_share_hat) * y_hat_dry] %>%
-    .[, q1_yield := .SD[sat == 40, avg_yield], by = balance] %>%
+    .[, q1_yield := .SD[sat_rank == 1, avg_yield], by = balance] %>%
     .[, dif_avg_yield := avg_yield - q1_yield] %>%
-    .[, .(balance, sat, sat_cat, ir_share_hat, sat_cat, state_year, avg_yield, dif_avg_yield)]
+    .[, .(balance, sat, ir_share_hat, state_year, avg_yield, dif_avg_yield)]
 
   return(data_avg_yield)
-}
-
-run_analysis <- function(data) {
-  #++++++++++++++++++++++++++++++++++++
-  #+ Debug
-  #++++++++++++++++++++++++++++++++++++
-  # data <- all_results[1, data][[1]]
-
-  #++++++++++++++++++++++++++++++++++++
-  #+ Main
-  #++++++++++++++++++++++++++++++++++++
-  yield_pred_data <- reg_yield(data)
-
-  ir_share_data <-
-    data %>%
-    .[ir == "ir" & ir_area_ratio >= 0.75, ] %>%
-    .[, balance_avg := mean(balance), by = sc_code]
-
-  share_pred_data <- reg_share(ir_share_data)
-
-  avg_yield_data <- get_average_yield(yield_pred_data, share_pred_data$share_hat_data)
-
-  return(list(
-    yield_pred_data = yield_pred_data,
-    share_pred_data = share_pred_data$share_hat_data,
-    avg_yield_data = avg_yield_data
-  ))
 }
 
 boot <- function(data) {
@@ -454,3 +422,29 @@ theme_fig <-
     panel.background = element_blank(),
     panel.border = element_rect(fill = NA)
   )
+
+expand_grid_df <- function(data_1, data_2) {
+  data_1_ex <-
+    data_1[rep(1:nrow(data_1), each = nrow(data_2)), ] %>%
+    data.table() %>%
+    .[, rowid := 1:nrow(.)]
+
+  data_2_ex <-
+    data_2[rep(1:nrow(data_2), nrow(data_1)), ] %>%
+    data.table() %>%
+    .[, rowid := 1:nrow(.)]
+
+  expanded_data <-
+    data_1_ex[data_2_ex, on = "rowid"] %>%
+    .[, rowid := NULL]
+
+  if ("tbl" %in% class(data_1)) {
+    expanded_data <- as_tibble(expanded_data)
+  }
+
+  if ("rowwise_df" %in% class(data_1)) {
+    expanded_data <- rowwise(expanded_data)
+  }
+
+  return(expanded_data)
+}

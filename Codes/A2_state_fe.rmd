@@ -3,301 +3,99 @@ In the main regresion analysis in the manuscript, state FEs are included. County
 # Regression with and without state fixed effects
 
 ```{r}
-reg_results_data <- readRDS(here::here("Shared/Results/reg_results_data.rds"))
-```
-
-## Without State FEs
-
-### Corn
-
-```{r}
-ir_share_data_corn <- reg_results_data[crop == "Corn", share_data][[1]]
-
-ir_share_res_corn <-
-  gam(
-    acres_ratio ~
-      s(sat, k = 3, m = 2) + s(balance_avg, k = 3, m = 2) +
-      ti(sat, balance_avg, k = 3) + factor(year),
-    data = ir_share_data_corn,
-    # weight = ~acres,
-    family = binomial
-  )
-
-share_pred_data_corn <-
-  CJ(
-    sat = seq(
-      min(ir_share_data_corn$sat),
-      max(ir_share_data_corn$sat),
-      length = 100
-    ),
-    balance_avg = mean(ir_share_data_corn$balance_avg),
-    year = 2016
-  )
-
-ir_share_hat_data <-
-  predict(
-    ir_share_res_corn,
-    newdata = share_pred_data_corn,
-    type = "response",
-    se.fit = TRUE
-  )
-
-share_pred_data_corn[, ir_share_hat := ir_share_hat_data$fit]
-share_pred_data_corn[, ir_share_hat_se := ir_share_hat_data$se.fit]
-```
-
-### Soybean
-
-```{r}
-ir_share_data_soy <- reg_results_data[crop == "Soybean", share_data][[1]]
-
-ir_share_res_soy <-
-  gam(
-    acres_ratio ~
-      s(sat, k = 4, m = 2) +
-      s(balance_avg, k = 3, m = 2) +
-      ti(sat, balance_avg, k = 3, m = 2) +
-      factor(state_name) +
-      factor(year),
-    data = ir_share_data_soy,
-    # weight = ~acres,
-    family = binomial
-  )
-
-share_pred_data_soy <-
-  CJ(
-    sat = seq(
-      min(ir_share_data_soy$sat),
-      max(ir_share_data_soy$sat),
-      length = 100
-    ),
-    balance_avg = mean(ir_share_data_soy$balance_avg),
-    year = 2016,
-    state_name = "Nebraska"
-  )
-
-ir_share_hat_data <-
-  predict(
-    ir_share_res_soy,
-    newdata = share_pred_data_soy,
-    type = "response",
-    se.fit = TRUE
-  )
-
-share_pred_data_soy[, ir_share_hat := ir_share_hat_data$fit]
-share_pred_data_soy[, ir_share_hat_se := ir_share_hat_data$se.fit]
-```
-
-```{r}
-plot_data_ir_share_no_sfe <-
-  rbind(
-    share_pred_data_corn[, .(ir_share_hat, ir_share_hat_se, sat)][, type := "Corn"],
-    share_pred_data_soy[, .(ir_share_hat, ir_share_hat_se, sat)][, type := "Soybean"]
-  ) %>%
-  .[, sfe := "No State FE"]
-```
-
-## With State FEs (Main)
-
-### Corn
-
-```{r}
-ir_share_res_corn <-
-  gam(
-    acres_ratio ~
-      s(sat, k = 3, m = 2) +
-      s(balance_avg, k = 3, m = 2) +
-      ti(sat, balance_avg, k = 3) +
-      factor(state_name) +
-      factor(year),
-    data = ir_share_data_corn,
-    # weight = ~acres,
-    family = binomial
-  )
-
-share_pred_data_corn <-
-  CJ(
-    sat = seq(
-      min(ir_share_data_corn$sat),
-      max(ir_share_data_corn$sat),
-      length = 100
-    ),
-    balance_avg = mean(ir_share_data_corn$balance_avg),
-    year = 2016,
-    state_name = "Nebraska"
-  )
-
-ir_share_hat_data <-
-  predict(
-    ir_share_res_corn,
-    newdata = share_pred_data_corn,
-    type = "response",
-    se.fit = TRUE
-  )
-
-share_pred_data_corn[, ir_share_hat := ir_share_hat_data$fit]
-share_pred_data_corn[, ir_share_hat_se := ir_share_hat_data$se.fit]
-```
-
-### Soybean
-
-```{r}
-ir_share_res_soy <-
-  gam(
-    acres_ratio ~
-      s(sat, k = 4, m = 2) +
-      s(balance_avg, k = 3, m = 2) +
-      ti(sat, balance_avg, k = 3, m = 2) +
-      factor(state_name) +
-      factor(year),
-    data = ir_share_data_soy,
-    # weight = ~acres,
-    family = binomial
-  )
-
-share_pred_data_soy <-
-  CJ(
-    sat = seq(
-      min(ir_share_data_soy$sat),
-      max(ir_share_data_soy$sat),
-      length = 100
-    ),
-    balance_avg = mean(ir_share_data_soy$balance_avg),
-    year = 2016,
-    state_name = "Nebraska"
-  )
-
-ir_share_hat_data <-
-  predict(
-    ir_share_res_soy,
-    newdata = share_pred_data_soy,
-    type = "response",
-    se.fit = TRUE
-  )
-
-share_pred_data_soy[, ir_share_hat := ir_share_hat_data$fit]
-share_pred_data_soy[, ir_share_hat_se := ir_share_hat_data$se.fit]
-```
-
-```{r}
-plot_data_ir_share_with_sfe <-
-  rbind(
-    share_pred_data_corn[, .(ir_share_hat, ir_share_hat_se, sat)][, type := "Corn"],
-    share_pred_data_soy[, .(ir_share_hat, ir_share_hat_se, sat)][, type := "Soybean"]
-  ) %>%
-  .[, sfe := "With State FE"]
+all_results <- readRDS(here::here("Shared/Results/all_results.rds"))
 ```
 
 
-## With State-year FEs (Main)
-
-### Corn
-
 ```{r}
-ir_share_data_corn[, state_year := paste0(state_name, year)]
+#++++++++++++++++++++++++++++++++++++
+#+ Formula
+#++++++++++++++++++++++++++++++++++++
+formula_text <- "acres_ratio ~
+    s(sat, k = 5, m = 2) + s(balance_avg, k = 5, m = 2) +
+    sandtotal_r + silttotal_r + awc_r +
+    factor(year)"
 
-ir_share_res_corn <-
-  gam(
-    acres_ratio ~
-      s(sat, k = 3, m = 2) +
-      s(balance_avg, k = 3, m = 2) +
-      ti(sat, balance_avg, k = 3) +
-      factor(state_year),
-    data = ir_share_data_corn,
-    # weight = ~acres,
-    family = binomial
+share_formula_yfe <- formula(formula_text)
+
+share_formula_sandyfe <-
+  formula_text %>%
+  gsub("factor\\(year\\)", "factor\\(year\\) + factor\\(state_name\\)", .) %>%
+  formula()
+
+share_formula_syfe <-
+  formula_text %>%
+  gsub("factor\\(year\\)", "factor\\(state_year\\)", .) %>%
+  formula()
+
+formula_data <-
+  data.table(
+    formula = c(share_formula_yfe, share_formula_sandyfe, share_formula_syfe),
+    type = c("Year FE", "State and Year FE", "State-Year FE")
   )
 
-share_pred_data_corn <-
-  CJ(
-    sat = seq(
-      min(ir_share_data_corn$sat),
-      max(ir_share_data_corn$sat),
-      length = 100
-    ),
-    balance_avg = mean(ir_share_data_corn$balance_avg),
-    year = 2016,
-    state_year = "Nebraska2009"
-  )
-
-ir_share_hat_data <-
-  predict(
-    ir_share_res_corn,
-    newdata = share_pred_data_corn,
-    type = "response",
-    se.fit = TRUE
-  )
-
-share_pred_data_corn[, ir_share_hat := ir_share_hat_data$fit]
-share_pred_data_corn[, ir_share_hat_se := ir_share_hat_data$se.fit]
-```
-
-### Soybean
-
-```{r}
-ir_share_data_soy[, state_year := paste0(state_name, year)]
-
-ir_share_res_soy <-
-  gam(
-    acres_ratio ~
-      s(sat, k = 4, m = 2) +
-      s(balance_avg, k = 3, m = 2) +
-      ti(sat, balance_avg, k = 3, m = 2) +
-      factor(state_year),
-    data = ir_share_data_soy,
-    # weight = ~acres,
-    family = binomial
-  )
-
-share_pred_data_soy <-
-  CJ(
-    sat = seq(
-      min(ir_share_data_soy$sat),
-      max(ir_share_data_soy$sat),
-      length = 100
-    ),
-    balance_avg = mean(ir_share_data_soy$balance_avg),
-    year = 2016,
-    state_year = "Nebraska2009"
-  )
-
-ir_share_hat_data <-
-  predict(
-    ir_share_res_soy,
-    newdata = share_pred_data_soy,
-    type = "response",
-    se.fit = TRUE
-  )
-
-share_pred_data_soy[, ir_share_hat := ir_share_hat_data$fit]
-share_pred_data_soy[, ir_share_hat_se := ir_share_hat_data$se.fit]
+results <-
+  all_results[, .(crop, data)] %>%
+  expand_grid_df(., formula_data) %>%
+  rowwise() %>%
+  dplyr::mutate(ir_share_data = list(
+    data[ir == "ir" & ir_area_ratio >= 0.75, ] %>%
+      .[, balance_avg := mean(balance), by = sc_code]
+  )) %>%
+  dplyr::mutate(ir_share_res = list(
+    gam(
+      formula,
+      data = ir_share_data_corn,
+      family = binomial
+    )
+  )) %>%
+  dplyr::mutate(share_pred_data = list(
+    CJ(
+      sat = seq(
+        min(ir_share_data$sat),
+        max(ir_share_data$sat),
+        length = 100
+      ),
+      balance_avg = mean(ir_share_data$balance_avg),
+      awc_r = mean(ir_share_data$awc_r),
+      sandtotal_r = mean(ir_share_data$sandtotal_r),
+      silttotal_r = mean(ir_share_data$silttotal_r),
+      state_year = "Nebraska_2009",
+      state_name = "Nebraska",
+      year = 2009
+    )
+  )) %>%
+  dplyr::mutate(ir_share_hat_data = list(
+    predict(
+      ir_share_res,
+      newdata = share_pred_data,
+      type = "response",
+      se.fit = TRUE
+    )
+  )) %>%
+  dplyr::mutate(share_pred_data = list(
+    dplyr::mutate(
+      share_pred_data,
+      ir_share_hat = ir_share_hat_data$fit,
+      ir_share_hat_se = ir_share_hat_data$se.fit
+    )
+  )) %>%
+  dplyr::select(crop, type, share_pred_data) %>%
+  unnest(cols = c(share_pred_data)) %>%
+  data.table()
 ```
 
 ```{r}
-plot_data_ir_share_with_syfe <-
-  rbind(
-    share_pred_data_corn[, .(ir_share_hat, ir_share_hat_se, sat)][, type := "Corn"],
-    share_pred_data_soy[, .(ir_share_hat, ir_share_hat_se, sat)][, type := "Soybean"]
-  ) %>%
-  .[, sfe := "With State-year FE"]
-```
-
-```{r}
-plot_data_ir_share <-
-  rbind(
-    plot_data_ir_share_with_sfe,
-    plot_data_ir_share_with_syfe,
-    plot_data_ir_share_no_sfe
-  )
-
 g_share_comp <-
-  ggplot(plot_data_ir_share[sat <= 500, ]) +
-  geom_line(aes(y = ir_share_hat, x = sat * 0.3048)) +
+  results[sat <= 500, ] %>%
+  .[, type := factor(type, levels = c("Year FE", "State and Year FE", "State-Year FE"))] %>%
+  ggplot() +
+  geom_line(aes(y = ir_share_hat, x = sat)) +
   geom_ribbon(
     aes(
       ymin = ir_share_hat - 1.96 * ir_share_hat_se,
       ymax = ir_share_hat + 1.96 * ir_share_hat_se,
-      x = sat * 0.3048
+      x = sat
     ),
     alpha = 0.4
   ) +
@@ -306,8 +104,8 @@ g_share_comp <-
   scale_x_continuous(breaks = seq(10, 160, by = 20)) +
   xlab("Saturated Thickness (meter)") +
   ylab("Share of Irrigated Acres") +
-  facet_grid(type ~ sfe) +
-  # theme_fig +
+  facet_grid(type ~ crop) +
+  theme_fig +
   theme(
     strip.text = element_text(face = "bold"),
     strip.background = element_blank()

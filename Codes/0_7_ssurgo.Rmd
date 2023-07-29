@@ -102,6 +102,7 @@ get_ssurgo_props <- function(field, vars) {
     ssurgo_data_sum <- get_summarized_ssurgo(ssurgo_geom, vars)
   }
 
+  ssurgo_data_sum[, sc_code := field$sc_code]
   return(ssurgo_data_sum)
 }
 
@@ -145,24 +146,36 @@ parallel::mclapply(
       temp <- get_ssurgo_props(all_counties[x, ], vars)
       saveRDS(temp, here::here(paste0("Shared/Data/RawData/SSURGO/ssurgo_", x, "rds")))
     } else {
-      print(paste0("skipping ", x))
+      temp <- readRDS(file_name)
+      if (ncol(temp) < 7) {
+        temp <- get_ssurgo_props(field = all_counties[x, ], vars)
+        saveRDS(temp, paste0("Shared/Data/RawData/SSURGO/ssurgo_", x, "rds"))
+      } else {
+        print(paste0("skipping ", x))
+      }
     }
   },
   mc.cores = 6,
   mc.preschedule = FALSE
 )
 
-# lapply(
-#   1:nrow(all_counties),
-#   \(x) {
-#     print(x)
-#     file_name <- paste0("Shared/Data/RawData/SSURGO/ssurgo_", x, "rds")
-#     if (!file.exists(file_name)) {
-#       temp <- get_ssurgo_props(field = all_counties[x, ], vars)
-#       saveRDS(temp, paste0("Shared/Data/RawData/SSURGO/ssurgo_", x, "rds"))
-#     }
-#   }
-# )
+lapply(
+  1:nrow(all_counties),
+  \(x) {
+    print(x)
+    file_name <- paste0("Shared/Data/RawData/SSURGO/ssurgo_", x, "rds")
+    if (!file.exists(file_name)) {
+      temp <- get_ssurgo_props(field = all_counties[x, ], vars)
+      saveRDS(temp, paste0("Shared/Data/RawData/SSURGO/ssurgo_", x, "rds"))
+    } else {
+      temp <- readRDS(file_name)
+      if (ncol(temp) < 7) {
+        temp <- get_ssurgo_props(field = all_counties[x, ], vars)
+        saveRDS(temp, paste0("Shared/Data/RawData/SSURGO/ssurgo_", x, "rds"))
+      }
+    }
+  }
+)
 ```
 
 # save the SSURGO data
@@ -171,16 +184,8 @@ parallel::mclapply(
 ssurgo_soil <-
   fs::dir_ls("Shared/Data/RawData/SSURGO") %>%
   purrr::map(readRDS) %>%
-  lapply(function(x) x[, geometry := NULL]) %>%
-  rbindlist() %>%
-  .[, `:=`(
-    state = NULL,
-    state_name = NULL,
-    ir_area_ratio = NULL,
-    in_hpa = NULL
-  )]
+  rbindlist()
 
 saveRDS(ssurgo_soil, here("Shared/Data/ProcessedData/ssurgo_soil.rds"))
-# all_counties[, state_name] %>% unique()
 ```
 

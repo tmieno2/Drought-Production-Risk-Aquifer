@@ -229,7 +229,7 @@ deficit_2012 <- data_corn[year == 2012, mean(balance)]
 balace_closest <- data_final_corn[which.min(abs(balance - deficit_2012)), balance]
 
 corn_avg_yield_low <- data_final_corn[balance == balace_closest & sat_cat == "[39.4,82]", avg_yield]
-corn_avg_yield_high <- data_final_corn[balance == balace_closest & sat_cat == "(194,708]", avg_yield]
+corn_avg_yield_high <- data_final_corn[balance == balace_closest & sat_cat == "(186,708]", avg_yield]
 
 corn_pct_decline <- (corn_avg_yield_high - corn_avg_yield_low) / corn_avg_yield_high * 100
 
@@ -237,7 +237,7 @@ corn_pct_decline <- (corn_avg_yield_high - corn_avg_yield_low) / corn_avg_yield_
 balace_closest <- data_final_soy[which.min(abs(balance - deficit_2012)), balance]
 
 soy_avg_yield_low <- data_final_soy[balance == balace_closest & sat_cat == "[39.4,82]", avg_yield]
-soy_avg_yield_high <- data_final_soy[balance == balace_closest & sat_cat == "(194,708]", avg_yield]
+soy_avg_yield_high <- data_final_soy[balance == balace_closest & sat_cat == "(186,708]", avg_yield]
 
 soy_pct_decline <- (soy_avg_yield_high - soy_avg_yield_low) / soy_avg_yield_high * 100
 ```

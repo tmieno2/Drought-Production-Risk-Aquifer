@@ -25,6 +25,10 @@ sat_all <- readRDS(here("Shared/Data/ProcessedData/sat_all.rds"))
 #' Yield, acreage data
 nass_data <- readRDS(here("Shared/Data/ProcessedData/nass_data.rds"))
 
+#* SSURGO
+
+ssurgo_soil <- readRDS(here("Shared/Data/ProcessedData/ssurgo_soil.rds"))
+
 # /*----------------------------------*/
 #' ## combine all
 # /*----------------------------------*/
@@ -33,7 +37,8 @@ merged_data <- base_counties[nass_data, on = c("sc_code")] %>%
   weather_data[., on = c("sc_code", "year")] %>%
   sat_all[., on = c("sc_code", "year")] %>%
   drought_county[., on = c("sc_code", "year")] %>%
-  .[order(sc_code, year), ]
+  .[order(sc_code, year), ] %>%
+  ssurgo_soil[, on = "sc_code"]
 
 # merged_data[ir == "nir", state] %>% unique()
 # merged_data[ir == "ir", state] %>% unique()

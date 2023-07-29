@@ -124,8 +124,8 @@ data_for_pred_corn <-
   # .[, sat := parse_number(gsub("\\,.*", "", sat_cat))] %>%
   .[, sat := case_when(
     sat_cat == "[39.4,82]" ~ 40,
-    sat_cat == "(82,194]" ~ 100,
-    sat_cat == "(194,708]" ~ 200,
+    sat_cat == "(75.7,186]" ~ 100,
+    sat_cat == "(186,708]" ~ 200,
     sat_cat == "dryland" ~ 0
   )] %>%
   .[is.na(sat), sat := 0] %>%
