@@ -1,0 +1,234 @@
+---
+title: "Regression Analysis and Prediction"
+author: "Taro Mieno"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  cache = TRUE,
+  comment = NA,
+  message = FALSE,
+  warning = FALSE,
+  tidy = FALSE,
+  cache.lazy = FALSE,
+  #--- figure ---#
+  dpi = 400,
+  fig.width = 7.5,
+  fig.height = 5,
+  out.width = "750px",
+  out.height = "500px"
+)
+```
+
+# Prepare data
+
+```{r}
+#--- read data ---#
+final_data <-
+  here("Shared/Data/ProcessedData/final_data.rds") %>%
+  readRDS()
+
+# reg_data[, data][[2]] %>% .[, .N, by = sat_cat]
+
+#--- Data used for regression analysis ---#
+reg_data <-
+  prepare_reg_data(
+    data = final_data,
+    sat_thld_m = 9, # saturated thickness has to be at least 12 meters
+    ir_share_thld = 0.75, # at least 75% of total county area has to be overlapped with HPA
+    balance_thld = c(-1200, 200),
+    sat_cat_num = 3,
+    state_ls =
+      list(
+        corn = c("CO", "KS", "NE", "NM", "SD", "TX", "WY"),
+        soy = c("KS", "NE", "TX")
+      )
+  ) %>%
+  data.table() %>%
+  setnames("crop_type", "crop")
+
+# saveRDS(reg_data, file = here::here("Shared/Data/reg_data.rds"))
+
+# ggplot(reg_data$data[[1]]) +
+#   geom_point(aes(y = acres_ratio, x = sat)) +
+#   geom_smooth(aes(y = acres_ratio, x = sat))
+```
+
+# Regression and prediciton
+
+## Yield
+
+```{r}
+main_analysis <-
+  reg_data %>%
+  rowwise() %>%
+  dplyr::mutate(sc_base = "31011") %>%
+  #--- the same sequence used for all the bootstrap iterations ---#
+  dplyr::mutate(balance_seq = list(
+    seq(
+      min(data$balance),
+      max(data$balance),
+      length = 100
+    )
+  )) %>%
+  dplyr::mutate(sat_seq_eval = list(
+    c(10, 50, 90, 130)
+  )) %>%
+  dplyr::mutate(share_reg_data = list(
+    data %>%
+      .[ir == "ir" & ir_area_ratio >= 0.75, ] %>%
+      .[, balance_avg := mean(balance), by = sc_code]
+  )) %>%
+  #--- the same sequence used for all the bootstrap iterations ---#
+  dplyr::mutate(sat_seq = list(
+    share_reg_data[, seq(min(sat),
+      max(sat),
+      length = 100
+    )] %>%
+      c(., sat_seq_eval)
+  )) %>%
+  #--- values of the controls to be used in prediction ---#
+  dplyr::mutate(
+    sandtotal_med = median(share_reg_data$sandtotal_r),
+    silttotal_med = median(share_reg_data$silttotal_r),
+    awc_med = median(share_reg_data$awc_r)
+  ) %>%
+  #++++++++++++++++++++++++++++++++++++
+  #+ Main analysis
+  #++++++++++++++++++++++++++++++++++++
+  dplyr::mutate(yield_analysis_results = list(
+    yield_analysis(data, balance_seq, sat_seq_eval, sat_breaks, sat_text_data, sc_base)
+  )) %>%
+  dplyr::mutate(
+    yield_pred_data = list(yield_analysis_results$yield_pred_data),
+    yield_semi_res = list(yield_analysis_results$semi_res)
+  ) %>%
+  dplyr::mutate(yield_dif_test = list(
+    lapply(
+      2:3,
+      \(x) {
+        test_dif_in_yield(
+          balance_ls = seq(min(data$balance), max(data$balance), length = 50),
+          base_q = 1,
+          comp_q = x,
+          yield_semi_res,
+          sat_text_data,
+          sc_base
+        ) %>%
+          .[, comp_q := x]
+      }
+    ) %>%
+      rbindlist()
+  )) %>%
+  dplyr::mutate(share_pred_data = list(
+    share_analysis(share_reg_data, sat_seq, sandtotal_med, silttotal_med, awc_med)
+  )) %>%
+  dplyr::mutate(avg_yield_pred_data = list(
+    get_average_yield(yield_pred_data, share_pred_data)
+  ))
+
+saveRDS(main_analysis, "Shared/Results/main_analysis.rds")
+```
+
+```{r}
+#++++++++++++++++++++++++++++++++++++
+#+ Bootstrap
+#++++++++++++++++++++++++++++++++++++
+set.seed(383954)
+
+all_results <-
+  main_analysis %>%
+  #--- bootsrap data ---#
+  dplyr::mutate(boot_results = list(
+    parallel::mclapply(
+      1:1000,
+      \(x) {
+        print(x)
+
+        #--- bootstrap data ---#
+        boot_data <- boot(data, sc_base)
+
+        #--- yield analysis ---#
+        yield_pred_data <-
+          yield_analysis(
+            boot_data,
+            balance_seq,
+            sat_seq_eval,
+            sat_breaks,
+            sat_text_data,
+            sc_base,
+            boot = TRUE
+          )
+
+        #--- share analysis ---#
+        share_boot_data <-
+          boot_data %>%
+          .[ir == "ir" & ir_area_ratio >= 0.75, ] %>%
+          .[, balance_avg := mean(balance), by = sc_code]
+
+        share_pred_data <-
+          share_analysis(
+            ir_share_data = share_boot_data,
+            sat_seq,
+            sandtotal_med,
+            silttotal_med,
+            awc_med
+          )
+        #--- average yield ---#
+        avg_yield_pred_data <- get_average_yield(yield_pred_data, share_pred_data)
+        
+        return(list(share_pred_data = share_pred_data, avg_yield_pred_data = avg_yield_pred_data))
+      },
+      mc.cores = parallel::detectCores() - 2
+    )
+  )) %>%
+  dplyr::mutate(
+    share_pred_data_boot = list(purrr::map(boot_results, "share_pred_data") %>% rbindlist()),
+    avg_yield_pred_data_boot = list(purrr::map(boot_results, "avg_yield_pred_data") %>% rbindlist())
+  ) %>%
+  dplyr::mutate(share_sum = list(
+    share_pred_data_boot[, .(
+      ir_share_hat_se = sd(ir_share_hat, na.rm = TRUE),
+      dif_ir_share_hat_se = sd(dif_ir_share_hat, na.rm = TRUE)
+    ),
+    by = .(sat)
+    ] %>%
+      .[share_pred_data, on = "sat"] %>%
+      .[, `:=`(
+        lower = ir_share_hat - 1.96 * ir_share_hat_se,
+        upper = ir_share_hat + 1.96 * ir_share_hat_se,
+        dif_lower = dif_ir_share_hat - 1.96 * dif_ir_share_hat_se,
+        dif_upper = dif_ir_share_hat + 1.96 * dif_ir_share_hat_se
+      )]
+  )) %>%
+  dplyr::mutate(avg_yield_sum = list(
+    avg_yield_pred_data_boot[, .(
+      avg_yield_se = sd(avg_yield, na.rm = TRUE),
+      dif_avg_yield_se = sd(dif_avg_yield, na.rm = TRUE)
+    ),
+    by = .(balance, sat)
+    ] %>%
+      .[avg_yield_pred_data, on = c("balance", "sat")] %>%
+      .[, `:=`(
+        upper = avg_yield + 1.96 * avg_yield_se,
+        lower = avg_yield - 1.96 * avg_yield_se,
+        dif_upper = dif_avg_yield + 1.96 * dif_avg_yield_se,
+        dif_lower = dif_avg_yield - 1.96 * dif_avg_yield_se
+      )]
+  )) %>%
+  data.table() %>%
+  dplyr::select(
+    crop, data, sat_seq, sat_text_data,
+    yield_pred_data,
+    yield_dif_test,
+    share_pred_data,
+    share_sum,
+    avg_yield_pred_data,
+    avg_yield_pred_data_boot,
+    avg_yield_sum
+  )
+
+saveRDS(all_results, "Shared/Results/all_results.rds")
+```
+
