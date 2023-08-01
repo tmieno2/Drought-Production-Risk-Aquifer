@@ -15,15 +15,15 @@ The significance and novelty of the paper stems from the clear and encompassing 
 
 + "We show that aquifer depletion reduces the ability of farmers to sustain irrigated crop yields and production areas in drought years." - If stated this way, please clarify in the results and/or discussion, how causality (direction of causality, no omitted factors) is established.
 
-\textcolor{blue}{}
+\textcolor{blue}{Direction of causality has been already discussed in the Main section, in which mechanisms by which aquifer thickness affects drought risk mitigation are detailed. It seems like you mean no bias in the estimation of the impact of a variable interest by "causality is established." In empirical studies, it is simply impossible to not have unobserved (omitted) factors unless the data is from a randomized control trial. There are plenty of other sources of bias including but not limited to model misspecification error. Any studies that claim their estimations are unbiased are simply lying. The important question is the degree of bias. Some are small, others are large enough to even change the direction of the impact of a treatment. In our studies, we of course have unobservables (omitted) factors. One of the limitations we have is not including county fixed effects, which would have controlled all the county-specific time-invariant characteristics. We acknowledge this as a limitation and now have discussions on this issue in the Method and Appendix C. Another potential issue we have is measurement errors in aquifer thickness as a proxy for well yield. This is likely to have results in attenuation bias, making our estimates of the impact of aquifer thickness smaller in magnitude than it truly is. This limitation is acknowledged in the 4th paragraph of the Discussion section. We do not intend to claim that our estimation is free of bias. Indeed, it must be somewhat biased. However, we still believe that our results are consistent with the hydrologic and economic theories and provide useful insights with important policy implications.}
 
 + "... in drought years" - Please define in the in the main text (or methods) how drought and drought years are defined. E.g. are any effects linked to increasing water deficits considered drought-related or only those above a certain level?
 
-\textcolor{blue}{In this paper, drought is rather loosely defined. Also, it is not a dihcotomous definition of whether it is a drought or not. The water deficit variable is used as a measure of drought and it has a continous scale. For example, water deficit of 1000 mm would be considered a "severe" drought as corn and soybean yields are estimated to be almost zero under rainfed production. Water deficit of -200 mm would be considered no drought because irrigated and rainfed yields are almost the same. We do not see the need to clearly define what drought is as it does not seem to improve our dicussions.}
+\textcolor{blue}{In this paper, drought is rather loosely defined. Also, it is not a dichotomous definition of whether it is a drought or not. The water deficit variable is used as a measure of drought and it has a continuous scale. For example, water deficit of 1000 mm would be considered a "severe" drought as corn and soybean yields are estimated to be almost zero under rainfed production. Water deficit of -200 mm would be considered no drought because irrigated and rainfed yields are almost the same. We do not see the need to clearly define what drought is as it does not seem to improve our discussions.}
 
-2. Figure 1: This figure does not convey the effects of saturated thickness very clearly, either because the underlying analysis does not produce substantial effects, or because they are not presented in a compelling manner. It might also be helpful to use a visualization that more effectively illustrates the statements in the text. See detailed points below:
+1. Figure 1: This figure does not convey the effects of saturated thickness very clearly, either because the underlying analysis does not produce substantial effects, or because they are not presented in a compelling manner. It might also be helpful to use a visualization that more effectively illustrates the statements in the text. See detailed points below:
 
-\textcolor{blue}{We appreciate this comment. In response, we added another figure: Figure 2 in the current manuscript, which shows the difference in yield betwee the 2nd and 3rd quantiles relative to the 1st quantile to illustrate the difference in yield across different awuifer thickness levels. Please see our detailed reponses to your comments below.}
+\textcolor{blue}{We appreciate this comment. In response, we added another figure: Figure 2 in the current manuscript, which shows the difference in yield between the 2nd and 3rd quantiles relative to the 1st quantile to illustrate the difference in yield across different aquifer thickness levels. Please see our detailed response to your comments below.}
 
 + Please distinguish more clearly between significant and non-significant results. P. 2 states that "counties with the highest level of saturated thickness ... experience ... productivity close to rainfed yields". From the figure it is difficult to tell if the 2nd and 3rd quantile are significantly different for soybean. For corn this does not seem to be the case. Similarly, the text at the bottom of p. 2 states that "saturated thickness has a statistically significant impact on per-area irrigated crop yields in moderate to extreme drought conditions". Please clarify how the significance is evaluated here. Which range of deficits is meant by "moderate to extreme"? Are the soybean yields considered significantly different between quantiles? Are only the 1st and 3rd quantile considered significantly different for corn? - It could even be of interest to readers which results are not significant here, in contrast to the greater significance of the effects analyzed in Fig. 2 and Fig. 3.
 
@@ -32,19 +32,19 @@ The significance and novelty of the paper stems from the clear and encompassing 
 Your comment: Please distinguish more clearly between significant and non-significant results.
 
 \textcolor{blue}{
-We now have Figure 2, which compares the yield of the second and third aquifer thickness quantiles against the 1st quantile with 95$\%$ confidence interval. So, for a given level of water deficit, it shows whether the difference in yield betwee the 3rd (or 2nd) and 1st quantiles is statistically significantly different from 0 at the 5$\%$ level.
+We now have Figure 2, which compares the yield of the second and third aquifer thickness quantiles against the 1st quantile with 95$\%$ confidence interval. So, for a given level of water deficit, it shows whether the difference in yield between the 3rd (or 2nd) and 1st quantiles is statistically significantly different from 0 at the 5$\%$ level.
 }
 
 Your comment: P. 2 states that "counties with the highest level of saturated thickness ... experience ... productivity close to rainfed yields". From the figure it is difficult to tell if the 2nd and 3rd quantile are significantly different for soybean. For corn this does not seem to be the case.
 
 \textcolor{blue}{
-You are right that there is not much difference between the second and third quantiles. Our intention was not to distinguish the 2nd and 3rd, but rather pointing out the fact that higher aquifer thickness counties (2nd and 3rd) have lower yields than the lowest aquifer thickness (1st quantile), and their yield are comparable to that of dryland production. Therefore, we also added 2nd quantile to our statement. We modify the sentence to make this point clearer.
+You are right that there is not much difference between the second and third quantiles. Our intention was not to distinguish the 2nd and 3rd, but rather pointing out the fact that higher aquifer thickness counties (2nd and 3rd) have lower yields than the lowest aquifer thickness (1st quantile), and their yield are comparable to that of rainfed production. Therefore, we also added 2nd quantile to our statement. We modify the sentence to make this point clearer.
 }
 
 Your comments: Similarly, the text at the bottom of p. 2 states that "saturated thickness has a statistically significant impact on per-area irrigated crop yields in moderate to extreme drought conditions". Please clarify how the significance is evaluated here. Which range of deficits is meant by "moderate to extreme"?
 
 \textcolor{blue}{
-We have stopped using vague words like "moderate to extreme", but be more precise. We now say that "in years with water deficit higher than about 800 mm." We also explicitly add "statistically" when we are talking about statistical significance instead of economic or agronomic significance. Previously, we used "significantly" too loosely.
+We have stopped using vague words like "moderate to extreme", but be more precise. We now say that "in years with water deficit higher than about 750 mm." We also explicitly add "statistically" when we are talking about statistical significance instead of economic or agronomic significance. Previously, we used "significantly" too loosely.
 }
 
 Your comment: Are the soybean yields considered significantly different between quantiles? Are only the 1st and 3rd quantile considered significantly different for corn? - It could even be of interest to readers which results are not significant here, in contrast to the greater significance of the effects analyzed in Fig. 2 and Fig. 3.
@@ -53,7 +53,7 @@ Your comment: Are the soybean yields considered significantly different between 
 
 + In light of point (1.a), please also consider whether additional panels showing tests for specific hypotheses or other visual aids could make the Fig. 1 more accessible to readers with regards to the statements made. The figure is quite crowded, with many confidence bands overlapping. Currently, it takes time for readers to parse where the confidence bands for some of the plot lines end. The figure could be of greater benefit to readers if it was more accessible.
 
-\textcolor{blue}{Thank you for the suggestion. As we have discussed above, we added Figure 2, which compares the 2nd and 3rd quantiles to the 1st quantile. We believe this change has made it significantly easier for the readers to understand the impact of saturated thickness, not just the impact of water deficit. For Figure 1, it is important to have all the four curves in the same panel as that would allow the readers to compare them easily. However, with confidence intervals, the figure was too crowded. Therefore, we took out the confidence intervals around the curves. We then put estiamted curves with confidence intervals individually in separate panels as Figure A1 for corn and A2 for soybean in Appendix A.}
+\textcolor{blue}{Thank you for the suggestion. As we have discussed above, we added Figure 2, which compares the 2nd and 3rd quantiles to the 1st quantile. We believe this change has made it significantly easier for the readers to understand the impact of saturated thickness, not just the impact of water deficit. For Figure 1, it is important to have all the four curves in the same panel as that would allow the readers to compare them easily. However, with confidence intervals, the figure was too crowded. Therefore, we took out the confidence intervals around the curves. We then put estimated curves with confidence intervals individually in separate panels as Figure A1 for corn and A2 for soybean in Appendix A.}
 
 + How were confidence bands determined? Were additional tests performed to evaluate their validity? Please consider showing individual data points.
 
@@ -61,13 +61,13 @@ Your comment: Are the soybean yields considered significantly different between 
 
 + P. 2 states that "for water deficits above around 400mm, yield changes become negative for counties with the lowest levels of saturated thickness (i.e., 1st quantile in Figure 1). This reflects the restrictions that lower saturated thickness and associated reductions in well yields place on farmers ability to fully meet crop water requirements during periods of more severe or extended precipitation deficits". How valid is this interpretation in view of the fact that these counties see a similarly large yield decrease below 400mm and that counties with the highest levels of saturated thickness even see a much stronger increase in yields with increasing deficits?
 
-\textcolor{blue}{We believe, our interpretation is valid. When you mention "similarly large yield decrease," you are talking about "declines" in reponse to the opposite directions of water deficit. Yield increases as water defitic increases at first, and then starts to decline. This can be due to "increased evapotranspiration and associated biomass accumulation, reductions of heat-related stressors" as mentioned in our manuscript. This holds for all the three aquifer thickness categories. However, if aquifer thickness is low and as a consequence well yield is low, farmers cannot cathch up with high water demand, leading to declining yield caused by highr water deficit. The figure shows that lower aquifer thickness quantile starts to experinence a decline in yield at lower water deficits than the second and third.} 
+\textcolor{blue}{We believe, our interpretation is valid. When you mention "similarly large yield decrease," you are talking about "declines" in response to the opposite directions of water deficit. Yield increases as water deficit increases at first, and then starts to decline. This can be due to "increased evapotranspiration and associated biomass accumulation, reductions of heat-related stressors" as mentioned in our manuscript. This holds for all the three aquifer thickness categories. However, if aquifer thickness is low and as a consequence well yield is low, farmers cannot catch up with high water demand, leading to declining yield caused by higher water deficit. The figure shows that lower aquifer thickness quantile starts to experience a decline in yield at lower water deficits than the second and third.} 
 
 + Please clarify in the legend or caption that the quantiles indicate levels of saturated thickness.
 
 \textcolor{blue}{Thank you for this comment. We made changes to all the relevant figures according to this suggestion.}
 
-3. Figure 2: Please clarify in the texthow the significance of reductions in the share of irrigated acres is evaluated (e.g. relative to which aquifer depletion level(s)?), and at which level of aquifer depletion the reduced irrigation share becomes significant for each crop.
+3. Figure 2: Please clarify in the text how the significance of reductions in the share of irrigated acres is evaluated (e.g. relative to which aquifer depletion level(s)?), and at which level of aquifer depletion the reduced irrigation share becomes significant for each crop.
 
 \textcolor{blue}{}
 
@@ -76,7 +76,7 @@ Your comment: Are the soybean yields considered significantly different between 
 + Please clarify why this figure has no confidence bands. The text describes it as a combination of the effects shown in Fig. 1 and Fig. 2, which both have confidence bands. Please clarify how significance is evaluated.
 
 \textcolor{blue}{
-We should have had confidence intervals for this figure as well. However, in reponse to your earlier comments, we have decided to not present confidence intervals for this figure just like we did for Figure 1 because the figure would look too busy. Instead, we now have Figure 5, which is similar to Figure 2. It compares average (irrigated and rainfed combined) yield for counties with aquifer thickness of 59.1 and 106.1m against those with 12.2m. 
+We should have had confidence intervals for this figure as well. However, in response to your earlier comments, we have decided to not present confidence intervals for this figure just like we did for Figure 1 because the figure would look too busy. Instead, we now have Figure 5, which is similar to Figure 2. It compares average (irrigated and rainfed combined) yield for counties with aquifer thickness of 59.1 and 106.1m against those with 12.2m. 
 }
 
 + Relatedly, the text states that deficits beyond 200mm yield significant reductions in corn production. 200mm is where the curves intersect. Please clarify if this actually is also where significance starts, or if significance starts at a higher deficit.
@@ -91,23 +91,23 @@ We should have had confidence intervals for this figure as well. However, in rep
 
 + P. 6: "Previous research focused on impacts..." this sentence largely repeats a sentence from the introduction, not in the same words but in content (and using the same references). Please consider removing or modifying the sentence to add new insights for readers.
 
-\textcolor{red}{Tim, they look different enough to me. And who cares if we repated the same thing as long as it is important to emphasize.}
+\textcolor{red}{Tim, they look different enough to me. And who cares if we repeated the same thing as long as it is important to emphasize.}
 
 + P. 6: "... demonstrate that the relationship between aquifer saturated thickness and drought impacts is highly nonlinear when accounting for farmers decisions about irrigated production areas. This indicates that sustainable groundwater conservation efforts [...] should be targeted in space and time to avoid depletion exceeding critical thresholds ..." Is the assumption of non-linearity tested? It is difficult to assess the validity of this statement based on the figures provided. Please clarify (e.g. in the results) what supports this statement.
 
-\textcolor{blue}{We now have statements that clarify this point at the end of the subsection of average yield. We do not believe that we need a formal statistical test of non-linearity here.} 
+\textcolor{blue}{We now have statements that clarify this point in the last paragraph of section 2.3 on page 7. We do not believe that we need a formal statistical test of non-linearity here.} 
 
 6. Methods - data sets: 
 
 + P. 7: "For counties that do not meet this condition, only rainfed yield observations are obtained to avoid the possibility that irrigated production may be only partly dependent on use of groundwater from the HPA." - Please consider whether this assumption could bias results and how potential biases can be ruled out.
 
 \textcolor{blue}{
-This will not bias our main part of the regression analysis in any way. Dryland yields are part of the modeling just to illustrate how powerful irrigation is. As you know, this is not our main results. The identification of yield reposne to water deficit for the three awuifer thickness catoegories is coming solely drom the irrigated production data.
+This will not bias our main part of the regression analysis in any way. Dryland yields are part of the modeling just to illustrate how powerful irrigation is. As you know, this is not our main results. The identification of yield response to water deficit for the three aquifer thickness categories is coming solely from the irrigated production data.
 }
 
 + P. 9: Saturated thickness data - the number of monitoring wells would be of interest for readers to better judge the data, if available.
 
-\textcolor{blue}{}
+\textcolor{blue}{I agree that information is useful. But, we do not think that that information is essential here. All the details on the data are described in Haacker et al., which we cite.}
 
 7. Methods - regression models:
 
@@ -121,7 +121,9 @@ That is because a single county-year was selected in predicting yields. We could
 
 \textcolor{red}{Tim, I don't know what he wants from the first sentence. I don't really care what he is talking about and I think it is irrelevant. But, if you can somehow address this with some citations including the one he suggested, that would be great. He is probably one of the authors of that paper (he is not an economist, his understanding of the methods and results is not of the one who were trained as an economist.).}
 
-\textcolor{red}{Tim, can you address this? "Relatedly, the analysis only saturated thickness and water deficits to explain yields, rather than adding more explanatory variables. The advantage of the approach taken here might be the simplicity and clarity of assumptions. Readers would benefit from a short explicit discussion.". I believe you already had sound arguments when we zoomed last time.}
+\textcolor{blue}{Note that the gradual depletion of aquifer is not something you need to model. Rather, gradual depletion is embedded in the aquifer thickness variable. Beyond the aquifer thickness variable, there is no trend in saturated thickness to account for. We are modeling the impact of aquifer thickness on the share of irrigated acres. Once, we model it, then you can predict what the gradual decline (or any trend) in aquifer thickness is affecting the shared of irrigated acres. Similar arguments hold for groundwater regulations. Whatever regulations that may have been placed in the region (e.g., LEMA in GMD 4 in Kansas, water allocation limits in some of the NRDs in Nebraska), its effect on saturated thickness through reductions in groundwater extraction are reflected in the aquifer thickness variable.}
+
+\textcolor{blue}{We should have included soil characteristics. Given that we cannot include county fixed effects, this is important. We added sand percentage, silt percentage, and water holding capacity from SSURGO now in the share regression. There results did not change dramatically. }
 
 + P. 10: Please provide details on the basis functions in the methods section or the supplement. 
 
@@ -129,7 +131,7 @@ That is because a single county-year was selected in predicting yields. We could
 
 8. Supplementary information: Please also consider providing additional information to give readers more clarity on the points outlined above in the supplementary information.
 
-\textcolor{blue}{Thank you for this suggestion. We added Appendix, which we belive made our paper much stronger.}
+\textcolor{blue}{Thank you for this suggestion. We added Appendix, which we believe made our paper much stronger.}
 
 ## MINOR POINTS:
 
@@ -139,11 +141,11 @@ That is because a single county-year was selected in predicting yields. We could
 
 + [x] M2. P. 2: Missing closing parenthesis after "(i.e., 3rd quantile ..."
 
-+ [ ] M3. Fig. 1, 2, 3, and 5: Please add panel tags ("a", "b" ...) to make it easier for readers to understand the captions.
++ [x] M3. Fig. 1, 2, 3, and 5: Please add panel tags ("a", "b" ...) to make it easier for readers to understand the captions.
 
 + [x] M4. Fig. 3: Closing parenthesis of y-axis title missing
 
-+ [ ] M5. P. 9: "WB" and "ST" should not be in italics, unless "W", "B", "S", and "T" are separate variables
++ [x] M5. P. 9: "WB" and "ST" should not be in italics, unless "W", "B", "S", and "T" are separate variables
 
 + [x] M6. P. 9: "[0 - 33.3$\%$)j" - the "j" does not seem to belong here
 
@@ -151,6 +153,6 @@ That is because a single county-year was selected in predicting yields. We could
 
 + [x] M8. P. 9: "under the generalize additive model framework" should be "generalized" and "modeling" or something similar
 
-+ [ ] M9. P. 9: What is "mu_t" in equation 2? Should "theta_t" in equation 1 be "mu_t"? Because "theta_jk" is already the spline basis function.
++ [x] M9. P. 9: What is "mu_t" in equation 2? Should "theta_t" in equation 1 be "mu_t"? Because "theta_jk" is already the spline basis function.
 
 + [x] M10. P. 9: One reference seems to be missing (the text includes "(REF)").

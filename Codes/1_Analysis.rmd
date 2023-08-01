@@ -59,6 +59,12 @@ reg_data <-
 ## Yield
 
 ```{r}
+# ir_share_data <- main_analysis$share_reg_data[[1]]
+# sat_seq <- main_analysis$sat_seq[[1]]
+# sandtotal_e <- main_analysis$sandtotal_med[[1]]
+# silttotal_e <- main_analysis$silttotal_med[[1]]
+# awc_e <- main_analysis$awc_med[[1]]
+
 main_analysis <-
   reg_data %>%
   rowwise() %>%
@@ -136,20 +142,12 @@ saveRDS(main_analysis, "Shared/Results/main_analysis.rds")
 #++++++++++++++++++++++++++++++++++++
 set.seed(383954)
 
-# data <- main_analysis$data[[1]]
-# yield_pred_data <- main_analysis$yield_pred_data[[1]]
-# sat_seq <- main_analysis$sat_seq[[1]]
-# silttotal_med <- main_analysis$silttotal_med[[1]]
-# sandtotal_med <- main_analysis$sandtotal_med[[1]]
-# awc_med <- main_analysis$awc_med[[1]]
-# sc_base <- main_analysis$sc_base[[1]]
-
-boot_results_added <-
+all_results <-
   main_analysis %>%
   #--- bootsrap data ---#
-  dplyr::mutate(avg_yield_pred_data_boot = list(
+  dplyr::mutate(boot_results = list(
     parallel::mclapply(
-      1:18,
+      1:1000,
       \(x) {
         print(x)
 
@@ -185,70 +183,17 @@ boot_results_added <-
         #--- average yield ---#
         avg_yield_pred_data <- get_average_yield(yield_pred_data, share_pred_data)
         
-        return(avg_yield_pred_data)
+        return(list(share_pred_data = share_pred_data, avg_yield_pred_data = avg_yield_pred_data))
       },
       mc.cores = parallel::detectCores() - 2
-    ) %>%
-      rbindlist()
+    )
   )) %>%
-  dplyr::mutate(avg_yield_sum = list(
-    avg_yield_pred_data_boot[, .(
-      avg_yield_se = sd(avg_yield, na.rm = TRUE),
-      dif_avg_yield_se = sd(dif_avg_yield, na.rm = TRUE)
-    ),
-    by = .(balance, sat)
-    ] %>%
-      .[avg_yield_pred_data, on = c("balance", "sat")] %>%
-      .[, `:=`(
-        upper = avg_yield + 1.96 * avg_yield_se,
-        lower = avg_yield - 1.96 * avg_yield_se,
-        dif_upper = dif_avg_yield + 1.96 * dif_avg_yield_se,
-        dif_lower = dif_avg_yield - 1.96 * dif_avg_yield_se
-      )]
-  )) %>%
-  data.table() %>%
-  dplyr::select(
-    crop, data, sat_seq, sat_text_data,
-    yield_pred_data,
-    yield_dif_test,
-    share_pred_data,
-    avg_yield_pred_data,
-    avg_yield_pred_data_boot,
-    avg_yield_sum
-  )
-
-saveRDS(boot_results_added, "Shared/Results/boot_results_added.rds")
-```
-
-```{r}
-#++++++++++++++++++++++++++++++++++++
-#+ Summarize
-#++++++++++++++++++++++++++++++++++++
-boot_results_added <- readRDS("Shared/Results/boot_results_added.rds")
-
-all_results <-
-  boot_results_added %>%
-  # rowwise() %>%
-  dplyr::mutate(yield_response_sum = list(
-    yield_pred_data_boot[, .(
-      # y_hat_boot = median(y_hat, na.rm = TRUE),
-      y_hat_se = sd(y_hat, na.rm = TRUE),
-      # dif_y_hat_boot = mean(dif_y_hat, na.rm = TRUE),
-      dif_y_hat_se = sd(dif_y_hat, na.rm = TRUE)
-    ),
-    by = .(balance, sat, sat_cat)
-    ] %>%
-      .[yield_pred_data, on = c("balance", "sat")] %>%
-      .[, `:=`(
-        lower = y_hat - 1.96 * y_hat_se,
-        upper = y_hat + 1.96 * y_hat_se,
-        dif_lower = dif_y_hat - 1.96 * dif_y_hat_se,
-        dif_upper = dif_y_hat + 1.96 * dif_y_hat_se
-      )]
-  )) %>%
+  dplyr::mutate(
+    share_pred_data_boot = list(purrr::map(boot_results, "share_pred_data") %>% rbindlist()),
+    avg_yield_pred_data_boot = list(purrr::map(boot_results, "avg_yield_pred_data") %>% rbindlist())
+  ) %>%
   dplyr::mutate(share_sum = list(
     share_pred_data_boot[, .(
-      # ir_share_hat = mean(ir_share_hat, na.rm = TRUE),
       ir_share_hat_se = sd(ir_share_hat, na.rm = TRUE)
     ),
     by = .(sat)
@@ -274,7 +219,17 @@ all_results <-
         dif_lower = dif_avg_yield - 1.96 * dif_avg_yield_se
       )]
   )) %>%
-  data.table()
+  data.table() %>%
+  dplyr::select(
+    crop, data, sat_seq, sat_text_data,
+    yield_pred_data,
+    yield_dif_test,
+    share_pred_data,
+    share_sum,
+    avg_yield_pred_data,
+    avg_yield_pred_data_boot,
+    avg_yield_sum
+  )
 
 saveRDS(all_results, "Shared/Results/all_results.rds")
 ```

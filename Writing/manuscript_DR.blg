@@ -5,16 +5,16 @@ The style file: plainnat.bst
 Database file #1: DRA.bib
 You've used 7 entries,
             2773 wiz_defined-function locations,
-            647 strings with 6305 characters,
-and the built_in function-call counts, 3476 in all, are:
-= -- 311
+            645 strings with 6121 characters,
+and the built_in function-call counts, 3448 in all, are:
+= -- 305
 > -- 208
 < -- 1
 + -- 70
 - -- 63
-* -- 316
-:= -- 550
-add.period$ -- 26
+* -- 312
+:= -- 544
+add.period$ -- 24
 call.type$ -- 7
 change.case$ -- 42
 chr.to.int$ -- 7
@@ -22,13 +22,13 @@ cite$ -- 14
 duplicate$ -- 145
 empty$ -- 273
 format.name$ -- 70
-if$ -- 711
+if$ -- 705
 int.to.chr$ -- 1
 int.to.str$ -- 1
 missing$ -- 7
-newline$ -- 48
+newline$ -- 46
 num.names$ -- 28
-pop$ -- 66
+pop$ -- 68
 preamble$ -- 1
 purify$ -- 35
 quote$ -- 0
@@ -43,4 +43,4 @@ type$ -- 77
 warning$ -- 0
 while$ -- 30
 width$ -- 0
-write$ -- 108
+write$ -- 104

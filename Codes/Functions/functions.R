@@ -1,48 +1,49 @@
 prepare_reg_data <- function(data, sat_thld_m, ir_share_thld, balance_thld, sat_cat_num, state_ls) {
-  # === saturated thickness threshold in meter ===#
-  # data <- reg_data$data[[1]]
-  # sat_breaks <- reg_data$sat_breaks[[1]]
-
-  # reg_data_y <- reg_data$reg_data_y[[1]]
-
   reg_data <-
     data.table(
       crop_type = c("corn", "soy"),
-      states = list(state_ls[["corn"]], state_ls[["soy"]])
+      states = state_ls
     ) %>%
     rowwise() %>%
-    mutate(base_data = list(
+    mutate(data = list(
       data %>%
-        # === lower bound ===#
+        .[crop == crop_type, ] %>%
+        .[state %in% states, ] %>%
+        #--- yield ---#
+        .[, yield := yield * 12.553 / 200] %>%
+        #--- balance ---#
         .[balance >= balance_thld[1], ] %>%
-        # === upper bound ===#
         .[balance <= balance_thld[2], ] %>%
+        .[, balance := -balance] %>%
         #--- unit conversion ---#
-        .[, sat := measurements::conv_unit(sat, "ft", "m")]
-    )) %>%
-    # === select observations for each crop type ===#
-    mutate(data = list(
-      base_data[crop == crop_type & state %in% states, ]
-    )) %>%
-    mutate(data = list(
-      # === share of irrigated/dryland acres ===#
-      data[, acres_ratio := acres / sum(acres), by = .(sc_code, year, crop)] %>%
-        # === filter out counties with too low saturated thickness ===#
-        # 0: dryland
-        # If irrigated, sat is set to be at least 0.01.
-        # See 0_6_merge_datasets.R
-        .[sat >= sat_thld_m | sat == 0, ]
+        .[, sat := measurements::conv_unit(sat, "ft", "m")] %>%
+        #--- filter out counties with too low saturated thickness ---#
+        .[sat >= sat_thld_m | sat == 0, ] %>%
+        #--- share of irrigated/dryland acres ---#
+        .[, acres_ratio := acres / sum(acres), by = .(sc_code, year)] %>%
+        .[sat == 0 | (ir == "ir" & ir_area_ratio >= ir_share_thld), ] %>%
+        .[, dry_or_not := fifelse(sat == 0, 1, 0)] %>%
+        .[, sc_dry := paste0(sc_code, "_", dry_or_not)] %>%
+        .[, state_year := paste0(state_name, "_", year)] %>%
+        .[, num_obs := .N, by = sc_dry] %>%
+        .[num_obs > 5, ] %>%
+        .[, num_obs := NULL]
     )) %>%
     # === sat breaks for grouping ===#
     #' dryland production will have NA
     mutate(sat_breaks = list(
       quantile(
-        base_data[ir == "ir" & sat >= sat_thld_m, sat],
+        data[ir == "ir", sat],
         prob = seq(0, 1, length = sat_cat_num + 1),
         na.rm = TRUE
       )
-    )) %>%
-    # === prepare data for regression by crop type ===#
+    ))
+
+  #--- sat-breaks almost identical so, make them the same ---#
+  reg_data[2, ]$sat_breaks <- reg_data[1, ]$sat_breaks
+
+  return_data <-
+    reg_data %>%
     mutate(data = list(
       data %>%
         # === define saturated thickness category variable ===#
@@ -54,16 +55,9 @@ prepare_reg_data <- function(data, sat_thld_m, ir_share_thld, balance_thld, sat_
             include.lowest = TRUE
           )
         ] %>%
+        #--- sat == 0 would have NA ---#
         .[is.na(sat_cat), sat_cat := "dryland"] %>%
-        .[, sat_q_rank := as.numeric(factor(sat_cat))] %>%
-        .[sat_cat == "dryland" | (ir == "ir" & ir_area_ratio >= ir_share_thld), ] %>%
-        .[, yield := yield * 12.553 / 200] %>%
-        .[, dry_or_not := fifelse(sat_cat == "dryland", 1, 0)] %>%
-        .[, sc_dry := paste0(sc_code, "_", dry_or_not)] %>%
-        .[, state_year := paste0(state_name, "_", year)] %>%
-        .[, balance := -balance] %>%
-        .[, num_obs := .N, by = sc_dry] %>%
-        .[num_obs > 1, ]
+        .[, sat_q_rank := as.numeric(factor(sat_cat))]
     )) %>%
     dplyr::mutate(sat_text_data = list(
       data.table(sat = zoo::rollmean(sat_breaks, 2)) %>%
@@ -79,13 +73,10 @@ prepare_reg_data <- function(data, sat_thld_m, ir_share_thld, balance_thld, sat_
           nombre::ordinal(sat_rank) %>% stringr::str_to_title(),
           " Quantile: [", low, "m, ", up, "m]"
         )] %>%
-        .[, sat := NULL] %>%
-        .[, ]
-    )) %>%
-    # === prepare irrigation share data ===#
-    dplyr::select(-base_data)
+        .[, sat := NULL]
+    ))
 
-  return(reg_data)
+  return(return_data)
 }
 
 # /*=================================================*/
@@ -271,7 +262,7 @@ yield_analysis <- function(yield_data, balance_seq, sat_seq_eval, sat_breaks, sa
 
   if (bootstrap == TRUE) {
     return(
-     yield_pred_data = return_data[, .(balance, sat, sat_cat, sat_cat_text, sat_rank, y_hat, y_hat_se_modeled, dif_y_hat)]
+      yield_pred_data = return_data[, .(balance, sat, sat_cat, sat_cat_text, sat_rank, y_hat, y_hat_se_modeled, dif_y_hat)]
     )
   } else {
     return(list(
@@ -285,6 +276,11 @@ share_analysis <- function(ir_share_data, sat_seq, sandtotal_e, silttotal_e, awc
   #++++++++++++++++++++++++++++++++++++
   #+ Debug
   #++++++++++++++++++++++++++++++++++++
+  # ir_share_data <- main_analysis$share_reg_data[[1]]
+  # sat_seq <- main_analysis$sat_seq[[1]]
+  # sandtotal_e <- main_analysis$sandtotal_med[[1]]
+  # silttotal_e <- main_analysis$silttotal_med[[1]]
+  # awc_e <- main_analysis$awc_med[[1]]
 
   #++++++++++++++++++++++++++++++++++++
   #+ Main
@@ -318,7 +314,7 @@ share_analysis <- function(ir_share_data, sat_seq, sandtotal_e, silttotal_e, awc
     paste0("acres_ratio ~ ", .) %>%
     paste0(., "+ sandtotal_r + silttotal_r + awc_r") %>%
     #--- add state-year FE ---#
-    paste0(., " | state_name") %>%
+    paste0(., " | state_year") %>%
     # paste0(., " | ", "state_name") %>%
     formula()
 
@@ -363,6 +359,81 @@ share_analysis <- function(ir_share_data, sat_seq, sandtotal_e, silttotal_e, awc
   share_hat_data[, `:=`(
     ir_share_hat = share_hat
   )]
+
+  base_ir_share <- share_hat_data[sat == sat_seq[length(sat_seq)], ir_share_hat]
+
+  share_hat_data[, dif_ir_share_hat := base_ir_share - ir_share_hat]
+
+  return(
+    share_hat_data = share_hat_data[, .(sat, ir_share_hat, dif_ir_share_hat)]
+  )
+}
+
+share_analysis_gam <- function(ir_share_data, sat_seq, sandtotal_e, silttotal_e, awc_e) {
+  #++++++++++++++++++++++++++++++++++++
+  #+ Debug
+  #++++++++++++++++++++++++++++++++++++
+
+  #++++++++++++++++++++++++++++++++++++
+  #+ Main
+  #++++++++++++++++++++++++++++++++++++
+  #---------------------
+  #- define the formula for the flexible part
+  #---------------------
+  gam_formula_ir_share <-
+    formula(
+      acres_ratio ~
+        s(sat, k = 5, m = 2) +
+        s(balance_avg, k = 5, m = 2) +
+        sandtotal_r + silttotal_r + awc_r +
+        factor(state_year)
+    )
+
+  #---------------------
+  #- Run FE-logit
+  #---------------------
+  share_res <-
+    gam(
+      gam_formula_ir_share,
+      data = ir_share_data,
+      family = binomial(link = "logit")
+    )
+
+  share_pred_data_corn <-
+    CJ(
+      sat = sat_seq,
+      balance_avg = median(ir_share_data$balance_avg),
+      sandtotal_r = sandtotal_e,
+      silttotal_r = silttotal_e,
+      awc_r = awc_e,
+      state_year = "Nebraska_2009",
+      state_name = "Nebraska"
+    ) %>%
+    .[sat >= min(ir_share_data$sat), ] %>%
+    .[sat <= max(ir_share_data$sat), ] %>%
+    .[, acres_ratio := 0]
+
+  share_hat <-
+    predict(
+      share_res,
+      newdata = share_hat_data,
+      se.fit = TRUE,
+      type = "response"
+    )
+
+  share_hat_data[, `:=`(
+    ir_share_hat = share_hat$fit,
+    ir_share_hat_se = share_hat$se.fit
+  )]
+
+  ggplot(share_hat_data) +
+    geom_line(aes(y = ir_share_hat, x = sat)) +
+    geom_ribbon(aes(
+      ymin = ir_share_hat - 1.96 * ir_share_hat_se,
+      ymax = ir_share_hat + 1.96 * ir_share_hat_se,
+      x = sat
+    ), alpha = 0.4
+    )
 
   return(
     share_hat_data = share_hat_data[, .(sat, ir_share_hat)]

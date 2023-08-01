@@ -359,10 +359,10 @@ ggsave(file = "GitControlled/Writing/Figures/g_map.pdf", g_map, height = 7, widt
 
 ```{r}
 plot_yield_data <-
-  all_results[, .(crop, yield_response_sum)] %>%
+  all_results[, .(crop, yield_pred_data)] %>%
   rowwise() %>%
   dplyr::mutate(plot_data = list(
-    yield_response_sum[, crop_type := crop] %>%
+    yield_pred_data[, crop_type := crop] %>%
       .[, crop_type := case_when(
         crop_type == "corn" ~ "A. Corn",
         crop_type == "soy" ~ "B. Sybean"
@@ -448,12 +448,19 @@ g_yield_response <-
 
 cowplot::ggsave2("GitControlled/Writing/Figures/g_yield_intensive.pdf", g_yield_response, width = 6, height = 6)
 
+
 #++++++++++++++++++++++++++++++++++++
 #+ With confidence interval (seprately)
 #++++++++++++++++++++++++++++++++++++
 g_yield_with_conf <-
   plot_yield_data %>%
-  mutate(g_fig = list(
+  dplyr::mutate(plot_data = list(
+    plot_data[, `:=`(
+      lower = y_hat - 1.96 * y_hat_se_modeled,
+      upper = y_hat + 1.96 * y_hat_se_modeled
+    )]
+  )) %>%
+  dplyr::mutate(g_fig = list(
       ggplot(plot_data) +
         geom_ribbon(
           aes(
@@ -484,7 +491,6 @@ g_yield_with_conf <-
   )) %>%
   dplyr::select(crop, g_fig) %>%
   data.table()
-
 
 ggsave("GitControlled/Writing/Figures/g_yield_with_conf_corn.pdf", g_yield_with_conf[crop == "corn", g_fig][[1]], width = 6, height = 3.5)
 ggsave("GitControlled/Writing/Figures/g_yield_with_conf_soy.pdf", g_yield_with_conf[crop == "soy", g_fig][[1]], width = 6, height = 3.5)
@@ -528,6 +534,41 @@ g_share <-
 ggsave(
   file = "GitControlled/Writing/Figures/g_share.pdf",
   g_share,
+  height = 4,
+  width = 5
+)
+```
+
+# Difference in the share of irrigated production (from 130)
+
+```{r}
+g_share_dif <-
+  ggplot(plot_data_ir_share[sat < 130, ]) +
+  geom_line(aes(y = dif_ir_share_hat, x = sat)) +
+  geom_ribbon(
+    aes(
+      ymin = dif_lower,
+      ymax = dif_upper,
+      x = sat
+    ),
+    alpha = 0.4
+  ) +
+  geom_hline(yintercept = 0, color = "red") +
+  scale_y_continuous(breaks = seq(0, 1, by = 0.1)) +
+  scale_x_continuous(breaks = seq(10, 160, by = 10)) +
+  xlab("Aquifer Thickness (meter)") +
+  ylab("Estimated Share of Irrigated Acres") +
+  facet_wrap(crop_type ~ ., ncol = 1) +
+  theme_fig +
+  theme(
+    legend.position = "bottom",
+    strip.background = element_blank(),
+    strip.text = element_text(hjust = 0, face = "bold", family = "Times", size = )
+  )
+
+ggsave(
+  file = "GitControlled/Writing/Figures/g_share_dif.pdf",
+  g_share_dif,
   height = 4,
   width = 5
 )
@@ -592,14 +633,18 @@ ggsave(
 
 ```{r}
 g_dif <-
-  all_results[, .(crop, yield_response_sum)] %>%
+  all_results[, .(crop, yield_dif_test, sat_text_data)] %>%
   rowwise() %>%
   dplyr::mutate(plot_data = list(
-    yield_response_sum[, crop_type := crop] %>%
+    yield_dif_test[, crop_type := crop] %>%
       .[, crop_type := case_when(
         crop_type == "corn" ~ "A. Corn",
         crop_type == "soy" ~ "B. Sybean"
-      )]
+      )] %>%
+      setnames("comp_q", "sat_rank") %>%
+      sat_text_data[., on = "sat_rank"] %>%
+      .[, dif_upper := dif_hat + 1.96 * se] %>%
+      .[, dif_lower := dif_hat - 1.96 * se]
   )) %>%
   dplyr::mutate(sat_cat_text_ls = list(
     plot_data[, .(sat_rank, sat_cat_text)] %>%
@@ -608,12 +653,7 @@ g_dif <-
       .[order(sat_rank), sat_cat_text]
   )) %>%
   dplyr::mutate(plot_data = list(
-    plot_data %>%
-      .[is.na(sat_cat_text), sat_cat_text := "Rainfed"] %>%
-      .[, sat_cat_text := factor(sat_cat_text, levels = c("Rainfed", sat_cat_text_ls))] %>%
-      .[!is.na(sat_rank), ] %>%
-      .[sat_rank != 1, ] %>%
-      unique(by = c("crop_type", "balance", "sat_cat"))
+     plot_data[, sat_cat_text := factor(sat_cat_text, levels = sat_cat_text_ls)]
   )) %>%
   dplyr::mutate(g_fig = list(
     ggplot(plot_data) +
@@ -630,7 +670,7 @@ g_dif <-
       geom_line(
         aes(
           x = balance,
-          y = dif_y_hat
+          y = dif_hat
         ),
         color = "red"
       ) +
@@ -697,7 +737,7 @@ g_ay_corn <-
     legend.position = "none",
     axis.title.x = element_blank()
   ) +
-  scale_y_continuous(breaks = -2:5, limits = c(-2, 5)) +
+  scale_y_continuous(breaks = -2:5, limits = c(-2, 6)) +
   ggtitle("A. Corn")
 
 g_ay_soy <-
@@ -706,22 +746,6 @@ g_ay_soy <-
   ggtitle("B. Soybean")
 
 g_ay <- g_ay_corn / g_ay_soy
-
-
-# g_avg_yield_dif <-
-#   ggplot(plot_data_dif) +
-#   geom_ribbon(aes(x = -balance, ymin = lower, ymax = upper), alpha = 0.3, fill = "blue") +
-#   geom_line(aes(x = -balance, y = dif_yield), color = "red") +
-#   geom_hline(yintercept = 0) +
-#   facet_grid(crop ~ sat_cat_text, scales = "free_y") +
-#   xlab("Water Deficit (mm)") +
-#   ylab("Difference in Yield (tonne/ha)") +
-#   theme_fig +
-#   theme(
-#     strip.background = element_blank(),
-#     strip.text = element_text(size = 9, family = "Times"),
-#     panel.spacing.y = unit(1, "cm")
-#   )
 
 ggsave("GitControlled/Writing/Figures/g_avg_yield_dif.pdf", g_ay, width = 6, height = 5)
 ```
@@ -769,19 +793,6 @@ g_ay_response_soy <-
   ggtitle("B. Soybean")
 
 g_ay_response <- g_ay_response_corn / g_ay_response_soy
-
-# g_avg_yield_response <-
-#   ggplot(plot_data_response) +
-#   geom_ribbon(aes(x = -balance, ymin = lower, ymax = upper), alpha = 0.3) +
-#   geom_line(aes(x = -balance, y = avg_yield)) +
-#   facet_grid(crop ~ sat_cat_text, scales = "free_y") +
-#   xlab("Water Deficit (mm)") +
-#   ylab("Yield (tonne/ha)") +
-#   theme_fig +
-#   theme(
-#     strip.background.x = element_blank(),
-#     panel.spacing = unit(0.2, "cm")
-#   )
 
 ggsave("GitControlled/Writing/Figures/g_avg_yield.pdf", g_ay_response, width = 6, height = 3.5)
 ```
