@@ -1,0 +1,75 @@
+```{r}
+yields <-
+  fread("Shared/Data/RawData/USDA-NASS/yields.csv") %>%
+  setnames(names(.), tolower(names(.))) %>%
+  setnames(
+    c("county ansi", "state ansi", "data item", "value", "commodity"),
+    c("county_fips", "state_fips", "data_item", "yield", "crop")
+  ) %>%
+  .[!str_detect(data_item, "SILAGE"), ] %>%
+  .[!is.na(county_fips), ] %>%
+  .[, crop := tolower(crop)] %>%
+  .[, crop := ifelse(crop == "soybeans", "soy", "corn")] %>%
+  .[, yield_type := case_when(
+    str_detect(data_item, "NET") ~ "yield_npa",
+    !str_detect(data_item, "NET") ~ "yield_pa"
+  )] %>%
+  .[, ir := ifelse(str_detect(data_item, "NON"), "nir", "ir")] %>%
+  .[, county_fips := str_pad(county_fips, 3, "left", "0")] %>%
+  .[, state_fips := str_pad(state_fips, 2, "left", "0")] %>%
+  .[, sc_code := paste0(state_fips, county_fips)] %>%
+  .[, .(sc_code, year, crop, ir, yield, yield_type)] %>%
+  dcast(sc_code + crop + year + ir ~ yield_type, value.var = "yield")
+
+harvested_acres <-
+  fread("Shared/Data/RawData/USDA-NASS/harvested_acres.csv") %>%
+  setnames(names(.), tolower(names(.))) %>%
+  setnames(
+    c("county ansi", "state ansi", "data item", "value", "commodity"),
+    c("county_fips", "state_fips", "data_item", "acres", "crop")
+  ) %>%
+  .[!str_detect(data_item, "SILAGE"), ] %>%
+  .[!is.na(county_fips), ] %>%
+  .[, crop := tolower(crop)] %>%
+  .[, crop := ifelse(crop == "soybeans", "soy", "corn")] %>%
+  .[, county_fips := str_pad(county_fips, 3, "left", "0")] %>%
+  .[, state_fips := str_pad(state_fips, 2, "left", "0")] %>%
+  .[, sc_code := paste0(state_fips, county_fips)] %>%
+  .[, ir := ifelse(str_detect(data_item, "NON"), "nir", "ir")] %>%
+  .[, harvested_acres := as.numeric(gsub(",", "", acres))] %>%
+  .[, comp := sum(ir == "nir" | ir == "ir"), by = .(crop, sc_code, year)] %>%
+  .[comp == 2, ] %>%
+  .[, acres := as.numeric(gsub(",", "", acres))] %>%
+  .[, acres_ratio_h := acres / sum(acres), by = .(crop, sc_code, year)] %>%
+  .[, .(sc_code, year, crop, ir, harvested_acres, acres_ratio_h)]
+
+planted_acres <-
+  fread("Shared/Data/RawData/USDA-NASS/planted_acres.csv") %>%
+  setnames(names(.), tolower(names(.))) %>%
+  setnames(
+    c("county ansi", "state ansi", "data item", "value", "commodity"),
+    c("county_fips", "state_fips", "data_item", "acres", "crop")
+  ) %>%
+  .[!str_detect(data_item, "SILAGE"), ] %>%
+  .[!is.na(county_fips), ] %>%
+  .[, crop := tolower(crop)] %>%
+  .[, crop := ifelse(crop == "soybeans", "soy", "corn")] %>%
+  .[, county_fips := str_pad(county_fips, 3, "left", "0")] %>%
+  .[, state_fips := str_pad(state_fips, 2, "left", "0")] %>%
+  .[, sc_code := paste0(state_fips, county_fips)] %>%
+  .[, ir := ifelse(str_detect(data_item, "NON"), "nir", "ir")] %>%
+  .[, planted_acres := as.numeric(gsub(",", "", acres))] %>%
+  .[, comp := sum(ir == "nir" | ir == "ir"), by = .(crop, sc_code, year)] %>%
+  .[comp == 2, ] %>%
+  .[, acres := as.numeric(gsub(",", "", acres))] %>%
+  .[, acres_ratio_p := acres / sum(acres), by = .(crop, sc_code, year)] %>%
+  .[, .(sc_code, year, crop, ir, planted_acres, acres_ratio_p)]
+```
+
+```{r}
+nass_data_new <-
+  harvested_acres[yields, on = c("sc_code", "ir", "year", "crop")] %>%
+  planted_acres[., on = c("sc_code", "ir", "year", "crop")]
+
+nass_data_new <- saveRDS(nass_data_new, "Shared/Data/ProcessedData/nass_data_new.rds")
+```
