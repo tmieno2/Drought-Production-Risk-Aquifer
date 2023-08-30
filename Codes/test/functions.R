@@ -286,8 +286,8 @@ share_analysis <- function(ir_share_data, sat_seq, sandtotal_e, silttotal_e, awc
   gam_formula_ir_share <-
     formula(
       acres_ratio ~
-        s(sat, k = 5, m = 2) +
-        s(balance_avg, k = 5, m = 2)
+        s(sat, k = 4, m = 2) +
+        s(balance_avg, k = 4, m = 2)
     )
   #---------------------
   #- Run preliminary gam estimation

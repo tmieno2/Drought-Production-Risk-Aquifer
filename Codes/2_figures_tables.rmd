@@ -3,24 +3,6 @@ title: "Create Figures and Tables"
 author: "Taro Mieno"
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(
-  echo = TRUE,
-  cache = TRUE,
-  comment = NA,
-  message = FALSE,
-  warning = FALSE,
-  tidy = FALSE,
-  cache.lazy = FALSE,
-  #--- figure ---#
-  dpi = 400,
-  fig.width = 7.5,
-  fig.height = 5,
-  out.width = "750px",
-  out.height = "500px"
-)
-```
-
 # Preparation
 
 ## Load the data and results 
@@ -154,6 +136,7 @@ g_yield_wd_corn <-
 
 
 coeff_soy <- 200
+
 g_yield_wd_soy <-
   ggplot() +
   geom_line(
@@ -220,21 +203,7 @@ ggsave(
 )
 ```
 
-## Saturated thickness 
-
-```{r, eval = FALSE}
-g_sat_dist <-
-  rbind(data_corn[year <= 2016, ], data_soy[year <= 2016, ]) %>%
-  .[sat != 0, ] %>%
-  ggplot(data = .) +
-  geom_histogram(aes(x = sat), fill = "white", color = "blue") +
-  facet_grid(type ~ ., scale = "free_y") +
-  ylab("Count") +
-  xlab("Aquifer Thickness (meter)") +
-  theme_fig
-```
-
-## Map
+## Saturated Thickness Map
 
 ```{r echo = F, eval = F}
 # === hpa ===#
@@ -248,6 +217,7 @@ data(fips_codes, package = "tidycensus")
 
 all_counties <-
   tigris::counties() %>%
+  st_simplify(dTolerance = 100) %>%
   rename(
     state_code = STATEFP,
     county_code = COUNTYFP,
@@ -277,11 +247,12 @@ counties_corn_all <-
   st_as_sf()
 
 counties_corn_ir <-
-  data_corn %>%
+  copy(data_corn) %>%
   .[sat_cat != "dryland", ] %>%
   .[, .(sat, sc_code)] %>%
   .[, .(sat = mean(sat, na.rm = TRUE)), by = sc_code] %>%
   left_join(all_counties, by = "sc_code") %>%
+  data.table() %>%
   .[, type := "Corn"] %>%
   st_as_sf()
 
@@ -292,11 +263,12 @@ counties_soy_all <-
   st_as_sf()
 
 counties_soy_ir <-
-  data_soy %>%
+  copy(data_soy) %>%
   .[sat_cat != "dryland", ] %>%
   .[, .(sat, sc_code)] %>%
   .[, .(sat = mean(sat, na.rm = TRUE)), by = sc_code] %>%
   left_join(all_counties, by = "sc_code") %>%
+  data.table() %>%
   .[, type := "Soybean"] %>%
   st_as_sf()
 
@@ -351,7 +323,6 @@ g_soy <-
 
 g_map <- g_corn | g_soy
 
-ggsave(file = "GitControlled/Writing/Figures/g_map.png", g_map, height = 7, width = 6, dpi = 600)
 ggsave(file = "GitControlled/Writing/Figures/g_map.pdf", g_map, height = 7, width = 6)
 ```
 
@@ -432,9 +403,9 @@ g_wds <-
         ylab("") +
         # scale_x_continuous(breaks = (-2:11)*100) +
         coord_cartesian(xlim = c(-200, 1150))
-        # +
-        # # xlim(NA, max_balance) +
-        # theme_void()
+      # +
+      # # xlim(NA, max_balance) +
+      # theme_void()
     }
   ))
 
@@ -448,8 +419,9 @@ g_wd_corn <-
     axis.ticks.x = element_blank(),
     axis.ticks.y = element_blank(),
     panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
     panel.border = element_blank(),
-    plot.margin = margin(0, 0, 0, 0, "cm")
+    plot.margin = margin(0, 0, -0.5, 0, "cm")
   )
 
 g_wd_soy <-
@@ -464,8 +436,8 @@ g_wd_soy <-
     panel.grid.major = element_blank(),
     panel.grid.minor = element_blank(),
     panel.border = element_blank(),
-    plot.margin = margin(0, 0, 0, 0, "cm")
-    )
+    plot.margin = margin(0, 0, -0.5, 0, "cm")
+  )
 
 
 g_yield_response <-
@@ -473,7 +445,7 @@ g_yield_response <-
     g_wd_corn, g_ir_yield_corn, g_wd_soy, g_ir_yield_soy,
     ncol = 1,
     align = "v",
-    rel_heights = c(0.15 / 2, 0.72 / 2, 0.15 / 2, 0.98 / 2)
+    rel_heights = c(0.18 / 2, 0.69 / 2, 0.18 / 2, 0.95 / 2)
   )
 
 # g_yield_response <-
@@ -507,33 +479,33 @@ g_yield_with_conf <-
     )]
   )) %>%
   dplyr::mutate(g_fig = list(
-      ggplot(plot_data) +
-        geom_ribbon(
-          aes(
-            ymin = lower,
-            ymax = upper,
-            x = balance
-          ),
-          alpha = 0.3
-        ) +
-        geom_line(aes(
-          y = y_hat,
+    ggplot(plot_data) +
+      geom_ribbon(
+        aes(
+          ymin = lower,
+          ymax = upper,
           x = balance
-        )) +
-        facet_wrap(~sat_cat_text, ncol = 2) +
-        scale_x_continuous(
-          name = "Water Deficit (mm)",
-          breaks = (-1:5) * 200
-        ) +
-        scale_y_continuous(
-          name = "Yield (tonne/ha)",
-          breaks = 0:14
-        ) +
-        theme_fig +
-        theme(
-          legend.position = "bottom",
-          strip.background = element_blank()
-        )
+        ),
+        alpha = 0.3
+      ) +
+      geom_line(aes(
+        y = y_hat,
+        x = balance
+      )) +
+      facet_wrap(~sat_cat_text, ncol = 2) +
+      scale_x_continuous(
+        name = "Water Deficit (mm)",
+        breaks = (-1:5) * 200
+      ) +
+      scale_y_continuous(
+        name = "Yield (tonne/ha)",
+        breaks = 0:14
+      ) +
+      theme_fig +
+      theme(
+        legend.position = "bottom",
+        strip.background = element_blank()
+      )
   )) %>%
   dplyr::select(crop, g_fig) %>%
   data.table()
@@ -545,6 +517,93 @@ ggsave("GitControlled/Writing/Figures/g_yield_with_conf_soy.pdf", g_yield_with_c
 # The impact of saturated thickness on the share of irrigated production
 
 ```{r}
+#++++++++++++++++++++++++++++++++++++
+#+ Share response
+#++++++++++++++++++++++++++++++++++++
+plot_data_ir_share <-
+  all_results[, .(crop, share_pred_data)] %>%
+  unnest(cols = share_pred_data) %>%
+  data.table() %>%
+  .[, crop_type := case_when(
+    crop == "corn" ~ "A. Corn",
+    crop == "soy" ~ "B. Soybean"
+  )]
+
+g_share <-
+  plot_data_ir_share %>%
+  nest_by(crop) %>%
+  dplyr::mutate(g_fig = list(
+    ggplot(dplyr::filter(data, sat <= 150)) +
+      geom_line(aes(y = ir_share_hat, x = sat)) +
+      geom_ribbon(
+        aes(
+          ymin = ir_share_hat - 1.96 * ir_share_hat_se,
+          ymax = ir_share_hat + 1.96 * ir_share_hat_se,
+          x = sat
+        ),
+        alpha = 0.4
+      ) +
+      scale_y_continuous(breaks = seq(0, 1, by = 0.1), limits = c(0.4, 1)) +
+      scale_x_continuous(breaks = seq(10, 150, by = 10)) +
+      coord_cartesian(xlim = c(9, 150)) +
+      xlab("Aquifer Thickness (meter)") +
+      ylab("Share of Irrigated Acres") +
+      theme_fig +
+      theme(
+        legend.position = "bottom"
+      )
+  ))
+
+#++++++++++++++++++++++++++++++++++++
+#+ Saturated thickness histogram
+#++++++++++++++++++++++++++++++++++++
+g_sat_hist <-
+  all_results[, .(crop, data)] %>%
+  dplyr::mutate(g_fig = purrr::map(
+    data,
+    function(data) {
+      ggplot(data[sat < 150 & ir == "ir", ]) +
+        geom_histogram(aes(x = sat), bins = 30, col = "darkgreen", fill = NA) +
+        theme_fig +
+        xlab("") +
+        ylab("") +
+        coord_cartesian(xlim = c(9, 150)) +
+        theme(
+          plot.title = element_text(size = 9, family = "Times", face = "bold"),
+          axis.text.x = element_blank(),
+          axis.text.y = element_blank(),
+          axis.ticks.x = element_blank(),
+          axis.ticks.y = element_blank(),
+          panel.grid.major = element_blank(),
+          panel.grid.minor = element_blank(),
+          panel.border = element_blank(),
+          plot.margin = margin(0, 0, -0.5, 0, "cm")
+        )
+    }
+  ))
+
+g_ir_share <-
+  cowplot::plot_grid(
+    g_sat_hist$g_fig[[1]] + ggtitle("A. Corn"),
+    g_share$g_fig[[1]] + theme(plot.margin = margin(0, 0, 0.5, 0, "cm")),
+    g_sat_hist$g_fig[[2]] + ggtitle("B. Soybean"),
+    g_share$g_fig[[2]],
+    ncol = 1,
+    align = "v",
+    rel_heights = c(0.18 / 2, 0.64 / 2, 0.18 / 2, 0.64 / 2)
+  )
+
+ggsave(
+  file = "GitControlled/Writing/Figures/g_share.pdf",
+  g_ir_share,
+  height = 6,
+  width = 6
+)
+```
+
+# Difference in the share of irrigated production (from 100)
+
+```{r}
 plot_data_ir_share <-
   all_results[, .(crop, share_sum)] %>%
   unnest(cols = share_sum) %>%
@@ -554,42 +613,8 @@ plot_data_ir_share <-
     crop == "soy" ~ "B. Soybean"
   )]
 
-g_share <-
-  ggplot(plot_data_ir_share[sat <= 150, ]) +
-  geom_line(aes(y = ir_share_hat, x = sat)) +
-  geom_ribbon(
-    aes(
-      ymin = lower,
-      ymax = upper,
-      x = sat
-    ),
-    alpha = 0.4
-  ) +
-  scale_y_continuous(breaks = seq(0, 1, by = 0.1)) +
-  scale_x_continuous(breaks = seq(10, 160, by = 10)) +
-  xlab("Aquifer Thickness (meter)") +
-  ylab("Decline in Estimated Share of Irrigated Acres") +
-  facet_wrap(crop_type ~ ., ncol = 1) +
-  theme_fig +
-  theme(
-    legend.position = "bottom",
-    strip.background = element_blank(),
-    strip.text = element_text(hjust = 0, face = "bold", family = "Times", size = )
-  )
-
-ggsave(
-  file = "GitControlled/Writing/Figures/g_share.pdf",
-  g_share,
-  height = 4,
-  width = 5
-)
-```
-
-# Difference in the share of irrigated production (from 130)
-
-```{r}
 g_share_dif <-
-  ggplot(plot_data_ir_share[sat < 105, ]) +
+  ggplot(plot_data_ir_share[sat < 100, ]) +
   geom_line(aes(y = dif_ir_share_hat, x = sat)) +
   geom_ribbon(
     aes(
@@ -603,7 +628,7 @@ g_share_dif <-
   scale_y_continuous(breaks = seq(0, 1, by = 0.1)) +
   scale_x_continuous(breaks = seq(10, 160, by = 10)) +
   xlab("Aquifer Thickness (meter)") +
-  ylab("Estimated Share of Irrigated Acres") +
+  ylab("Decline in Estimated Share of Irrigated Acres") +
   facet_wrap(crop_type ~ ., ncol = 1) +
   theme_fig +
   theme(
@@ -646,29 +671,62 @@ g_total_both <-
           nrow = 1
         )
       ) +
-      scale_x_continuous(name = "Water Deficit (mm)", breaks = (-2:11) * 100, limits = c(-200, 1200)) +
+      scale_x_continuous(
+        name = "Water Deficit (mm)",
+        breaks = (-2:12) * 100
+      ) +
+      coord_cartesian(xlim = c(-200, 1150)) +
       theme(legend.position = "bottom")
   }))
 
 g_total_corn <-
   g_total_both$g_fig[[1]] +
-  theme(
-    legend.position = "none",
-    axis.title.x = element_blank()
-  ) +
-  ylim(6, 13) +
-  ggtitle("A. Corn")
+  theme(legend.position = "none") +
+  ylim(6, 13)
 
 g_total_soy <-
   g_total_both$g_fig[[2]] +
-  ylim(1.5, 4) +
-  ggtitle("B. Soybean")
+  ylim(1.5, 4)
 
-g_total <- g_total_corn / g_total_soy
+g_wds <-
+  all_results[, .(crop, data)] %>%
+  dplyr::mutate(g_fig = purrr::map(
+    data,
+    function(data) {
+      ggplot(data) +
+        geom_histogram(aes(x = balance), bins = 50, col = "darkgreen", fill = NA) +
+        theme_fig +
+        xlab("") +
+        ylab("") +
+        coord_cartesian(xlim = c(-200, 1150)) +
+        theme(
+          plot.title = element_text(size = 9, family = "Times", face = "bold"),
+          axis.text.x = element_blank(),
+          axis.text.y = element_blank(),
+          axis.ticks.x = element_blank(),
+          axis.ticks.y = element_blank(),
+          panel.grid.major = element_blank(),
+          panel.grid.minor = element_blank(),
+          panel.border = element_blank(),
+          plot.margin = margin(0, 0, -0.5, 0, "cm")
+        )
+    }
+  ))
+
+g_total_impact <-
+  cowplot::plot_grid(
+    g_wds$g_fig[[1]] + ggtitle("A. Corn"),
+    g_total_corn + theme(plot.margin = margin(0, 0, 0.5, 0, "cm")),
+    g_wds$g_fig[[2]] + ggtitle("B. Soybean"),
+    g_total_soy,
+    ncol = 1,
+    align = "v",
+    rel_heights = c(0.18 / 2, 0.65 / 2, 0.18 / 2, 0.8 / 2)
+  )
 
 ggsave(
   file = "GitControlled/Writing/Figures/g_total_impact.pdf",
-  g_total,
+  g_total_impact,
   height = 6,
   width = 6
 )
@@ -699,7 +757,7 @@ g_dif <-
       .[order(sat_rank), sat_cat_text]
   )) %>%
   dplyr::mutate(plot_data = list(
-     plot_data[, sat_cat_text := factor(sat_cat_text, levels = sat_cat_text_ls)]
+    plot_data[, sat_cat_text := factor(sat_cat_text, levels = sat_cat_text_ls)]
   )) %>%
   dplyr::mutate(g_fig = list(
     ggplot(plot_data) +

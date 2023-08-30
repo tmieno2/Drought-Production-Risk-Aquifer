@@ -385,9 +385,7 @@ share_analysis_gam <- function(ir_share_data, sat_seq, sandtotal_e, silttotal_e,
   #++++++++++++++++++++++++++++++++++++
   #+ Main
   #++++++++++++++++++++++++++++++++++++
-  ir_share_data <- 
-    ir_share_data[sat < 180, ] %>%
-    .[year != 2002, ]
+  ir_share_data <- ir_share_data[sat < 180, ]
 
   #---------------------
   #- define the formula for the flexible part
@@ -438,16 +436,16 @@ share_analysis_gam <- function(ir_share_data, sat_seq, sandtotal_e, silttotal_e,
     ir_share_hat_se = share_hat$se.fit
   )]
 
-  ggplot(share_hat_data) +
-    geom_line(aes(y = ir_share_hat, x = sat)) +
-    geom_ribbon(aes(
-      ymin = ir_share_hat - 1.96 * ir_share_hat_se,
-      ymax = ir_share_hat + 1.96 * ir_share_hat_se,
-      x = sat
-    ), alpha = 0.4)
+  # ggplot(share_hat_data) +
+  #   geom_line(aes(y = ir_share_hat, x = sat)) +
+  #   geom_ribbon(aes(
+  #     ymin = ir_share_hat - 1.96 * ir_share_hat_se,
+  #     ymax = ir_share_hat + 1.96 * ir_share_hat_se,
+  #     x = sat
+  #   ), alpha = 0.4)
 
   return(
-    share_hat_data = share_hat_data[, .(sat, ir_share_hat)]
+    share_hat_data = share_hat_data[, .(sat, ir_share_hat, ir_share_hat_se)]
   )
 }
 
@@ -656,29 +654,6 @@ yield_analysis_boot <- function(yield_data, balance_seq, sat_seq_eval, sat_break
   return(return_data[, .(balance, sat, sat_cat, sat_cat_text, sat_rank, y_hat, dif_y_hat)])
 }
 
-share_data_boot <- function(boot_data, share_reg_data) {
-  nobs <- nrow(share_reg_data)
-
-  share_reg_data[, sc_code] %>% unique()
-  boot_data[, sc_code] %>% unique()
-  data[, sc_code] %>% unique()
-
-  share_boot_data[comp == 3, ] %>%
-    .[order(sc_code, year), ]
-
-  data[sc_code == "08125"] %>%
-    .[order(sc_code, year), ]
-
-  share_boot_data <-
-    boot_data %>%
-    .[, comp := sum(ir == "ir" | ir == "nir"), by = .(sc_code, year)] %>%
-    .[comp == 2, ] %>%
-    .[, acres_ratio := acres / sum(acres), by = .(sc_code, year)] %>%
-    .[ir == "ir" & ir_area_ratio >= 0.75, ] %>%
-    .[, balance_avg := mean(balance), by = sc_code]
-
-  sc_ls <- share_boot_data[, sc_code] %>% unique()
-}
 
 boot <- function(data, sc_base) {
 
@@ -710,7 +685,7 @@ boot <- function(data, sc_base) {
   dry_sc_sampled <- sample(dry_sc_ls, drs_sc_len, replace = TRUE)
 
   #++++++++++++++++++++++++++++++++++++
-  #+
+  #+ Extract observations
   #++++++++++++++++++++++++++++++++++++
   all_sc_sampled <- c(ir_sc_sampled, dry_sc_sampled)
 

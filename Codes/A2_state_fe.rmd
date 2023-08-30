@@ -12,7 +12,7 @@ all_results <- readRDS(here::here("Shared/Results/all_results.rds"))
 #+ Formula
 #++++++++++++++++++++++++++++++++++++
 formula_text <- "acres_ratio ~
-    s(sat, k = 5, m = 2) + s(balance_avg, k = 5, m = 2) +
+    s(sat, k = 4, m = 2) + s(balance_avg, k = 4, m = 2) +
     sandtotal_r + silttotal_r + awc_r +
     factor(year)"
 
@@ -34,18 +34,26 @@ formula_data <-
     type = c("Year FE", "State and Year FE", "State-Year FE")
   )
 
+# ggplot(results$ir_share_data[[1]]) +
+#   geom_point(aes(y = acres_ratio, x = sat))
+
 results <-
   all_results[, .(crop, data)] %>%
   expand_grid_df(., formula_data) %>%
   rowwise() %>%
   dplyr::mutate(ir_share_data = list(
-    data[ir == "ir" & ir_area_ratio >= 0.75, ] %>%
-      .[, balance_avg := mean(balance), by = sc_code]
+    data %>%
+      .[, comp := sum(ir == "nir" | ir == "ir"), by = .(sc_code, year)] %>%
+      .[comp == 2, ] %>%
+      .[, acres_ratio := acres / sum(acres), by = .(sc_code, year)] %>%
+      .[ir == "ir" & ir_area_ratio >= 0.75, ] %>%
+      .[, balance_avg := mean(balance), by = sc_code] %>%
+      .[sat < 180, ]
   )) %>%
   dplyr::mutate(ir_share_res = list(
     gam(
       formula,
-      data = ir_share_data_corn,
+      data = ir_share_data,
       family = binomial
     )
   )) %>%
@@ -87,7 +95,11 @@ results <-
 
 ```{r}
 g_share_comp <-
-  results[sat <= 500, ] %>%
+  results[sat <= 150, ] %>%
+  .[, crop := case_when(
+    crop == "corn" ~ "Corn",
+    crop == "soy" ~ "Soybean"
+  )] %>%
   .[, type := factor(type, levels = c("Year FE", "State and Year FE", "State-Year FE"))] %>%
   ggplot() +
   geom_line(aes(y = ir_share_hat, x = sat)) +
@@ -99,9 +111,8 @@ g_share_comp <-
     ),
     alpha = 0.4
   ) +
-  ylim(0.25, 1) +
-  scale_y_continuous(breaks = seq(0, 1, by = 0.1)) +
-  scale_x_continuous(breaks = seq(10, 160, by = 20)) +
+  scale_y_continuous(breaks = seq(0, 1, by = 0.1), limits = c(0.4, 1)) +
+  scale_x_continuous(breaks = seq(10, 150, by = 20)) +
   xlab("Saturated Thickness (meter)") +
   ylab("Share of Irrigated Acres") +
   facet_grid(type ~ crop) +

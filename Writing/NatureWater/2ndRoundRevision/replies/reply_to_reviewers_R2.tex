@@ -67,16 +67,21 @@
 
 \begin{document}
 
+\section{Changes unrelated to reviewers' comments}
+
+\textcolor{blue}{We made a small correction to our codes. In the previous round, we included counties with only irrigated acres for the irrigation share regression. For such counties, the share of irrigated acres was calculated to be 1. Therefore, we dropped them. While it resulted in some minor changes in our results from those provided in the previous round, all the qualitative results and conclusions are the same as the previous rounds.}
+
 \section{Reply to reviewer \#1}
 
-\textcolor{blue}{Thank you for your feedback on our manuscript. We have addressed all your comments and suggestions, and our replies to your comments can found in blue below (original comments in black).}
-
 I have read the revised manuscript and the authors’ responses to my initial review. I think they have done a nice job in responding to the points I raised. Thus, I recommend acceptance after the authors address the minor points that I noted while reading the revised manuscript. Those points are as follows:
+
+\textcolor{blue}{Thank you for your feedback on our manuscript. We have addressed all your comments and suggestions, and our replies to your comments can be found in blue below (original comments in black). Please take a look at our comments about a small change in our codes at the top as well.}
+
 
 \begin{itemize}
     \item Line 58 – ``farmers'' should be ``farmers’''.
 
-\textcolor{blue}{Thank you for catching this. Fixed}
+\textcolor{blue}{Thank you for catching this. Fixed.}
 
 \item Figure 1 caption – I found the term ``county-year water deficit values'' confusing. I recommend use of something like ``county-level average water deficit values''. Might also consider modifying line 290.
 
@@ -84,7 +89,7 @@ I have read the revised manuscript and the authors’ responses to my initial re
 
 \item Line 305 – replace ``aquifer'' with ``aquifer thickness'' or ``they''.
 
-\textcolor{blue}{Thank you for catching this. Fixed}
+\textcolor{blue}{Thank you for catching this. Fixed.}
 
 \item Equations 1 and 2 – shouldn’t ``k'' be ``k=1'' – if not, please explain how k is determined. Also, explain ``K'' and how it was determined.
 
@@ -92,19 +97,19 @@ I have read the revised manuscript and the authors’ responses to my initial re
 
 \item Lines 385-387 – Figure A.3 is not presenting results by aquifer thickness category. It is presenting results for three aquifer thicknesses, not categories. Please rewrite.
 
-\textcolor{blue}{Figure A.3 indeed presents what we intended to present. Please note that we made similar changes for average productivity analysis in the main text as shown in Figures 4 and 5. While the irrigated yield regression (equation 1) uses aquifer thickness category, the irrigated share regression uses aquifer thickness as it is as a continuous variable. In our average productivity analysis, we use four aquifer thickness values: 10, 50, 90, and 130 meter. For example, for the analysis of 10 meter, estimated yield response function for the first category is used as it falls within the [9m, 30.1 m] range. Estimated irrigation share for 10 meter can be obtained simply by plugging 10 into the trained model of the share of irrigated acres. In our initial submission, we were doing the same kind of analysis (using one number from each aquifer thickness category), but reported by category. In the first round of revision, we decided to have two aquifer thickness values in the 3rd quantile category (90 and 130 meter). This is in response to another reviewer's point that it is not clear if indeed the impact of aquifer thickness on average productivity is non-linear as we claimed in our initial submission.}
+\textcolor{blue}{Figure A.3 indeed presents what we intended to present. Please note that we made similar changes for average productivity analysis in the main text as shown in Figures 4 and 5. While the irrigated yield regression (equation 1) uses aquifer thickness category, the irrigated share regression uses aquifer thickness as it is as a continuous variable. In our average productivity analysis, we use four aquifer thickness values: 10, 40, 70, and 100 meter. For example, for the analysis of 10 meter, estimated yield response function for the first category is used as it falls within the [9m, 30.1 m] range. Estimated irrigation share for 10 meter can be obtained simply by plugging 10 into the trained model of the share of irrigated acres. In our initial submission, we were doing the same kind of analysis (using one number from each aquifer thickness category), but reported by category. In the previous round of revision, we decided to have two aquifer thickness values in the 3rd quantile category (90 and 130 meter). This is in response to another reviewer's point that it is not clear if indeed the impact of aquifer thickness on average productivity is non-linear as we claimed in our initial submission. Given the chosen series of aquifer thickness numbers are equi-distance, it has become much easier to observe the non-linearity in the impact of saturated thickness on overall productivity. Please note that we now present results for 10, 40, 70, and 100 meters, which are in the first, second, third, and third saturated thickness categories. }
 
 \item Section B title – revise ``the the''.
 
-\textcolor{blue}{Thank you for catching this. Fixed}
+\textcolor{blue}{Thank you for catching this. Fixed.}
 
 \item Figure B.1 – y-axis label is not correct – this should be ``Decline in Estimated….''.
 
-\textcolor{blue}{Thank you for catching this. Fixed}
+\textcolor{blue}{Thank you for catching this. Fixed.}
 
 \item Lines 398-407 – this paragraph needs to be rewritten. Use of ``demeaning'' or ``demeaned'' is incorrect. My guess is that the authors mean something like ``detrending'' or ``detrended'' – please revise. Also, fix noun-verb disagreement, etc. in this paragraph.
 
-\textcolor{blue}{We understand that demeaning sounds wrong, however, it is a term that is used specifically for the types of operations in Economics.}
+\textcolor{blue}{We understand that demeaning sounds wrong, however, it is a term that is used specifically for the types of operations we are conducting in that analysis in Economics.}
 
 \textcolor{red}{Tim, can you work on making the paragraph free of grammatical errors?}
 
@@ -121,6 +126,8 @@ I have read the revised manuscript and the authors’ responses to my initial re
 The manuscript has been considerably improved by the substantial edits in response to the first round reviewer comments. The highly relevant insights of the paper can now be more readily understood by readers. The inclusion of new Figures 2 and 5 and Appendices A and B make it easier to parse the results. Main text additions and Appendices C and D clarify the methods and result interpretation.
 
 Most of the previous comments have been addressed. Some open points, however, still remain and a few new ones have arisen:
+
+\textcolor{blue}{Thank you for your feedback on our manuscript. We have addressed all your comments and suggestions, and our replies to your comments can be found in blue below (original comments in black). Please take a look at our comments about a small change in our codes at the top as well.}
 
 \subsection{MAIN COMMENTS}
 
