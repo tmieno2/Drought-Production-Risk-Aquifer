@@ -330,3 +330,14 @@ soy_reg <- felm(soy_yield ~
 
 stargazer(soy_reg, type = "text")
 
+
+
+# 
+
+main_analysis$data[[1]]
+
+temp <- main_analysis$share_reg_data[[1]]
+temp[sat > 200, ]
+
+ggplot(data = temp) +
+  geom_point(aes(y = acres_ratio, x = sat))

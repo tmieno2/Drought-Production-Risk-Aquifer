@@ -1,34 +1,6 @@
 ---
 title: "Get crop yield and acreage data: Corn and Soybeans"
-author: "Taro Mieno"
-output:
-  html_document:
-    number_sections: yes
-    theme: flatly
-    highlight: zenburn
-    toc_float: yes
-    toc: yes
-    toc_depth: 3
-geometry: margin=1in
 ---
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(
-  echo = TRUE,
-  cache = TRUE,
-  comment = NA,
-  message = FALSE,
-  warning = FALSE,
-  tidy = FALSE,
-  cache.lazy = FALSE,
-  #--- figure ---#
-  dpi = 400,
-  fig.width = 7.5,
-  fig.height = 5,
-  out.width = "750px",
-  out.height = "500px"
-)
-```
 
 # Preparation
 Read the counties data 
@@ -40,7 +12,8 @@ base_counties <- readRDS(here("Shared/Data/ProcessedData/base_counties.rds"))
 Get the list of states
 
 ```{r }
-all_states <- base_counties$state_name %>%
+all_states <-
+  base_counties$state_name %>%
   unique() %>%
   toupper()
 ```
@@ -51,18 +24,18 @@ Define a function to get QuickStat data
 get_quickstat_data <- function(year, data_item) {
   desc <-
     tidyUSDA::allDataItem %>%
-    grep(pattern = data_item, ., value = TRUE) %>%
-    .[!grepl(., pattern = "NET")]
+    grep(pattern = data_item, ., value = TRUE)
 
-  temp_data <- getQuickstat(
-    key = key_get("usda_nass_qs_api"),
-    program = "SURVEY",
-    data_item = desc,
-    geographic_level = "COUNTY",
-    state = all_states,
-    year = year,
-    geometry = FALSE
-  ) %>%
+  temp_data <-
+    tidyUSDA::getQuickstat(
+      key = key_get("usda_nass_qs_api"),
+      program = "SURVEY",
+      data_item = desc,
+      geographic_level = "COUNTY",
+      state = all_states,
+      year = year,
+      geometry = FALSE
+    ) %>%
     #--- keep only some of the variables ---#
     dplyr::select(year, county_code, state_fips_code, short_desc, Value) %>%
     rename("state_code" = "state_fips_code")
@@ -76,51 +49,56 @@ List of items to download
 ```{r }
 item_list <-
   c(
-    "CORN, GRAIN, IRRIGATED - YIELD",
-    "CORN, GRAIN, NON-IRRIGATED - YIELD",
+    "CORN, GRAIN, IRRIGATED - YIELD, MEASURED IN BU / ACRE",
+    "CORN, GRAIN, NON-IRRIGATED - YIELD, MEASURED IN BU / ACRE",
     "CORN, GRAIN, IRRIGATED - ACRES HARVESTED",
     "CORN, GRAIN, NON-IRRIGATED - ACRES HARVESTED",
-    "SOYBEANS, IRRIGATED - YIELD",
-    "SOYBEANS, NON-IRRIGATED - YIELD",
+    "SOYBEANS, IRRIGATED - YIELD, MEASURED IN BU / ACRE",
+    "SOYBEANS, NON-IRRIGATED - YIELD, MEASURED IN BU / ACRE",
     "SOYBEANS, IRRIGATED - ACRES HARVESTED",
     "SOYBEANS, NON-IRRIGATED - ACRES HARVESTED"
   )
+
+# tidyUSDA::allDataItem %>%
+#     grep(pattern = "PLANTED", ., value = TRUE) %>%
+#     grep(pattern = "SOYBEANS", ., value = TRUE) %>%
+#     grep(pattern = "IRRIGATED", ., value = TRUE)
+
+# for (i in 1:length(item_list)) {
+#   desc <-
+#     tidyUSDA::allDataItem %>%
+#     grep(pattern = data_item, ., value = TRUE)
+#   print(desc)
+# }
 ```
 
 List of year-item combinations
 
 ```{r }
-(
-  par_list <-
-    expand.grid(
-      data_item = item_list,
-      year = as.character(1985:2018)
-    ) %>%
-    data.table()
-)
+par_list <-
+  data.table::CJ(
+    data_item = item_list,
+    year = as.character(1985:2018)
+  )
 ```
 
 # Download the data
 
 ```{r download-nass-data, eval = F}
-
-# === Download the relevant NASS data ===#
-(
-  nass_data <-
-    lapply(
-      seq_len(nrow(par_list)),
-      function(x) {
-        print(x)
-        data <- get_quickstat_data(
-          par_list[x, year],
-          par_list[x, data_item]
+nass_data <-
+  lapply(
+    seq_len(nrow(par_list)),
+    function(x) {
+      print(x)
+      data <-
+        get_quickstat_data(
+          year = par_list[x, year],
+          data_item = par_list[x, data_item]
         ) %>%
-          data.table()
-        return(data)
-      }
-    ) %>%
-    rbindlist()
-)
+        data.table()
+      return(data)
+    }
+  )
 
 # === save the data ===#
 saveRDS(nass_data, here("Shared/Data/RawData/nass_data_raw.rds"))

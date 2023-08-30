@@ -20,7 +20,7 @@ prepare_reg_data <- function(data, sat_thld_m, ir_share_thld, balance_thld, sat_
         #--- filter out counties with too low saturated thickness ---#
         .[sat >= sat_thld_m | sat == 0, ] %>%
         #--- share of irrigated/dryland acres ---#
-        .[, acres_ratio := acres / sum(acres), by = .(sc_code, year)] %>%
+        # .[, acres_ratio := acres / sum(acres), by = .(sc_code, year)] %>%
         .[sat == 0 | (ir == "ir" & ir_area_ratio >= ir_share_thld), ] %>%
         .[, dry_or_not := fifelse(sat == 0, 1, 0)] %>%
         .[, sc_dry := paste0(sc_code, "_", dry_or_not)] %>%
@@ -285,15 +285,18 @@ share_analysis <- function(ir_share_data, sat_seq, sandtotal_e, silttotal_e, awc
   #++++++++++++++++++++++++++++++++++++
   #+ Main
   #++++++++++++++++++++++++++++++++++++
+  ir_share_data <- ir_share_data[sat < 180, ]
+
   #---------------------
   #- define the formula for the flexible part
   #---------------------
   gam_formula_ir_share <-
     formula(
       acres_ratio ~
-        s(sat, k = 5, m = 2) +
-        s(balance_avg, k = 5, m = 2)
+        s(sat, k = 4, m = 2) +
+        s(balance_avg, k = 4, m = 2)
     )
+
   #---------------------
   #- Run preliminary gam estimation
   #---------------------
@@ -373,18 +376,27 @@ share_analysis_gam <- function(ir_share_data, sat_seq, sandtotal_e, silttotal_e,
   #++++++++++++++++++++++++++++++++++++
   #+ Debug
   #++++++++++++++++++++++++++++++++++++
+  # ir_share_data <- main_analysis$share_reg_data[[1]]
+  # sat_seq <- main_analysis$sat_seq[[1]]
+  # sandtotal_e <- main_analysis$sandtotal_med[[1]]
+  # silttotal_e <- main_analysis$silttotal_med[[1]]
+  # awc_e <- main_analysis$awc_med[[1]]
 
   #++++++++++++++++++++++++++++++++++++
   #+ Main
   #++++++++++++++++++++++++++++++++++++
+  ir_share_data <- 
+    ir_share_data[sat < 180, ] %>%
+    .[year != 2002, ]
+
   #---------------------
   #- define the formula for the flexible part
   #---------------------
   gam_formula_ir_share <-
     formula(
       acres_ratio ~
-        s(sat, k = 5, m = 2) +
-        s(balance_avg, k = 5, m = 2) +
+        s(sat, k = 4, m = 2) +
+        s(balance_avg, k = 4, m = 2) +
         sandtotal_r + silttotal_r + awc_r +
         factor(state_year)
     )
@@ -399,7 +411,7 @@ share_analysis_gam <- function(ir_share_data, sat_seq, sandtotal_e, silttotal_e,
       family = binomial(link = "logit")
     )
 
-  share_pred_data_corn <-
+  share_hat_data <-
     CJ(
       sat = sat_seq,
       balance_avg = median(ir_share_data$balance_avg),
@@ -432,8 +444,7 @@ share_analysis_gam <- function(ir_share_data, sat_seq, sandtotal_e, silttotal_e,
       ymin = ir_share_hat - 1.96 * ir_share_hat_se,
       ymax = ir_share_hat + 1.96 * ir_share_hat_se,
       x = sat
-    ), alpha = 0.4
-    )
+    ), alpha = 0.4)
 
   return(
     share_hat_data = share_hat_data[, .(sat, ir_share_hat)]
@@ -645,40 +656,88 @@ yield_analysis_boot <- function(yield_data, balance_seq, sat_seq_eval, sat_break
   return(return_data[, .(balance, sat, sat_cat, sat_cat_text, sat_rank, y_hat, dif_y_hat)])
 }
 
-boot <- function(data, sc_base) {
-  sc_dry_ir <- paste0(sc_base, "_0")
-  sc_dry_ls <- data[sat_cat != "dryland", sc_dry] %>% unique()
-  sc_dry_len <- length(sc_dry_ls)
+share_data_boot <- function(boot_data, share_reg_data) {
+  nobs <- nrow(share_reg_data)
 
-  #++++++++++++++++++++++++++++++++++++
-  #+ Irrigated data
-  #++++++++++++++++++++++++++++++++++++
+  share_reg_data[, sc_code] %>% unique()
+  boot_data[, sc_code] %>% unique()
+  data[, sc_code] %>% unique()
+
+  share_boot_data[comp == 3, ] %>%
+    .[order(sc_code, year), ]
+
+  data[sc_code == "08125"] %>%
+    .[order(sc_code, year), ]
+
+  share_boot_data <-
+    boot_data %>%
+    .[, comp := sum(ir == "ir" | ir == "nir"), by = .(sc_code, year)] %>%
+    .[comp == 2, ] %>%
+    .[, acres_ratio := acres / sum(acres), by = .(sc_code, year)] %>%
+    .[ir == "ir" & ir_area_ratio >= 0.75, ] %>%
+    .[, balance_avg := mean(balance), by = sc_code]
+
+  sc_ls <- share_boot_data[, sc_code] %>% unique()
+}
+
+boot <- function(data, sc_base) {
+
   #--- create temporary id ---#
   temp_data <- copy(data)[, row_id := 1:.N]
 
-  #--- sample sc_dry with replacement ---#
-  sc_dry_sampled <- sample(sc_dry_ls, sc_dry_len - 1, replace = TRUE)
+  #++++++++++++++++++++++++++++++++++++
+  #+ Irrigated data (sc that has at least ir records)
+  #++++++++++++++++++++++++++++++++++++
+  ir_sc_ls <-
+    data[sat_cat != "dryland", sc_dry] %>%
+    unique() %>%
+    gsub("_0", "", .)
 
-  #--- sc_dry - row_ids corresponsdence ---#
-  sc_dry_id <-
-    temp_data[sc_dry %in% sc_dry_sampled, .(sc_dry, row_id)] %>%
-    nest_by(sc_dry) %>%
+  ir_sc_len <- length(ir_sc_ls)
+
+  #--- sample sc_dry with replacement ---#
+  ir_sc_sampled <- sample(ir_sc_ls, ir_sc_len - 1, replace = TRUE)
+
+  #++++++++++++++++++++++++++++++++++++
+  #+ Dryland
+  #++++++++++++++++++++++++++++++++++++
+  dry_sc_ls <-
+    data[, .(any_ir = sum(ir == "ir")), by = sc_code] %>%
+    .[any_ir == 0, sc_code]
+
+  drs_sc_len <- length(dry_sc_ls)
+
+  dry_sc_sampled <- sample(dry_sc_ls, drs_sc_len, replace = TRUE)
+
+  #++++++++++++++++++++++++++++++++++++
+  #+
+  #++++++++++++++++++++++++++++++++++++
+  all_sc_sampled <- c(ir_sc_sampled, dry_sc_sampled)
+
+  #--- sc_dry - row_ids correspondence ---#
+  sc_id <-
+    temp_data[sc_code %in% all_sc_sampled, .(sc_code, row_id)] %>%
+    nest_by(sc_code) %>%
     data.table()
+
+  # temp_data[sc_dry_id$data[[1]]$row_id,]
 
   #--- which rows ---#
   row_id_ls <-
     data.table(
-      sc_dry = sc_dry_sampled
+      sc_code = all_sc_sampled
     ) %>%
-    sc_dry_id[., on = "sc_dry"] %>%
+    sc_id[., on = "sc_code"] %>%
     unnest(cols = c(data)) %>%
     .$row_id
 
   #--- get data and renew sc_dry ---#
-  ir_data <-
+  sampled_data <-
     temp_data[row_id_ls, ] %>%
     .[, row_num := rowid(row_id)] %>%
-    .[, sc_dry := paste0(sc_dry, "_", row_num)] %>%
+    #--- renew sc_code ---#
+    # this is necessary to do feols right (need to treat multiple instances of the same county separately)
+    .[, sc_code := paste0(sc_code, "_", row_num)] %>%
     .[, row_num := NULL] %>%
     .[, row_id := NULL]
 
@@ -687,10 +746,11 @@ boot <- function(data, sc_base) {
   #++++++++++++++++++++++++++++++++++++
   data_boot <-
     rbind(
-      ir_data,
-      data[sc_dry == sc_dry_ir, ],
-      data[sat_cat == "dryland", ]
+      sampled_data,
+      data[sc_code == sc_base, ],
+      fill = TRUE
     )
+
   return(data_boot)
 }
 

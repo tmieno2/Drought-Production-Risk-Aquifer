@@ -358,6 +358,8 @@ ggsave(file = "GitControlled/Writing/Figures/g_map.pdf", g_map, height = 7, widt
 # Yield response to water deficit by saturated thickness level (intensive margin) 
 
 ```{r}
+# all_results <-  data.table(all_results)
+
 plot_yield_data <-
   all_results[, .(crop, yield_pred_data)] %>%
   rowwise() %>%
@@ -408,7 +410,11 @@ g_ir_yield_both <-
       scale_fill_discrete(guide = "none") +
       theme_fig +
       coord_cartesian(xlim = c(-200, 1150)) +
-      theme(legend.position = "bottom")
+      theme(
+        legend.position = "bottom",
+        plot.margin = margin(0, 0, 0, 0, "cm"),
+        plot.title = element_blank()
+      )
   ))
 
 g_ir_yield_corn <- g_ir_yield_both$g_yield[[1]] + theme(legend.position = "none")
@@ -422,21 +428,45 @@ g_wds <-
       ggplot(data) +
         geom_histogram(aes(x = balance), bins = 50, col = "darkgreen", fill = NA) +
         theme_fig +
-        xlab("Water Deficit (mm)") +
+        xlab("") +
         ylab("") +
-        theme_void()
+        # scale_x_continuous(breaks = (-2:11)*100) +
+        coord_cartesian(xlim = c(-200, 1150))
+        # +
+        # # xlim(NA, max_balance) +
+        # theme_void()
     }
   ))
 
 g_wd_corn <-
   g_wds$g_fig[[1]] +
   ggtitle("A. Corn") +
-  theme(plot.title = element_text(size = 9, family = "Times", face = "bold"))
+  theme(
+    plot.title = element_text(size = 9, family = "Times", face = "bold"),
+    axis.text.x = element_blank(),
+    axis.text.y = element_blank(),
+    axis.ticks.x = element_blank(),
+    axis.ticks.y = element_blank(),
+    panel.grid.major = element_blank(),
+    panel.border = element_blank(),
+    plot.margin = margin(0, 0, 0, 0, "cm")
+  )
 
 g_wd_soy <-
   g_wds$g_fig[[2]] +
   ggtitle("B. Soybean") +
-  theme(plot.title = element_text(size = 9, family = "Times", face = "bold"))
+  theme(
+    plot.title = element_text(size = 9, family = "Times", face = "bold"),
+    axis.text.x = element_blank(),
+    axis.text.y = element_blank(),
+    axis.ticks.x = element_blank(),
+    axis.ticks.y = element_blank(),
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    panel.border = element_blank(),
+    plot.margin = margin(0, 0, 0, 0, "cm")
+    )
+
 
 g_yield_response <-
   cowplot::plot_grid(
@@ -445,6 +475,22 @@ g_yield_response <-
     align = "v",
     rel_heights = c(0.15 / 2, 0.72 / 2, 0.15 / 2, 0.98 / 2)
   )
+
+# g_yield_response <-
+#   cowplot::plot_grid(
+#     g_wd_corn, g_ir_yield_corn,
+#     ncol = 1,
+#     align = "v",
+#     rel_heights = c(0.15, 0.72)
+#   )
+
+# g_yield_response_soy <-
+#   cowplot::plot_grid(
+#     g_wd_soy, g_ir_yield_soy,
+#     ncol = 1,
+#     align = "v",
+#     rel_heights = c(0.15, 0.72)
+#   )
 
 cowplot::ggsave2("GitControlled/Writing/Figures/g_yield_intensive.pdf", g_yield_response, width = 6, height = 6)
 
@@ -481,7 +527,7 @@ g_yield_with_conf <-
         ) +
         scale_y_continuous(
           name = "Yield (tonne/ha)",
-          breaks = 0:13
+          breaks = 0:14
         ) +
         theme_fig +
         theme(
@@ -522,7 +568,7 @@ g_share <-
   scale_y_continuous(breaks = seq(0, 1, by = 0.1)) +
   scale_x_continuous(breaks = seq(10, 160, by = 10)) +
   xlab("Aquifer Thickness (meter)") +
-  ylab("Estimated Share of Irrigated Acres") +
+  ylab("Decline in Estimated Share of Irrigated Acres") +
   facet_wrap(crop_type ~ ., ncol = 1) +
   theme_fig +
   theme(
@@ -543,7 +589,7 @@ ggsave(
 
 ```{r}
 g_share_dif <-
-  ggplot(plot_data_ir_share[sat < 130, ]) +
+  ggplot(plot_data_ir_share[sat < 105, ]) +
   geom_line(aes(y = dif_ir_share_hat, x = sat)) +
   geom_ribbon(
     aes(
@@ -770,7 +816,7 @@ g_ay_response <-
       geom_ribbon(aes(x = balance, ymin = lower, ymax = upper), alpha = 0.3) +
       geom_line(aes(x = balance, y = avg_yield)) +
       facet_grid(. ~ sat_text, scales = "free_y") +
-      ylim(min(data$avg_yield) * 0.7, max(data$avg_yield) + 1) +
+      ylim(min(data$lower) * 0.7, max(data$upper) + 1) +
       xlab("Water Deficit (mm)") +
       ylab("Yield (tonne/ha)") +
       theme_fig +

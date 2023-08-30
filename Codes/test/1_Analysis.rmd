@@ -3,24 +3,6 @@ title: "Regression Analysis and Prediction"
 author: "Taro Mieno"
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(
-  echo = TRUE,
-  cache = TRUE,
-  comment = NA,
-  message = FALSE,
-  warning = FALSE,
-  tidy = FALSE,
-  cache.lazy = FALSE,
-  #--- figure ---#
-  dpi = 400,
-  fig.width = 7.5,
-  fig.height = 5,
-  out.width = "750px",
-  out.height = "500px"
-)
-```
-
 # Prepare data
 
 ```{r}
@@ -29,13 +11,11 @@ final_data <-
   here("Shared/Data/ProcessedData/final_data.rds") %>%
   readRDS()
 
-# reg_data[, data][[2]] %>% .[, .N, by = sat_cat]
-
 #--- Data used for regression analysis ---#
 reg_data <-
   prepare_reg_data(
     data = final_data,
-    sat_thld_m = 9, # saturated thickness has to be at least 12 meters
+    sat_thld_m = 9, # saturated thickness has to be at least 9 meters
     ir_share_thld = 0.75, # at least 75% of total county area has to be overlapped with HPA
     balance_thld = c(-1200, 200),
     sat_cat_num = 3,
@@ -73,12 +53,16 @@ main_analysis <-
     )
   )) %>%
   dplyr::mutate(sat_seq_eval = list(
-    c(10, 50, 90, 130)
+    c(15, 45, 75, 105)
   )) %>%
   dplyr::mutate(share_reg_data = list(
     data %>%
+      .[, comp := sum(ir == "ir" | ir == "nir"), by = .(sc_code, year)] %>%
+      .[comp == 2, ] %>%
+      .[, acres_ratio := acres / sum(acres), by = .(sc_code, year)] %>%
       .[ir == "ir" & ir_area_ratio >= 0.75, ] %>%
       .[, balance_avg := mean(balance), by = sc_code]
+      
   )) %>%
   #--- the same sequence used for all the bootstrap iterations ---#
   dplyr::mutate(sat_seq = list(
@@ -137,6 +121,16 @@ saveRDS(main_analysis, "Shared/Results/main_analysis.rds")
 #++++++++++++++++++++++++++++++++++++
 set.seed(383954)
 
+# data <- main_analysis$data[[1]]
+
+# temp <- 
+#   data_boot %>%
+#   .[, comp := sum(ir == "ir" | ir == "nir"), by = .(sc_code, year)] %>%
+#   .[comp == 2, ] %>%
+#   .[, acres_ratio := acres / sum(acres), by = .(sc_code, year)] %>%
+#   .[ir == "ir" & ir_area_ratio >= 0.75, ] %>%
+#   .[, balance_avg := mean(balance), by = sc_code]
+
 all_results <-
   main_analysis %>%
   #--- bootsrap data ---#
@@ -164,6 +158,9 @@ all_results <-
         #--- share analysis ---#
         share_boot_data <-
           boot_data %>%
+          .[, comp := sum(ir == "ir" | ir == "nir"), by = .(sc_code, year)] %>%
+          .[comp == 2, ] %>%
+          .[, acres_ratio := acres / sum(acres), by = .(sc_code, year)] %>%
           .[ir == "ir" & ir_area_ratio >= 0.75, ] %>%
           .[, balance_avg := mean(balance), by = sc_code]
 
@@ -177,10 +174,11 @@ all_results <-
           )
         #--- average yield ---#
         avg_yield_pred_data <- get_average_yield(yield_pred_data, share_pred_data)
-        
+
         return(list(share_pred_data = share_pred_data, avg_yield_pred_data = avg_yield_pred_data))
       },
-      mc.cores = parallel::detectCores() - 2
+      mc.cores = parallel::detectCores() - 2,
+      mc.preschedule = FALSE
     )
   )) %>%
   dplyr::mutate(

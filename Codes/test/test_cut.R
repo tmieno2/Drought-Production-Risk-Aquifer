@@ -41,3 +41,16 @@ mutate(sat_breaks = list(
             include.lowest = TRUE
           )
         ] 
+
+
+gam_k3 <- gam(yield ~ s(balance, by = sat_cat, k = 3, m = 2) + factor(sat_cat) +  factor(year) + factor(sc_dry), data = yield_data)
+
+BIC(gam_k3)
+
+gam_k4 <- gam(yield ~ s(balance, by = sat_cat, k = 4, m = 2) + factor(sat_cat) +  factor(year) + factor(sc_dry), data = yield_data)
+
+BIC(gam_k4)
+
+gam_k5 <- gam(yield ~ s(balance, by = sat_cat, k = 10, m = 2) + factor(sat_cat) +  factor(year) + factor(sc_dry), data = yield_data)
+
+BIC(gam_k5)
