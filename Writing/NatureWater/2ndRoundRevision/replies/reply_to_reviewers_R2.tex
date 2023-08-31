@@ -69,17 +69,17 @@
 
 \section{Changes unrelated to reviewers' comments}
 
-\textcolor{blue}{We made a small correction to our codes. In the previous round, we included counties with only irrigated acres for the irrigation share regression. For such counties, the share of irrigated acres was calculated to be 1. Therefore, we dropped them. While it resulted in some minor changes in our results from those provided in the previous round, all the qualitative results and conclusions are the same as the previous rounds.}
+\textcolor{blue}{We made a small correction to our codes and data. In the previous round, we included counties with only irrigated acres for the irrigation share regression. For such counties, the share of irrigated acres was calculated to be 1. Therefore, we dropped them. While it resulted in some minor changes in our results from those provided in the previous round, all the qualitative results and conclusions are the same as the previous rounds.}
 
 \section{Reply to reviewer \#1}
 
-I have read the revised manuscript and the authors’ responses to my initial review. I think they have done a nice job in responding to the points I raised. Thus, I recommend acceptance after the authors address the minor points that I noted while reading the revised manuscript. Those points are as follows:
+I have read the revised manuscript and the authors' responses to my initial review. I think they have done a nice job in responding to the points I raised. Thus, I recommend acceptance after the authors address the minor points that I noted while reading the revised manuscript. Those points are as follows:
 
 \textcolor{blue}{Thank you for your feedback on our manuscript. We have addressed all your comments and suggestions, and our replies to your comments can be found in blue below (original comments in black). Please take a look at our comments about a small change in our codes at the top as well.}
 
 
 \begin{itemize}
-    \item Line 58 – ``farmers'' should be ``farmers’''.
+    \item Line 58 – ``farmers'' should be ``farmers'''.
 
 \textcolor{blue}{Thank you for catching this. Fixed.}
 
@@ -91,13 +91,16 @@ I have read the revised manuscript and the authors’ responses to my initial re
 
 \textcolor{blue}{Thank you for catching this. Fixed.}
 
-\item Equations 1 and 2 – shouldn’t ``k'' be ``k=1'' – if not, please explain how k is determined. Also, explain ``K'' and how it was determined.
+\item Equations 1 and 2 – shouldn't ``k'' be ``k=1'' – if not, please explain how k is determined. Also, explain ``K'' and how it was determined.
 
 \textcolor{blue}{Please see line 327 for the explanation of what K represents and how K is selected. We added similar explanations for equation 2 at line 341.}
 
 \item Lines 385-387 – Figure A.3 is not presenting results by aquifer thickness category. It is presenting results for three aquifer thicknesses, not categories. Please rewrite.
 
-\textcolor{blue}{Figure A.3 indeed presents what we intended to present. Please note that we made similar changes for average productivity analysis in the main text as shown in Figures 4 and 5. While the irrigated yield regression (equation 1) uses aquifer thickness category, the irrigated share regression uses aquifer thickness as it is as a continuous variable. In our average productivity analysis, we use four aquifer thickness values: 10, 40, 70, and 100 meter. For example, for the analysis of 10 meter, estimated yield response function for the first category is used as it falls within the [9m, 30.1 m] range. Estimated irrigation share for 10 meter can be obtained simply by plugging 10 into the trained model of the share of irrigated acres. In our initial submission, we were doing the same kind of analysis (using one number from each aquifer thickness category), but reported by category. In the previous round of revision, we decided to have two aquifer thickness values in the 3rd quantile category (90 and 130 meter). This is in response to another reviewer's point that it is not clear if indeed the impact of aquifer thickness on average productivity is non-linear as we claimed in our initial submission. Given the chosen series of aquifer thickness numbers are equi-distance, it has become much easier to observe the non-linearity in the impact of saturated thickness on overall productivity. Please note that we now present results for 10, 40, 70, and 100 meters, which are in the first, second, third, and third saturated thickness categories. }
+\textcolor{blue}{Figure A.3 indeed presents what we intended to present. Please note that we made similar changes for average productivity analysis in the main text as shown in Figures 4 and 5. While the irrigated yield regression (equation 1) uses aquifer thickness category, the irrigated share regression uses aquifer thickness as it is as a continuous variable. In our average productivity analysis that combines both analysis results, we use four aquifer thickness values: 10, 40, 70, and 100 meter. For example, for the analysis of 10 meter, estimated yield response function for the first category is used as it falls within the [9m, 30.1 m] range. Estimated irrigation share for 10 meter can be obtained simply by plugging 10 into the trained model of the share of irrigated acres. Please note that it is ``necessary'' to use point values for this analysis. The estimated model of the share of irrigated acres do not accept an aquifer thickness category or range. It accepts a single value of aquifer thickness and returns an estimate of the share of irrigated acres by design.}
+
+\textcolor{blue}{
+In our initial submission, we were doing the same kind of analysis (using one number from each aquifer thickness category), but reported by category. In the previous round of revision, we decided to have two aquifer thickness values in the 3rd quantile category (90 and 130 meter). This is in response to another reviewer's point that it is not clear if indeed the impact of aquifer thickness on average productivity is non-linear as we claimed in our initial submission. Given the chosen series of aquifer thickness numbers are equi-distance, it has become much easier to observe the non-linearity in the impact of saturated thickness on overall productivity. Please note that we now present results for 10, 40, 70, and 100 meters, which are in the first, second, third, and third saturated thickness categories, respectively. We made this change because 130 meters is really high and rarely observed, and we wanted the range of analysis to be more representative of the region.}
 
 \item Section B title – revise ``the the''.
 
@@ -115,9 +118,21 @@ I have read the revised manuscript and the authors’ responses to my initial re
 
 \item Figure C.2 – ``soy'' should be ``soybean'' to be consistent with the rest of the manuscript.
 
-\item Line 428 – is ``a linear in parameter model'' correct? Wouldn’t ``a linear parameter model'' be better?
+\textcolor{blue}{Thank you for catching this. Fixed.}
 
-\textcolor{blue}{We rewrote it to "linear-in-parameter" model. Linear-in-parameter model is a more explicit and correct way of saying what we people call a linear model.}
+\item Line 428 – is ``a linear in parameter model'' correct? Wouldn't ``a linear parameter model'' be better?
+
+\textcolor{blue}{We rewrote it to the following:}
+
+\textcolor{blue}{``Notice that unlike non-parametric regression, GAM is actually a linear-in-parameter model and estimate $\beta_k$ to fit the data best.''}
+
+\textcolor{blue}{In statistics, ``linear'' model means that the model is linear in parameter, but not necessarily in independent variable. For example, the model below is linear in parameter, but not linear in $x$.} 
+
+\begin{align}
+  y = \beta x^2 + v
+\end{align}  
+
+\textcolor{blue}{ GAM is linear in parameter, but not linear in independent variable. We wanted to emphasize the distinction and used the term linear-in-parameter model instead of linear model.} 
 
 \end{itemize}
 
@@ -134,20 +149,20 @@ Most of the previous comments have been addressed. Some open points, however, st
 \begin{itemize}
 \item New comment 1 – Clarification about moderate result changes in Figures 1, 3, and 4: Could you explain in more detail how and why the results in these figures have changed? The response to my previous comment (7.b) mentions that the regressions were re-run with sand percentage, silt percentage, and water holding capacity. The variable ``X'' corresponding to these soil characteristics, however, is only included in Equation (2) (irrigated area) and not in Equation (1) (yields).
 
-  \textcolor{blue}{As clearly stated in the manuscript, county fixed effects were included in equation 1 (reperesented by $\alpha_i$). This means that any county-specific time-invariant variables like those in $X$ will be dropped. This does not mean $X$ are not accounted for. They are accounted for as county fixed effects will capture them.}
+  \textcolor{blue}{As stated in the manuscript, county fixed effects were included in equation 1 (represented by $\alpha_i$). This means that any county-specific time-invariant variables like those in $X$ will be dropped. This does not mean $X$ are not accounted for. They are accounted for as county fixed effects will capture them.}
 
   \begin{itemize}
   \item (1.a) Does the addition of ``X'' to Equation (2) explain the changed irrigated area results in Figure 3?
 
-  \textcolor{blue}{Yes. Moreover, the results for the share of irrigated acre in this manuscript are different from the previous round due to the changes in the choice of the number of spline basis functions ($K$ and $L$). Previously, we were using 5 for both. However, in responding to reviewer 1's request to explain how the number of spline basis functions are determined, we realized that we were not using the optimal numbers. We tested different numbers earlier in the project and found that the results are not sensitive to the choice of the number of spline basis functions. So, we were simply using reasonable numbers back then. Even though the choice of $K$ and $L$ does not affect the results much, we now pick the numbers based on BIC.}
+  \textcolor{blue}{Yes. Please note that the results for the share of irrigated acre in this manuscript are different from the previous round as well due to the changes we mentioned at the top of this document.}
   
   \item (1.b) What motivates the other changes made to Equation (2)?
 
-  \textcolor{blue}{The change made other than the ones explained above and including state-year FE is whether we allow the interactions of $WB$ and $AT$. Since we found that there is not significant interactions between them, we have decided to make the model more parsimonious and simply model the impact of $WB$ and $AT$ separately. The results are virtually the same whether we used the old and current models.}
+  \textcolor{blue}{The change made other than the ones explained above and including state-year FE (which is provides stronger controls than just including year FE) is whether we allow the interactions of $WB$ and $AT$. Since we found that there is no significant interactions between them, we have decided to make the model more parsimonious and simply model the impact of $WB$ and $AT$ individually. The results are virtually the same whether we used the old and current models.}
   
   \item (1.c) What explains the change in the yield results in Figures 1 and 4?
 
-  \textcolor{blue}{We should have mentioned this change in our previous replies. We found that we were actually not grouping observations into three groups in a way that their number of observations are the same as we claimed due to a coding error. We fixed this problem in the previous round. The changes observed in Figure 1 is due solely to this change. For Figure 3, the changes are combination of this change and also the change in the results of the share of irrigated acres as mentioned above. The previous round of Figure 3 of course is different from the one in the initial version as we added another aquifer level to make our claim of the non-linear impact of aquifer much clearer. Figure 3 in the current version is different from the one in the previous round as we changed the number of spline basis function for equation 2 as mentioned above. Overall, the observed changes in results are really minor.} 
+  \textcolor{blue}{We should have mentioned this change in our previous replies. We found that we were actually not grouping observations into three groups in a way that their number of observations are the same as we claimed due to a small coding error. This problem was fixed in the previous round. The changes observed in Figure 1 in the previous round is due solely to this change. For Figure 4 of the previous version (1st round revision), the changes are combination of this change and also the change in the results of the share of irrigated acres as mentioned above. This is because Figure 4 presents the results of the analysis that combines what are presented in Figures 1 and Figure 3 of the previous version (1st round revision). Figure 3 in the 1st round and Figure 4 in the previous round are different because as we added another aquifer level to make our claim of the non-linear impact of aquifer much clearer in response to one of your comments in the previous round. Further, Figure 4 in the current version is different from the one in the previous round as we changed the aquifer levels for the analysis. Instead of 10, 50, 90, and 130 meters, we use 10, 40, 70, and 100 meters. This is because 130 meters is really high and rarely observed, and we wanted the range of analysis to be more representative of the region. Please see our reply to New  comment 3 for further details on this.} 
   
   \item (1.d) Please add a short reference to the soil characteristics dataset used in Section 4.1 or 4.2 to allow readers can assess the assumptions made without checking the data availability statement.
 
@@ -164,7 +179,9 @@ Most of the previous comments have been addressed. Some open points, however, st
 
 \item New comment 3 - Figure 4 category changes: Why were the aquifer thickness categories changed in Figure 4? Please also clarify how function estimates for point values of aquifer thickness (rather than value ranges) are derived from the data and explain what motivates using different categories in Figures 1 and 4.
 
-    \textcolor{blue}{We are not using the different categories between Figures 1 and 4. While the irrigated yield regression (equation 1) uses aquifer thickness category, the irrigated share regression uses aquifer thickness as it is as a continuous variable. In our average productivity analysis which combines the two kinds of analysis, we use four aquifer thickness values: 10, 50, 90, and 130 meter. For example, for the analysis of 10 meter, the estimated yield response function to water deficit for the ``first'' category is used as it falls within the [9m, 30.1 m] range. The estimated irrigation share for 10 meter can be obtained simply by plugging 10 into the trained model of the share of irrigated acres (equation 2). In our initial submission, we were doing the same of analysis (using one number from each aquifer thickness category), but reported by category instead of reporting aquifer levels we were using for each category. In the first round of revision, we decided to have two aquifer thickness values in the 3rd quantile category (90 and 130 meter). 50 meter falls in the second category. This is in response to your point that it is not clear if indeed the impact of aquifer thickness on average productivity is non-linear as we claimed in our initial submission.}
+    \textcolor{blue}{(Please note that the description in this paragraph is about the \textcolor{red}{previous} rounds, but not the current round.) In the previous round, we were not using the different categories between Figures 1 and 4. While the irrigated yield regression (equation 1) uses aquifer thickness category, the irrigated share regression uses aquifer thickness as it is as a continuous variable. In our average productivity analysis which combines the two kinds of analysis, we used four aquifer thickness values: 10, 50, 90, and 130 meters in the previous round. For example, for the analysis of 10 meters, the estimated yield response function to water deficit for the ``first'' category is used as it falls within the [9m, 30.1 m] range. The estimated irrigation share for 10 meters can be obtained simply by plugging 10 into the trained model of the share of irrigated acres (equation 2). Please note that it is ``necessary'' to use point values for this analysis. The estimated model of the share of irrigated acres does not accept an aquifer thickness category or range. It accepts a single value of aquifer thickness and returns an estimate of the share of irrigated acres by design. Indeed, in our initial submission, we were doing the same of analysis (using one number from each aquifer thickness category), but reported by category instead of reporting aquifer levels we were using for each of the point values. Specifically, we were using 9.144, 30.48, and 60.96 meters as the point values for the first, second, and third aquifer thickness categories, respectively. In the first round of revision, we decided to have two aquifer thickness values in the 3rd aquifer thickness category (90 and 130 meter). This is in response to your point that it is not clear if indeed the impact of aquifer thickness on average productivity is non-linear as we claimed in our initial submission.}
+
+    \textcolor{blue}{(Please note that the description in this paragraph is about the \textcolor{red}{current and previous} round.) Instead of 10, 50, 90, and 130 seen in the previous round, we now use 10 (1st category), 40 (2nd category), 70 (3rd category), and 100 (3rd category). This is because 130 meters is really high and rarely observed, and we wanted the range of analysis to be more representative of the region. Please note that key qualitative message is not any different whether we use either set of values.}
 
 \item New comment 4 – causality and fixed effects: The manuscript has been strengthened by the expansion of the section explaining the reasons for assuming declining aquifer thickness causally reduces the ability to use irrigation to maintain crop yields (lines 40-57). Please clarify the following:
 
@@ -175,19 +192,26 @@ Most of the previous comments have been addressed. Some open points, however, st
   
   \item (4.b) Relatedly, the responses to my previous comments 1.a and 7.b indicated that county-level fixed effects were not included in any regressions (only state-level). The response to reviewer \#2 and the Methods section suggest that county-level fixed effects were used in Equation 1. Please clarify the discrepancy and make sure this is clear in the paper.
 
-  \textcolor{blue}{From the initial submission, it has been clearly stated that county fixed effects $\alpha_i$ are included in equation 1. However, we understand your confusion because we stated the following in our response.}
+  \textcolor{blue}{From the initial submission, it has been clearly stated that county fixed effects $\alpha_i$ are included in equation 1. Here is the screenshot of the relevant part from the initial version. The last sentence of the paragraph below states that county fixed effects are included in equation 1.}
+  
+  \includegraphics{fixedeffects}
 
-  \textcolor{blue}{``Other sources of bias (e.g., model misspecification error) will also almost always
-exist. In our analysis, one of the main limitations is not including county fixed effects in our regression\textcolor{red}{s}, which would have controlled all the county-specific time-invariant characteristics.''}
+  \textcolor{blue}{However, we may have caused your confusion because we stated the following in our response.}
+
+  \textcolor{blue}{``Other sources of bias (e.g., model misspecification error) will also almost always exist. In our analysis, one of the main limitations is not including county fixed effects in our regression\textcolor{red}{s}, which would have controlled all the county-specific time-invariant characteristics.''}
 
   \textcolor{blue}{It is our mistake that we added \textcolor{red}{s} to ``regression''. As we stated above, we do include county fixed effect in equation 1. }
   
   \item (4.c) The following conclusion in Appendix C, lines 410-414 does not seem fully convincing in its present form: The fact that state-level fixed effects are not influential does not immediately imply that county-level fixed effects are ``unlikely to cause significant bias''. There could e.g. easily be relevant county-level effects that average out at the state level.
 
-  \textcolor{blue}{We agree. It is too strong of a claim. We simply tone down our confidence.}
+  \textcolor{blue}{We agree that it is too strong of a claim. Please see line 404 for our revision of the statement.}
 
-  \textcolor{blue}{We also changed our sentence in line .}
-  
+  \textcolor{blue}{"This indicates that, even though there may be unobservables that are spatially correlated with aquifer thickness beyond soil characteristics, their correlation may not cause significant bias to our estimation and findings. However, it is not possible to understand the true consequences of not being able to include county-fixed effects cannot be fully investigated with our datasets, and we defer this matter to future studies with less spatially disaggregated data with enough temporal variations in aquifer thickness levels."}
+
+  \textcolor{blue}{We also removed the sentence below in line 345 - 346 in the previous version to the following:}
+
+  \textcolor{blue}{"Instead, through robustness checks, we demonstrate that our results are consistent when using state fixed effects."}
+
   \end{itemize}
 
 \item New comment 5 – Figure 1:
@@ -195,7 +219,14 @@ exist. In our analysis, one of the main limitations is not including county fixe
   \begin{itemize}
    \item (5.a) The histograms are a helpful addition to Figure 1. Please consider adding the total number of observations to the caption to help readers interpret the values. I also recommend adding such histograms to Figures 3 and 4 for consistency. Please clarify why the histogram reaches further than the curves in Figure 1.B and correct this if necessary.
 
+   \textcolor{blue}{We have added total number of observations to the captions of Figures 1 and 3. Figure 4 is the results of simulation based on the estimated model represented by equations 1 and 2. So, there is no appropriate number of observations for the figure.}
+
+   \textcolor{blue}{We have added histograms for Figures 3 and 4. The inconsistency in the range of the histograms and the main figures were caused by a small coding error that did not align two figures vertically in the right way. The problems are fixed now. Please note that because of the width (range) of the histrogram bins, it looks like the bins at the left and right ends are beyond the range of the main figure. But they are not.}
+
   \item (5.b) Lines 77-78 state ``rainfed yields of both crops decline significantly'' with reference to Figure 1. Please quantify, visualize, or otherwise provide evidence of the significance to readers, or rephrase.
+
+  \textcolor{blue}{Figure A.1 provides the estimated response curve for rainfed production. As you can see, the confidence intervals are quite narrow at all the water deficit values. We do not think we need additional figures or explanations are necessarily for both statistical and real-world significance of the impacts of water deficit on rainfed production.}
+
   \end{itemize}
 
 \end{itemize}
@@ -208,17 +239,39 @@ exist. In our analysis, one of the main limitations is not including county fixe
 
 \item (M1.a) P. 15: ``WB'' and ``ST'' [now ``AT''] should not be in italics, unless ``W'', ``B'', ``S'', and ``T'' are separate variables
 
+\textcolor{red}{Tim, where is this rule coming from? It is not clear he is referring to them in equations or in-line.}
+
 \item (M1.b) Lines 325-326: ``with $\sigma_j$ represents the category specific intercept'' should be ``with $\sigma_j$ representing the category-specific intercept'' or something similar
 
+\textcolor{blue}{You are correct. It is fixed now.}
+
 \item (M1.c) Equation 2: What is ``$\mu_t$'' in equation 2?
+
+\textcolor{blue}{It used to represent year fixed effects. But, now that we included state-year FE represented $\theta_{s,t}$, we should have removed it. Equation 2 no longer has $mu_t$.}
 
 \item (M2) Some additional minor points have arisen:
 
 \item (M2.a) Line 315: ``Y'' is capitalized here, but not in equation (1)
 
+\textcolor{blue}{We changed $y_{i,t}$ in equation (1) to $y_{i,t}$.}
+
 \item (M2.b) Equation 2: Please replace the re-used symbol ``alpha'' with a different symbol to avoid confusion.
 
+\textcolor{blue}{We changed all the occurrences of $\alpha_{k}$ to $\eta_{k}$.}
+
 \item (M2.c) Lines 427-428: Please clarify the grammatical structure of the following sentence: ``Notice that unlike non-parametric regression, GAM is actually a linear in parameter model and estimate $\beta_k$ to fit the data best.''
+
+\textcolor{blue}{We rewrote it to the following:}
+
+\textcolor{blue}{``Notice that unlike non-parametric regression, GAM is actually a linear-in-parameter model and estimate $\beta_k$ to fit the data best.''}
+
+\textcolor{blue}{In statistics, ``linear'' model means that the model is linear in parameter, but not necessarily in independent variable. For example, the model below is linear in parameter, but not linear in $x$.} 
+
+\begin{align}
+  y = \beta x^2 + v
+\end{align}  
+
+\textcolor{blue}{ GAM is linear in parameter, but not linear in independent variable. We wanted to emphasize the distinction and used the term linear-in-parameter model instead of linear model.} 
 
 \end{itemize}
 

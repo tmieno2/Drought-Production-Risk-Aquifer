@@ -436,6 +436,10 @@ share_analysis_gam <- function(ir_share_data, sat_seq, sandtotal_e, silttotal_e,
     ir_share_hat_se = share_hat$se.fit
   )]
 
+  base_ir_share <- share_hat_data[sat == sat_seq[length(sat_seq)], ir_share_hat]
+
+  share_hat_data[, dif_ir_share_hat := base_ir_share - ir_share_hat]
+
   # ggplot(share_hat_data) +
   #   geom_line(aes(y = ir_share_hat, x = sat)) +
   #   geom_ribbon(aes(
@@ -445,7 +449,7 @@ share_analysis_gam <- function(ir_share_data, sat_seq, sandtotal_e, silttotal_e,
   #   ), alpha = 0.4)
 
   return(
-    share_hat_data = share_hat_data[, .(sat, ir_share_hat, ir_share_hat_se)]
+    share_hat_data = share_hat_data[, .(sat, ir_share_hat, ir_share_hat_se, dif_ir_share_hat)]
   )
 }
 

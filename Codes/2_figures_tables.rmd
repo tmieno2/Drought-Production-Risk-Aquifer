@@ -614,7 +614,7 @@ plot_data_ir_share <-
   )]
 
 g_share_dif <-
-  ggplot(plot_data_ir_share[sat < 100, ]) +
+  ggplot(plot_data_ir_share[sat <= 100, ]) +
   geom_line(aes(y = dif_ir_share_hat, x = sat)) +
   geom_ribbon(
     aes(
@@ -626,7 +626,7 @@ g_share_dif <-
   ) +
   geom_hline(yintercept = 0, color = "red") +
   scale_y_continuous(breaks = seq(0, 1, by = 0.1)) +
-  scale_x_continuous(breaks = seq(10, 160, by = 10)) +
+  scale_x_continuous(breaks = seq(10, 150, by = 10)) +
   xlab("Aquifer Thickness (meter)") +
   ylab("Decline in Estimated Share of Irrigated Acres") +
   facet_wrap(crop_type ~ ., ncol = 1) +
@@ -634,14 +634,14 @@ g_share_dif <-
   theme(
     legend.position = "bottom",
     strip.background = element_blank(),
-    strip.text = element_text(hjust = 0, face = "bold", family = "Times", size = )
+    strip.text = element_text(hjust = 0, face = "bold", family = "Times", size = 9)
   )
 
 ggsave(
   file = "GitControlled/Writing/Figures/g_share_dif.pdf",
   g_share_dif,
   height = 4,
-  width = 5
+  width = 6
 )
 ```
 
