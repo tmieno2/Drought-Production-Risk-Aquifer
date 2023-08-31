@@ -1,6 +1,9 @@
 /Writing/Manuscript*/*
-/Writing/Figures/*
+# /Writing/Figures/*
 /Writing/*cache/*
+/Writing/Earth*/*.pdf
+/Writing/NatureWater/*/*.pdf
+/Writing/NatureWater/*/*/*.pdf
 /Writing/*files/*
 /Codes/*cache*/*
 /Codes/*files*/*
@@ -8,7 +11,7 @@
 /Figures/*
 .Rproj.user/*
 .Rproj.user
-*.pdf
+# *.pdf
 *.log
 *.gz
 *.bbl
