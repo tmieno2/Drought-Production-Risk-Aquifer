@@ -383,7 +383,7 @@ g_ir_yield_both <-
       coord_cartesian(xlim = c(-200, 1150)) +
       theme(
         legend.position = "bottom",
-        plot.margin = margin(0, 0, 0, 0, "cm"),
+        plot.margin = margin(0, 0, 0.0, 0, "cm"),
         plot.title = element_blank()
       )
   ))
@@ -442,7 +442,9 @@ g_wd_soy <-
 
 g_yield_response <-
   cowplot::plot_grid(
-    g_wd_corn, g_ir_yield_corn, g_wd_soy, g_ir_yield_soy,
+    g_wd_corn, 
+    g_ir_yield_corn + theme(plot.margin = margin(0, 0, 0.2, 0, "cm")), g_wd_soy, 
+    g_ir_yield_soy,
     ncol = 1,
     align = "v",
     rel_heights = c(0.18 / 2, 0.69 / 2, 0.18 / 2, 0.95 / 2)
