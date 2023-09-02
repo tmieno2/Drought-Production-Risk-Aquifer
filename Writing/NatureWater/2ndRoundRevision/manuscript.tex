@@ -391,7 +391,7 @@ Where \(\phi_k(\cdot)\) is the \(k\)th spline basis function and \(\beta_k\) is 
 \caption{Example of a series of thin-plate spline basis functions}\label{fig:sp-basis}
 \end{figure}
 
-Different coefficients (or namely weights) given to the spline basis functions result in different shapes of the impact of \(x\) on \(y\). Figure \ref{fig:ex-fx} presents two examples of two different sets of coefficients and their resulting representation of \(f(x)\). In the first case, \(\{\beta_1, \dots, \beta_5\} = \{60, 60, 60, 60, 60\}\). In the second case, \(\{\beta_1, \dots, \beta_5\} = \{20, -20, -40, 40, 60\}\). Among all the possibilities of the combinations of the coefficients, GAM finds the set of coefficient values that fits the data best. Notice that unlike non-parametric regression, GAM is actually a linear-in-parameter model and estimate \(\beta_k\) to fit the data best.
+Different coefficients (or namely weights) given to the spline basis functions result in different shapes of the impact of \(x\) on \(y\). Figure \ref{fig:ex-fx} presents two examples of two different sets of coefficients and their resulting representation of \(f(x)\). In the first case, \(\{\beta_1, \dots, \beta_5\} = \{60, 60, 60, 60, 60\}\). In the second case, \(\{\beta_1, \dots, \beta_5\} = \{20, -20, -40, 40, 60\}\). Among all the possibilities of the combinations of the coefficients, GAM finds the set of coefficient values that fits the data best. Notice that unlike non-parametric regression, GAM is actually a linear (in parameter) model and estimate \(\beta_k\) to fit the data best.
 
 \begin{figure}[H]
 
