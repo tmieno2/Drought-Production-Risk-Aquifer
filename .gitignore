@@ -14,7 +14,9 @@
 # *.pdf
 *.log
 *.gz
+*.aux
 *.bbl
+*.blg
 *.png
 *DS_Store
 *.zip
