@@ -1,0 +1,105 @@
+---
+output:
+  pdf_document: 
+    keep_tex: true
+  html_document: default
+---
+
+# Reply to Reviewer 1
+
+I have read the second revision of this manuscript and the authors' responses to my last review. I think the authors have done an excellent job in responding to the points I raised in that review. Thus, I recommend acceptance after the authors address the very minor points that I noted while reading this version of the manuscript. Those points are as follows:
+
+\textcolor{blue}{Thank you for your feedback on our manuscript. We have addressed all your comments and suggestions, and our replies to your comments can be found in blue below (original comments in black).}
+
++ Footnote 1 – change "saturated thickness" to "aquifer thickness" to be consistent with usage elsewhere. Same for x-axis label on Figure C.2.
+
+\textcolor{blue}{Thank you for catching this. In the footnote, "saturated thickness" was replaced with "aquifer thickness".}
+
++ Line 110 – can you briefly describe how this "accounting" is done?
+
+\textcolor{blue}{The figure is designed to showcase the effect of aquifer thickness on the percentage of irrigated acres, without the influence of spatio-temporal variations in weather conditions and drought risk exposure across the aquifer. In deriving the relationship between aquifer thickness and the proportion of irrigated acres using our model, these factors are kept constant, allowing us to focus solely on the impact of aquifer thickness. We have opted to omit the latter part of the sentence to avoid potential confusion. While Figure 1 was constructed using a similar procedure—adjusting only the water deficit while keeping other factors unchanged — we did not explicitly state this either. We believe this omission avoids unnecessary confusion.}
+
++ Line 147 – "leading in" should be "leading to".
+
+\textcolor{blue}{Thank you for catching this. In the footnote, "leading in" was replaced with "leading to".}
+
++ Lines 282-283 – delete "of the aquifer" - redundant.
+
+\textcolor{blue}{Thank you for catching this. In the sentence, "of the aquifer" was removed to avoid redundancy.}
+
++ Line 289 – "thickness" should be "thicknesses".
+
+\textcolor{blue}{Thank you for catching this. In the sentence, "thickness" was replaced with "thicknesses".}
+
++ Figure 7 – need a 200 m label for scale bar on soybean map. Are the blank areas in the aquifer in Texas and Oklahoma an indication that the aquifer is thin or that there is a lack of data? Please clarify.
+
++ Line 308 – "y" should be "Y".
+
+\textcolor{blue}{Thank you for catching this. The suggested changes has been made.}
+
++ Lines 357-359 – delete sentence as it is repeated on lines 363-364 where it fits better.
+
+\textcolor{blue}{Thank you for catching this. The sentenced was removed.}
+
++ Lines 401-402 – a recent paper in Agricultural Water Management addresses this issue in more detail 
+(https://www.sciencedirect.com/science/article/pii/S0378377423002731).
+
+\textcolor{blue}{Thank you for suggesting this article. We now cite this article at the end of the sentence.}
+
++ Lines 410-413 – very awkward sentence – please rewrite.
+
+\textcolor{blue}{We have rewritten the sentence to the following:}
+
+\textcolor{blue}{"As discussed in section 1 of our manuscript, there is extensive evidence pointing to reduced well yields in these areas of the HPA. This evidence ranges from anecdotal and theoretical insights to simulation-based studies. Collectively, they suggest that these restrictions significantly constrain farmers' ability to meet crop water demands during droughts."}
+
++ Line 446 – delete "across".
+
+\textcolor{blue}{Thank you for catching this. The suggested changes has been made.}
+
+# Reply to Reviewer 3
+
+
+The second round comments have been addressed convincingly. The discussion of the role of groundwater management policies in Appendix A is particularly useful addition, as it clarifies how the results presented here relate to the findings of analyses which focused more on policy factors. Ruling out regulations as a substantial causal factor based on the limited temporal overlap with the study period is coherent. The other edits implemented in response to the other comments have further improved the strength and accuracy of the presentation.
+
+Two relatively minor points remain to be addressed, based on one of the responses and the data and code correction you mentioned:
+
+\textcolor{blue}{Thank you for your feedback on our manuscript. We have addressed all your comments and suggestions, and our replies to your comments can be found in blue below (original comments in black).}
+
++ (1) I would recommend a minor addition regarding the response to my second round comment 5.b. You have pointed out that the claim of a significant yield decline in lines 77-78 is supported by Figure A.1 (and also A.2 for soybeans). Please add a reference to both figures in this sentence to clarify for readers where they can find evidence for the statistical significance.
+
+\textcolor{blue}{Thank you for this suggestion. We modify the sentence as follows:}
+
+\textcolor{blue}{As drought severity increases (i.e., as water deficit increases), rainfed yields of both crops decline significantly whereas irrigated yields are increasing or stable as deficit increases (see Figures A.1 and A.2 for the 95\% confidence intervals)}
+
++ (2) The beginning of the response letter describes a code and data correction unrelated to the previous reviewer comments. "[Counties] with only irrigated acres" were removed from the irrigation share regression. The immediate acknowledgement of this correction is appreciated. I trust that it was based on sensible considerations, though the rationale does not immediately become clear from the short statement, especially given that this does not seem to have been relevant previously. As you point out, the result changes due to this correction are quantitatively relatively minor (most visible in Figs. 3 and 4), and do not affect the qualitative findings or conclusions.
+
+\textcolor{blue}{We apologize for the confusion we caused. Our sentnce on this issue was not clear in the last round of revision. We meants that we excluded counties where only the irrigated acres are "observed" because only irrigated acres were reported by USDA, but not rainfed acres. So, it is very much possible that those counties had rainfed production, but rainfed acres were simply not reported by USDA for the counties we dropped. So, we were not trying to drop the fully irrigated counties. Of course, they may be fully irrigated and actually had zero rainfed production though it is very unlikely. If we keep them, they would all have irrigated share of 1 (100\%) just because drayland acres were not repoted by USDA, which can be a significant over-estimation of their actual share of irrigated acres. Therefore, we should drop them to avoid the problem lowering the quality of the data and consequently analysis. This is more of a data limitation than anything.}
+
+I recommend, however, making sure that the correction, its rationale, and potential implications for the result interpretation are made clear to readers. Lines 347-348 state that "irrigated area share and average crop yield estimates use data only from counties that have both irrigated and rainfed production observations". This statement covers the removal of fully irrigated counties, but could be clearer: Lines 348-350 mention the removal of "solely rainfed" counties explicitly - mentioning this but not the removal of fully irrigated counties could be confusing to readers. Please include an explicit statement about the removal of fully irrigated counties to avoid confusion. Please also make clear whether this removal pertains to both regressions (as implied in lines 347) or just the irrigated share regression (the one highlighted in the letter).
+
+\textcolor{blue}{We modified the pertinent sentences to the following:}
+
+\textcolor{blue}{Note that irrigated area share and average crop yield estimates use data only from counties that have both irrigated and rainfed production observations because irrigated area share cannot be calculated when missing either one of the irrigated and rainfed observations. Counties with solely irrigated or rainfed production observation data (Section 4.1) are used solely for estimating impacts of drought on per-area crop yields (Equation 1).}
+
+Please also provide a short rationale, e.g. whether this is due to the model selected or substantive considerations. Finally, please clarify what this implies for the result interpretation. Fully irrigated county observations do not seem obviously irrelevant. The change in Fig. 3 results due to the correction is quantitatively minor but not irrelevant. It would, therefore, be helpful for readers to understand whether the exclusion of fully irrigated counties makes the results more accurate, or whether it creates a (necessary) bias.
+
+\textcolor{blue}{Please see our replies about the rational. We simply cannot calculate irrigated area share for counties with only irrigated or ranifed observations.}
+
+Relatedly, it seems that in Fig. 7, some of the previously displayed counties in both the irrigated (color shaded) and rainfed (grey) categories are now missing. Did the exclusion of fully irrigated counties also affect which rainfed areas are represented? If so, please also clarify this link for the readers.
+
+\textcolor{blue}{Thank you so much for noticing this change. This has nothing to do with the exclusion of counties with only irrigation acres reported. The maps were supposed to present saturated thickness for "all" the counties used in the analysis. So, even the counties that were dropped for the irrigation share analyis should have been present. After some digging, we found that we actually made mistakes twice on map creation during the whole review process so far.}
+
+1. \textcolor{blue}{In the 1st round, we made a correction to the lower bound of saturated thickness according to reviewer 1's comment. We stated that 9m was used as the lower bound as below.}
+
+\textcolor{blue}{"Aquifer thickness values were only estimated for counties with irrigated yield observations. Furthermore, during the aggregation process, any aquifer cells within a county that had a aquifer thickness value lower than 9 m were removed before aggregation to reflect the fact that aquifer thickness lower than this threshold are not considered to be viable for extraction and therefore it is unlikely these areas contribute groundwater for irrigation production [Fenichel et al., 2016, Haacker et al., 2016, Deines et al., 2020]."}
+
+\textcolor{blue}{However, we were actually using 12m as the lower bound, which we realized after seeing reviewer's comment on this in the first round:}
+
+\textcolor{blue}{"Figure 2 - Why do the plots stop at a thickness of about 12 m when you had earlier defined the minimum thickness as 9 m and mention 10 m in the text when discussing the relationships?"}
+
+\textcolor{blue}{Therefore, we change the code so that 9m is used instead of 12m. We, however, did not update the map according to this change in the data. This is why the map in this version has several more counties in Kansas and New Mexico that did not appear in the map of the first round revision. They used to be dropped prior to chaging the threshold from 12m to 9m.}
+
+2. \textcolor{blue}{The significant change in the map in the second round from the 1st round is a mistake on using the map we created when we were experimenting with codes. We then did not rerun the code to create a map with the whole dataset to overwrite the wrong map with the correct map. We made sure that we streamlined all the codes, rerun all of them, and cofirm that the map indeed reflect what we used for our analysis in this round. As stated in the manuscript, all the codes and data are available on a publicly accessible Github repository. Thank you again for your keen eyes on details. We would not have noticed this ourselves.}
+
+
+ 
