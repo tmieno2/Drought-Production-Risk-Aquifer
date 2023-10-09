@@ -86,7 +86,7 @@ I recommend, however, making sure that the correction, its rationale, and potent
 
 Please also provide a short rationale, e.g. whether this is due to the model selected or substantive considerations. Finally, please clarify what this implies for the result interpretation. Fully irrigated county observations do not seem obviously irrelevant. The change in Fig. 3 results due to the correction is quantitatively minor but not irrelevant. It would, therefore, be helpful for readers to understand whether the exclusion of fully irrigated counties makes the results more accurate, or whether it creates a (necessary) bias.
 
-\textcolor{blue}{Please see our replies about the rational. We simply cannot calculate irrigated area share for counties with only irrigated or ranifed observations.}
+\textcolor{blue}{Please see our replies about the rational.}
 
 Relatedly, it seems that in Fig. 7, some of the previously displayed counties in both the irrigated (color shaded) and rainfed (grey) categories are now missing. Did the exclusion of fully irrigated counties also affect which rainfed areas are represented? If so, please also clarify this link for the readers.
 
