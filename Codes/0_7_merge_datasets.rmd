@@ -38,7 +38,6 @@ merged_data <-
 # merged_data[ir == "ir", state] %>% unique()
 ```
 
-
 # Create and redefine new variables, select observations
 
 ```{r}
@@ -62,7 +61,7 @@ final_data <-
   .[!is.na(sat), ] %>%
   # === number of observations by state-county code ===#
   .[, num_obs := .N, by = sc_code] %>%
-  # === keep only if more than 2 observations are available ===#
+  # === keep only if more than 10 observations are available ===#
   .[num_obs >= 10, ] %>%
   # === order (not necessary) ===#
   .[order(sc_code, year), ]
@@ -73,3 +72,4 @@ final_data <-
 ```{r}
 saveRDS(final_data, here("Shared/Data/ProcessedData/final_data.rds"))
 ```
+

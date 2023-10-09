@@ -26,7 +26,6 @@ prepare_reg_data <- function(data, sat_thld_m, ir_share_thld, balance_thld, sat_
         .[, sc_dry := paste0(sc_code, "_", dry_or_not)] %>%
         .[, state_year := paste0(state_name, "_", year)] %>%
         .[, num_obs := .N, by = sc_dry] %>%
-        .[num_obs > 5, ] %>%
         .[, num_obs := NULL]
     )) %>%
     # === sat breaks for grouping ===#

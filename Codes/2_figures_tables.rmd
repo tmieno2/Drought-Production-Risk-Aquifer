@@ -9,6 +9,9 @@ author: "Taro Mieno"
 
 ```{r}
 all_results <- readRDS("Shared/Results/all_results.rds")
+
+data_corn <- all_results[crop == "corn", data][[1]]
+data_soy <- all_results[crop == "soy", data][[1]]
 ```
 
 ## Set themes
@@ -65,9 +68,6 @@ theme_fig <-
 ## Boxplot of water deficit by year
 
 ```{r}
-data_corn <- all_results[crop == "corn", data][[1]]
-data_soy <- all_results[crop == "soy", data][[1]]
-
 wd_data <-
   rbind(data_corn[year <= 2016, ], data_soy[year <= 2016, ]) %>%
   .[, .(wd = mean(balance)), by = .(year, crop)] %>%
@@ -212,30 +212,36 @@ hpa_simplified <-
   here("Shared/Data/ProcessedData/hp_simplified.shp") %>%
   readRDS()
 
-# === all counties ===#
 data(fips_codes, package = "tidycensus")
 
-all_counties <-
-  tigris::counties() %>%
-  st_simplify(dTolerance = 100) %>%
-  rename(
-    state_code = STATEFP,
-    county_code = COUNTYFP,
-    county_name = NAME
-  ) %>%
-  left_join(., fips_codes, by = c("state_code", "county_code")) %>%
-  dplyr::select(state_code, state, county_code, county_name) %>%
-  mutate(sc_code = paste0(state_code, county_code)) %>%
-  data.table()
+# all_counties <-
+#   tigris::counties() %>%
+#   st_simplify(dTolerance = 100) %>%
+#   rename(
+#     state_code = STATEFP,
+#     county_code = COUNTYFP,
+#     county_name = NAME
+#   ) %>%
+#   left_join(., fips_codes, by = c("state_code", "county_code")) %>%
+#   dplyr::select(state_code, state, county_code, county_name) %>%
+#   mutate(sc_code = paste0(state_code, county_code)) %>%
+#   data.table()
+# saveRDS(all_counties, "Shared/Data/counties.rds")
 
-all_states <-
-  tigris::states() %>%
-  rename(state_code = STATEFP) %>%
-  left_join(
-    .,
-    unique(data.table(fips_codes), by = "state"),
-    by = "state_code"
-  )
+all_counties <- readRDS("Shared/Data/counties.rds")
+
+# all_states <-
+#   tigris::states() %>%
+#   rename(state_code = STATEFP) %>%
+#   left_join(
+#     .,
+#     unique(data.table(fips_codes), by = "state"),
+#     by = "state_code"
+#   )
+
+# saveRDS(all_states, "Shared/Data/states.rds")
+
+all_states <- readRDS("Shared/Data/states.rds")
 
 states_of_interest <-
   dplyr::filter(all_states, state %in% data_corn[, unique(state)])
@@ -245,6 +251,7 @@ counties_corn_all <-
   all_counties[sc_code %in% unique(data_corn$sc_code), ] %>%
   mutate(type = "Corn") %>%
   st_as_sf()
+
 
 counties_corn_ir <-
   copy(data_corn) %>%
@@ -442,8 +449,8 @@ g_wd_soy <-
 
 g_yield_response <-
   cowplot::plot_grid(
-    g_wd_corn, 
-    g_ir_yield_corn + theme(plot.margin = margin(0, 0, 0.2, 0, "cm")), g_wd_soy, 
+    g_wd_corn,
+    g_ir_yield_corn + theme(plot.margin = margin(0, 0, 0.2, 0, "cm")), g_wd_soy,
     g_ir_yield_soy,
     ncol = 1,
     align = "v",
