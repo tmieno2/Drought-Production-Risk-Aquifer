@@ -90,7 +90,7 @@ Please also provide a short rationale, e.g. whether this is due to the model sel
 
 Relatedly, it seems that in Fig. 7, some of the previously displayed counties in both the irrigated (color shaded) and rainfed (grey) categories are now missing. Did the exclusion of fully irrigated counties also affect which rainfed areas are represented? If so, please also clarify this link for the readers.
 
-\textcolor{blue}{Thank you so much for noticing this change. This has nothing to do with the exclusion of counties with only irrigation acres reported. The maps were supposed to present saturated thickness for "all" the counties used in the analysis. So, even the counties that were dropped for the irrigation share analyis should have been present. After some digging, we found that we actually made mistakes twice on map creation during the whole review process so far.}
+\textcolor{blue}{Thank you so much for noticing this change. This has nothing to do with the exclusion of counties with only irrigation acres reported. The maps were supposed to present "all" the counties used in the analysis. So, even the counties that were dropped for the irrigation share analyis should have been present. After some digging, we found that we actually made mistakes twice on map creation during the whole review process so far.}
 
 1. \textcolor{blue}{In the 1st round, we made a correction to the lower bound of saturated thickness according to reviewer 1's comment. We stated that 9m was used as the lower bound as below.}
 
