@@ -96,7 +96,7 @@ Relatedly, it seems that in Fig. 7, some of the previously displayed counties in
 
 1. \textcolor{blue}{In the 1st round, we made a correction to the lower bound of saturated thickness according to reviewer 1's comment. We stated that 9m was used as the lower bound as below.}
 
-\textcolor{blue}{"Aquifer thickness values were only estimated for counties with irrigated yield observations. Furthermore, during the aggregation process, any aquifer cells within a county that had a aquifer thickness value lower than 9 m were removed before aggregation to reflect the fact that aquifer thickness lower than this threshold are not considered to be viable for extraction and therefore it is unlikely these areas contribute groundwater for irrigation production [Fenichel et al., 2016, Haacker et al., 2016, Deines et al., 2020]."}
+\textcolor{blue}{"Furthermore, during the aggregation process, any aquifer cells within a county that had a aquifer thickness value lower than \textcolor{red}{9} m were removed before aggregation to reflect the fact that aquifer thickness lower than this threshold are not considered to be viable for extraction and therefore it is unlikely these areas contribute groundwater for irrigation production [Fenichel et al., 2016, Haacker et al., 2016, Deines et al., 2020]."}
 
 \textcolor{blue}{However, we were actually using 12m as the lower bound, which we realized after seeing reviewer's comment on this in the first round:}
 
