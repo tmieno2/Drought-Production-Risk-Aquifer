@@ -122,10 +122,18 @@ are as follows:
 \textcolor{blue}{Thank you for catching this. In the sentence, "thickness" was replaced with "thicknesses".}
 
 \begin{itemize}
+\tightlist
 \item
   Figure 7 -- need a 200 m label for scale bar on soybean map. Are the
   blank areas in the aquifer in Texas and Oklahoma an indication that
   the aquifer is thin or that there is a lack of data? Please clarify.
+\end{itemize}
+
+\textcolor{blue}{200m lable was added to the legend of the soybean map. The blank area are counties that were not used at all in either of the yield and irrigation share regressions because neither of them are reported by USDA. 
+}
+
+\begin{itemize}
+\tightlist
 \item
   Line 308 -- ``y'' should be ``Y''.
 \end{itemize}
@@ -226,7 +234,7 @@ responses and the data and code correction you mentioned:
   \end{enumerate}
 \end{itemize}
 
-\textcolor{blue}{We apologize for the confusion we caused. Our sentnce on this issue was not clear in the last round of revision. We meants that we excluded counties where only the irrigated acres are "observed" because only irrigated acres were reported by USDA, but not rainfed acres. So, it is very much possible that those counties had rainfed production, but rainfed acres were simply not reported by USDA for the counties we dropped. So, we were not trying to drop the fully irrigated counties. Of course, they may be fully irrigated and actually had zero rainfed production though it is very unlikely. If we keep them, they would all have irrigated share of 1 (100\%) just because drayland acres were not repoted by USDA, which can be a significant over-estimation of their actual share of irrigated acres. Therefore, we should drop them to avoid the problem lowering the quality of the data and consequently analysis. This is more of a data limitation than anything.}
+\textcolor{blue}{We apologize for the confusion we caused. Our sentnce on this issue was not clear in the last round of revision. We meant that we excluded counties where only the irrigated acres are "observed" because only irrigated acres were reported by USDA, but not rainfed acres. It is very much possible that those counties had rainfed production, but rainfed acres were simply not reported by USDA for the counties we dropped. This means that we cannot even calculate the share of irrigation for those counties (This is also the case for counties with only rainfed production observations). So, we were not trying to drop the fully irrigated counties. Of course, they may be fully irrigated and actually had zero rainfed production though it is very unlikely. Previously before fixing the coding error, those counties were assigned the value of 1 (100\%) as their share of irrigated acres just because drayland acres were not repoted by USDA, which can be a significant over-estimation of their actual share of irrigated acres. Therefore, we should drop them to avoid the problem lowering the quality of the data and consequently analysis. This is more of a data limitation than anything.}
 
 I recommend, however, making sure that the correction, its rationale,
 and potential implications for the result interpretation are made clear
@@ -285,7 +293,7 @@ also clarify this link for the readers.
 \setcounter{enumi}{1}
 \tightlist
 \item
-  \textcolor{blue}{The significant change in the map in the second round from the 1st round is a mistake on using the map we created when we were experimenting with codes. We then did not rerun the code to create a map with the whole dataset to overwrite the wrong map with the correct map. We made sure that we streamlined all the codes, rerun all of them, and cofirm that the map indeed reflect what we used for our analysis in this round. As stated in the manuscript, all the codes and data are available on a publicly accessible Github repository. Thank you again for your keen eyes on details. We would not have noticed this ourselves.}
+  \textcolor{blue}{The significant change in the map in the second round from the 1st round is a mistake on using the map we created when we were experimenting with codes. We then did not rerun the code to create a map with the whole dataset to overwrite the wrong map with the correct map. In this round, we made sure that we streamlined all the codes, rerun all of them, and cofirmed that the map indeed reflect what we used for our analysis in this round. Thank you again for your keen eyes on details.}
 \end{enumerate}
 
 \end{document}
