@@ -4,14 +4,13 @@
 %
 \documentclass[
 ]{article}
+\usepackage{amsmath,amssymb}
 \usepackage{lmodern}
-\usepackage{amsmath}
-\usepackage{ifxetex,ifluatex}
-\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+\usepackage{iftex}
+\ifPDFTeX
   \usepackage[T1]{fontenc}
   \usepackage[utf8]{inputenc}
   \usepackage{textcomp} % provide euro and other symbols
-  \usepackage{amssymb}
 \else % if luatex or xetex
   \usepackage{unicode-math}
   \defaultfontfeatures{Scale=MatchLowercase}
@@ -34,12 +33,6 @@
   \KOMAoptions{parskip=half}}
 \makeatother
 \usepackage{xcolor}
-\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
-\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
-\hypersetup{
-  hidelinks,
-  pdfcreator={LaTeX via pandoc}}
-\urlstyle{same} % disable monospaced font for URLs
 \usepackage[margin=1in]{geometry}
 \usepackage{graphicx}
 \makeatletter
@@ -58,9 +51,15 @@
 \providecommand{\tightlist}{%
   \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
 \setcounter{secnumdepth}{-\maxdimen} % remove section numbering
-\ifluatex
+\ifLuaTeX
   \usepackage{selnolig}  % disable illegal ligatures
 \fi
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same} % disable monospaced font for URLs
+\hypersetup{
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
 
 \author{}
 \date{\vspace{-2.5em}}
@@ -129,7 +128,7 @@ are as follows:
   the aquifer is thin or that there is a lack of data? Please clarify.
 \end{itemize}
 
-\textcolor{blue}{The 200m label has been added to the legend of the soybean map. The blank area are counties that were not used in either of the yield and irrigation share regressions. This because neither of them have reported information on corn and/or soybean production from USDA, due to the small areas of land dvoted to production of these crops in these locations. 
+\textcolor{blue}{The 200m label has been added to the legend of the soybean map. The blank area are counties that were not used in either of the yield and irrigation share regressions. This is because neither of them have reported information on corn and/or soybean production from USDA, due to the small areas of land dvoted to production of these crops in these locations.
 }
 
 \begin{itemize}
@@ -234,7 +233,7 @@ responses and the data and code correction you mentioned:
   \end{enumerate}
 \end{itemize}
 
-\textcolor{blue}{We apologize for the confusion we caused. Our description of this issue was not clear in the last round of revision. We meant to highlight that we excluded counties where only the irrigated acres are "observed" because only irrigated production data were reported by USDA - typically this is because the total number of rainfed acres is small or was not captured by USDA surveys in the county. In these cases, we cannot  calculate the share of irrigated acres for those specific counties. Previously before fixing the coding error, those counties were assigned the value of 1 (100\%) for their share of irrigated acres because no rainfed production data was repoted by USDA, which may lead to an over-estimation of their actual share of irrigated acres. Therefore, in our revisions we removed these counties to avoid this issue and the consequent reduction of data quality. However, as previously, this did not alter the findings of our analysis, and therefore this is largely a cosmetic change to ensure we base our analysis on the highest quality data available.}
+\textcolor{blue}{We apologize for the confusion we caused. Our description of this issue was not clear in the last round of revision. We meant to highlight that we excluded counties where only the irrigated acres are "observed" because only irrigated production data were reported by USDA - typically this is because the total number of rainfed acres is small or was not captured by USDA surveys in the county. In these cases, we cannot calculate the share of irrigated acres for those specific counties. Previously before fixing the coding error, those counties were assigned the value of 1 (100\%) for their share of irrigated acres because no rainfed production data was repoted by USDA, which may lead to an over-estimation of their actual share of irrigated acres. Therefore, in our revisions we removed these counties to avoid this issue and the consequent reduction of data quality. However, as previously noted, this did not alter the findings of our analysis, and therefore this is largely a cosmetic change to ensure we base our analysis on the highest quality data available.}
 
 I recommend, however, making sure that the correction, its rationale,
 and potential implications for the result interpretation are made clear
@@ -271,29 +270,8 @@ categories are now missing. Did the exclusion of fully irrigated
 counties also affect which rainfed areas are represented? If so, please
 also clarify this link for the readers.
 
-\textcolor{blue}{Thank you for noticing this change. This has nothing to do with the exclusion of counties with only irrigation acres reported. The maps were intended to present saturated thickness for "all" the counties used in the analysis. So, even the counties that were dropped for the irrigation share analsyis should have been present. The figure has been corrected to reflect this, and information added to the caption to explain this distinction.}
+\textcolor{blue}{Thank you for noticing this change. This has nothing to do with the exclusion of counties with only irrigation acres reported. The maps were intended to present aquifer thickness for "all" the counties used in the analysis. So, even the counties that were dropped for the irrigation share analsyis should have been present.}
 
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\tightlist
-\item
-  \textcolor{blue}{In the 1st round, we made a correction to the lower bound of saturated thickness according to reviewer 1's comment. We stated that 9m was used as the lower bound as below.}
-\end{enumerate}
-
-\textcolor{blue}{"Aquifer thickness values were only estimated for counties with irrigated yield observations. Furthermore, during the aggregation process, any aquifer cells within a county that had a aquifer thickness value lower than 9 m were removed before aggregation to reflect the fact that aquifer thickness lower than this threshold are not considered to be viable for extraction and therefore it is unlikely these areas contribute groundwater for irrigation production [Fenichel et al., 2016, Haacker et al., 2016, Deines et al., 2020]."}
-
-\textcolor{blue}{However, we were actually using 12m as the lower bound, which we realized after seeing reviewer's comment on this in the first round:}
-
-\textcolor{blue}{"Figure 2 - Why do the plots stop at a thickness of about 12 m when you had earlier defined the minimum thickness as 9 m and mention 10 m in the text when discussing the relationships?"}
-
-\textcolor{blue}{Therefore, we change the code so that 9m is used instead of 12m. We, however, did not update the map according to this change in the data. This is why the map in this version has several more counties in Kansas and New Mexico that did not appear in the map of the first round revision. They used to be dropped prior to chaging the threshold from 12m to 9m.}
-
-\begin{enumerate}
-\def\labelenumi{\arabic{enumi}.}
-\setcounter{enumi}{1}
-\tightlist
-\item
-  \textcolor{blue}{The significant change in the map in the second round from the 1st round is a mistake on using the map we created when we were experimenting with codes. We then did not rerun the code to create a map with the whole dataset to overwrite the wrong map with the correct map. In this round, we made sure that we streamlined all the codes, rerun all of them, and cofirmed that the map indeed reflect what we used for our analysis in this round. Thank you again for your keen eyes on details.}
-\end{enumerate}
+\textcolor{blue}{We made an error of inserting a figure that originated during experimentation with our codes in the last round of revision. The figure has now been corrected. Additionally, please note that the current version includes several more counties in Kansas and New Mexico that did not appear in the map from the initial revision. In the first round of revision, we adjusted aquifer thickness threshold from 12m to 9m in response to a comment by reviewer 1. Due to this, we were using those counties in our analysis. However, we did not modify the map accordingly at that time. However, this change in the data has now been accurately reflected in the map.}
 
 \end{document}
