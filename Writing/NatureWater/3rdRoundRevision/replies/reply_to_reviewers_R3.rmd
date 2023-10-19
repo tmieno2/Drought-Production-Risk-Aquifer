@@ -102,9 +102,9 @@ Relatedly, it seems that in Fig. 7, some of the previously displayed counties in
 
 \textcolor{blue}{"Figure 2 - Why do the plots stop at a thickness of about 12 m when you had earlier defined the minimum thickness as 9 m and mention 10 m in the text when discussing the relationships?"}
 
-\textcolor{blue}{Therefore, we change the code so that 9m is used instead of 12m. We, however, did not update the map according to this change in the data. This is why the map in this version has several more counties in Kansas and New Mexico that did not appear in the map of the first round revision. They used to be dropped prior to chaging the threshold from 12m to 9m.}
+\textcolor{blue}{Therefore, we change the code so that 9m is used instead of 12m. We, however, did not update the map according to this change in the data. This is why the map in the current version has several more counties in Kansas and New Mexico that did not appear in the map of the first round revision. They used to be dropped prior to chaging the threshold from 12m to 9m.}
 
-2. \textcolor{blue}{The significant change in the map in the second round from the 1st round is a mistake on using the map we created when we were experimenting with codes. We then did not rerun the code to create a map with the whole dataset to overwrite the wrong map with the correct map. In this round, we made sure that we streamlined all the codes, rerun all of them, and cofirmed that the map indeed reflect what we used for our analysis in this round. Thank you again for your keen eyes on details.}
+2. \textcolor{blue}{The significant change in the map in the second round from the 1st round is simply an embarassing mistake of using the map we created when we were experimenting with the R codes. We then did not rerun the code to create a map with the whole dataset to overwrite the wrong map with the correct map. In this round, we made sure that we streamlined all the codes, rerun all of them, and cofirmed that the map indeed reflect what we used for our analysis in this round. Thank you again for your keen eyes on details.}
 
 
  
