@@ -129,7 +129,7 @@ are as follows:
   the aquifer is thin or that there is a lack of data? Please clarify.
 \end{itemize}
 
-\textcolor{blue}{200m lable was added to the legend of the soybean map. The blank area are counties that were not used at all in either of the yield and irrigation share regressions because neither of them are reported by USDA. 
+\textcolor{blue}{The 200m label has been added to the legend of the soybean map. The blank area are counties that were not used in either of the yield and irrigation share regressions. This because neither of them have reported information on corn and/or soybean production from USDA, due to the small areas of land dvoted to production of these crops in these locations. 
 }
 
 \begin{itemize}
@@ -138,7 +138,7 @@ are as follows:
   Line 308 -- ``y'' should be ``Y''.
 \end{itemize}
 
-\textcolor{blue}{Thank you for catching this. The suggested changes has been made.}
+\textcolor{blue}{Thank you for catching this. The suggested change has been made.}
 
 \begin{itemize}
 \tightlist
@@ -165,7 +165,7 @@ are as follows:
   Lines 410-413 -- very awkward sentence -- please rewrite.
 \end{itemize}
 
-\textcolor{blue}{We have rewritten the sentence to the following:}
+\textcolor{blue}{We have rewritten the sentence to now state the following, which we feel improves the clarity of the text:}
 
 \textcolor{blue}{"As discussed in section 1 of our manuscript, there is extensive evidence pointing to reduced well yields in these areas of the HPA. This evidence ranges from anecdotal and theoretical insights to simulation-based studies. Collectively, they suggest that these restrictions significantly constrain farmers' ability to meet crop water demands during droughts."}
 
@@ -175,7 +175,7 @@ are as follows:
   Line 446 -- delete ``across''.
 \end{itemize}
 
-\textcolor{blue}{Thank you for catching this. The suggested changes has been made.}
+\textcolor{blue}{Thank you for catching this. The suggested change has been made.}
 
 \hypertarget{reply-to-reviewer-3}{%
 \section{Reply to Reviewer 3}\label{reply-to-reviewer-3}}
@@ -209,7 +209,7 @@ responses and the data and code correction you mentioned:
   \end{enumerate}
 \end{itemize}
 
-\textcolor{blue}{Thank you for this suggestion. We modify the sentence as follows:}
+\textcolor{blue}{Thank you for this suggestion. We have modified the sentence as follows:}
 
 \textcolor{blue}{As drought severity increases (i.e., as water deficit increases), rainfed yields of both crops decline significantly whereas irrigated yields are increasing or stable as deficit increases (see Figures A.1 and A.2 for the 95\% confidence intervals)}
 
@@ -234,7 +234,7 @@ responses and the data and code correction you mentioned:
   \end{enumerate}
 \end{itemize}
 
-\textcolor{blue}{We apologize for the confusion we caused. Our sentnce on this issue was not clear in the last round of revision. We meant that we excluded counties where only the irrigated acres are "observed" because only irrigated acres were reported by USDA, but not rainfed acres. It is very much possible that those counties had rainfed production, but rainfed acres were simply not reported by USDA for the counties we dropped. This means that we cannot even calculate the share of irrigation for those counties (This is also the case for counties with only rainfed production observations). So, we were not trying to drop the fully irrigated counties. Of course, they may be fully irrigated and actually had zero rainfed production though it is very unlikely. Previously before fixing the coding error, those counties were assigned the value of 1 (100\%) as their share of irrigated acres just because drayland acres were not repoted by USDA, which can be a significant over-estimation of their actual share of irrigated acres. Therefore, we should drop them to avoid the problem lowering the quality of the data and consequently analysis. This is more of a data limitation than anything.}
+\textcolor{blue}{We apologize for the confusion we caused. Our description of this issue was not clear in the last round of revision. We meant to highlight that we excluded counties where only the irrigated acres are "observed" because only irrigated production data were reported by USDA - typically this is because the total number of rainfed acres is small or was not captured by USDA surveys in the county. In these cases, we cannot  calculate the share of irrigated acres for those specific counties. Previously before fixing the coding error, those counties were assigned the value of 1 (100\%) for their share of irrigated acres because no rainfed production data was repoted by USDA, which may lead to an over-estimation of their actual share of irrigated acres. Therefore, in our revisions we removed these counties to avoid this issue and the consequent reduction of data quality. However, as previously, this did not alter the findings of our analysis, and therefore this is largely a cosmetic change to ensure we base our analysis on the highest quality data available.}
 
 I recommend, however, making sure that the correction, its rationale,
 and potential implications for the result interpretation are made clear
@@ -250,9 +250,9 @@ clear whether this removal pertains to both regressions (as implied in
 lines 347) or just the irrigated share regression (the one highlighted
 in the letter).
 
-\textcolor{blue}{We modified the pertinent sentences to the following:}
+\textcolor{blue}{We modified the pertinent sentences to now state the following:}
 
-\textcolor{blue}{Note that irrigated area share and average crop yield estimates use data only from counties that have both irrigated and rainfed production observations because irrigated area share cannot be calculated when missing either one of the irrigated and rainfed observations. Counties with solely irrigated or rainfed production observation data (Section 4.1) are used solely for estimating impacts of drought on per-area crop yields (Equation 1).}
+\textcolor{blue}{Note that irrigated area share and average crop yield estimates use data only from counties that have both irrigated and rainfed production observations because irrigated area share cannot be calculated when missing either one of the irrigated and rainfed observations. Counties with solely irrigated or rainfed production observation data (Section 4.1) are used solely for estimating impacts of drought on per-area crop irrigated or rainfed yields respectively (Equation 1).}
 
 Please also provide a short rationale, e.g.~whether this is due to the
 model selected or substantive considerations. Finally, please clarify
@@ -263,7 +263,7 @@ irrelevant. It would, therefore, be helpful for readers to understand
 whether the exclusion of fully irrigated counties makes the results more
 accurate, or whether it creates a (necessary) bias.
 
-\textcolor{blue}{Please see our replies about the rational. We simply cannot calculate irrigated area share for counties with only irrigated or ranifed observations.}
+\textcolor{blue}{Please see our replies above that provide detail on the rational behind this change. In summary, the change was made to avoid introducing assumptions about the irrigated area share for counties where rainfed production is not reported. It is not possible to calculate irrigated area share for counties with only irrigated or rainfed observations. We believe that ommitting counties lacking either of these data is preferable to prior assumptions made (e.g. that there is no irrigated or rainfed production if no data is reported in a county), as these assumptions may introduce noise into our analysis - for example if rainfed production is not reported due to sampling decisions made in the generation of estimates by USDA.}
 
 Relatedly, it seems that in Fig. 7, some of the previously displayed
 counties in both the irrigated (color shaded) and rainfed (grey)
@@ -271,7 +271,7 @@ categories are now missing. Did the exclusion of fully irrigated
 counties also affect which rainfed areas are represented? If so, please
 also clarify this link for the readers.
 
-\textcolor{blue}{Thank you so much for noticing this change. This has nothing to do with the exclusion of counties with only irrigation acres reported. The maps were supposed to present saturated thickness for "all" the counties used in the analysis. So, even the counties that were dropped for the irrigation share analyis should have been present. After some digging, we found that we actually made mistakes twice on map creation during the whole review process so far.}
+\textcolor{blue}{Thank you for noticing this change. This has nothing to do with the exclusion of counties with only irrigation acres reported. The maps were intended to present saturated thickness for "all" the counties used in the analysis. So, even the counties that were dropped for the irrigation share analsyis should have been present. The figure has been corrected to reflect this, and information added to the caption to explain this distinction.}
 
 \begin{enumerate}
 \def\labelenumi{\arabic{enumi}.}
