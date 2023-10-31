@@ -1,12 +1,53 @@
 # Data Preparation
 
-```{r}
+```{r, eval = FALSE}
 knitr::purl(here("Codes/0_1_hpa_counties.Rmd"), here("Codes/0_1_hpa_counties.R"))
 knitr::purl(here("Codes/0_2_quickstat.Rmd"), here("Codes/0_2_quickstat.R"))
 knitr::purl(here("Codes/0_3_get_sat.Rmd"), here("Codes/0_3_get_sat.R"))
 knitr::purl(here("Codes/0_4_get_weather.Rmd"), here("Codes/0_4_get_weather.R"))
 knitr::purl(here("Codes/0_5_ssurgo.Rmd"), here("Codes/0_5_ssurgo.R"))
 knitr::purl(here("Codes/0_6_merge_datasets.Rmd"), here("Codes/0_6_merge_datasets.R"))
+```
+
+## Find counties in HPA
+```{r, eval = FALSE}
+source(here("Codes/0_1_hpa_counties.R"))
+```
+
+## Downlod yield and acreage data from USDA-NASS Quickstat
+
+```{r}
+source(here("Codes/0_2_quickstat.R"))
+```
+
+## Assign saturated thickness values to each county-year
+
+```{r, eval = FALSE}
+source(here("Codes/0_3_get_sat.R"))
+```
+
+## Download gridMET data and summarize by county-year
+
++ Downloading all the gridMET data and processing them take a while.
++ The total size of the gridMET files is about 35GB.
+
+```{r, eval = FALSE}
+source(here("Codes/0_4_get_weather.R"))
+```
+
+## Download SSURGO data and summarize by county
+
++ Running this takes a while.
++ SSURGO can be erratic and you may face downloading errors at times
+
+```{r, eval = FALSE}
+source(here("Codes/0_5_ssurgo.R"))
+```
+
+## Merge datasets, defined new variables, and drop observations
+
+```{r, eval = FALSE}
+source(here("Codes/0_6_merge_datasets.R"))
 ```
 
 # Analysis

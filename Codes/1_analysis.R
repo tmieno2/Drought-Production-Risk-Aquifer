@@ -165,7 +165,7 @@ all_results <-
           .[, balance_avg := mean(balance), by = sc_code]
 
         share_pred_data <-
-          share_analysis(
+          share_analysis_boot(
             ir_share_data = share_boot_data,
             sat_seq,
             sandtotal_med,
