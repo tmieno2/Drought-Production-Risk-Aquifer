@@ -9,25 +9,13 @@ prepare_reg_data <- function(data, sat_thld_m, ir_share_thld, balance_thld, sat_
       data %>%
         .[crop == crop_type, ] %>%
         .[state %in% states, ] %>%
-        #--- yield ---#
-        .[, yield := yield * 12.553 / 200] %>%
         #--- balance ---#
         .[balance >= balance_thld[1], ] %>%
         .[balance <= balance_thld[2], ] %>%
-        .[, balance := -balance] %>%
-        #--- unit conversion ---#
-        .[, sat := measurements::conv_unit(sat, "ft", "m")] %>%
         #--- filter out counties with too low saturated thickness ---#
         .[sat >= sat_thld_m | sat == 0, ] %>%
-        #--- share of irrigated/dryland acres ---#
-        .[, acres_ratio := acres / sum(acres), by = .(sc_code, year)] %>%
-        .[sat == 0 | (ir == "ir" & ir_area_ratio >= ir_share_thld), ] %>%
-        .[, dry_or_not := fifelse(sat == 0, 1, 0)] %>%
-        .[, sc_dry := paste0(sc_code, "_", dry_or_not)] %>%
-        .[, state_year := paste0(state_name, "_", year)] %>%
-        .[, num_obs := .N, by = sc_dry] %>%
-        .[num_obs > 5, ] %>%
-        .[, num_obs := NULL]
+        #--- keep only if the ratio of irrigable acres is above the threshold ---#
+        .[sat == 0 | (ir == "ir" & ir_area_ratio >= ir_share_thld), ]
     )) %>%
     # === sat breaks for grouping ===#
     #' dryland production will have NA
@@ -276,10 +264,17 @@ share_analysis <- function(ir_share_data, sat_seq, sandtotal_e, silttotal_e, awc
   #++++++++++++++++++++++++++++++++++++
   #+ Debug
   #++++++++++++++++++++++++++++++++++++
+  # ir_share_data <- main_analysis$share_reg_data[[1]]
+  # sat_seq <- main_analysis$sat_seq[[1]]
+  # sandtotal_e <- main_analysis$sandtotal_med[[1]]
+  # silttotal_e <- main_analysis$silttotal_med[[1]]
+  # awc_e <- main_analysis$awc_med[[1]]
 
   #++++++++++++++++++++++++++++++++++++
   #+ Main
   #++++++++++++++++++++++++++++++++++++
+  ir_share_data <- ir_share_data[sat < 180, ]
+
   #---------------------
   #- define the formula for the flexible part
   #---------------------
@@ -289,6 +284,7 @@ share_analysis <- function(ir_share_data, sat_seq, sandtotal_e, silttotal_e, awc
         s(sat, k = 4, m = 2) +
         s(balance_avg, k = 4, m = 2)
     )
+
   #---------------------
   #- Run preliminary gam estimation
   #---------------------
@@ -355,8 +351,12 @@ share_analysis <- function(ir_share_data, sat_seq, sandtotal_e, silttotal_e, awc
     ir_share_hat = share_hat
   )]
 
+  base_ir_share <- share_hat_data[sat == sat_seq[length(sat_seq)], ir_share_hat]
+
+  share_hat_data[, dif_ir_share_hat := base_ir_share - ir_share_hat]
+
   return(
-    share_hat_data = share_hat_data[, .(sat, ir_share_hat)]
+    share_hat_data = share_hat_data[, .(sat, ir_share_hat, dif_ir_share_hat)]
   )
 }
 
@@ -364,18 +364,25 @@ share_analysis_gam <- function(ir_share_data, sat_seq, sandtotal_e, silttotal_e,
   #++++++++++++++++++++++++++++++++++++
   #+ Debug
   #++++++++++++++++++++++++++++++++++++
+  # ir_share_data <- main_analysis$share_reg_data[[1]]
+  # sat_seq <- main_analysis$sat_seq[[1]]
+  # sandtotal_e <- main_analysis$sandtotal_med[[1]]
+  # silttotal_e <- main_analysis$silttotal_med[[1]]
+  # awc_e <- main_analysis$awc_med[[1]]
 
   #++++++++++++++++++++++++++++++++++++
   #+ Main
   #++++++++++++++++++++++++++++++++++++
+  ir_share_data <- ir_share_data[sat < 180, ]
+
   #---------------------
   #- define the formula for the flexible part
   #---------------------
   gam_formula_ir_share <-
     formula(
       acres_ratio ~
-        s(sat, k = 5, m = 2) +
-        s(balance_avg, k = 5, m = 2) +
+        s(sat, k = 4, m = 2) +
+        s(balance_avg, k = 4, m = 2) +
         sandtotal_r + silttotal_r + awc_r +
         factor(state_year)
     )
@@ -390,7 +397,7 @@ share_analysis_gam <- function(ir_share_data, sat_seq, sandtotal_e, silttotal_e,
       family = binomial(link = "logit")
     )
 
-  share_pred_data_corn <-
+  share_hat_data <-
     CJ(
       sat = sat_seq,
       balance_avg = median(ir_share_data$balance_avg),
@@ -417,16 +424,20 @@ share_analysis_gam <- function(ir_share_data, sat_seq, sandtotal_e, silttotal_e,
     ir_share_hat_se = share_hat$se.fit
   )]
 
-  ggplot(share_hat_data) +
-    geom_line(aes(y = ir_share_hat, x = sat)) +
-    geom_ribbon(aes(
-      ymin = ir_share_hat - 1.96 * ir_share_hat_se,
-      ymax = ir_share_hat + 1.96 * ir_share_hat_se,
-      x = sat
-    ), alpha = 0.4)
+  base_ir_share <- share_hat_data[sat == sat_seq[length(sat_seq)], ir_share_hat]
+
+  share_hat_data[, dif_ir_share_hat := base_ir_share - ir_share_hat]
+
+  # ggplot(share_hat_data) +
+  #   geom_line(aes(y = ir_share_hat, x = sat)) +
+  #   geom_ribbon(aes(
+  #     ymin = ir_share_hat - 1.96 * ir_share_hat_se,
+  #     ymax = ir_share_hat + 1.96 * ir_share_hat_se,
+  #     x = sat
+  #   ), alpha = 0.4)
 
   return(
-    share_hat_data = share_hat_data[, .(sat, ir_share_hat)]
+    share_hat_data = share_hat_data[, .(sat, ir_share_hat, ir_share_hat_se, dif_ir_share_hat)]
   )
 }
 
@@ -635,40 +646,65 @@ yield_analysis_boot <- function(yield_data, balance_seq, sat_seq_eval, sat_break
   return(return_data[, .(balance, sat, sat_cat, sat_cat_text, sat_rank, y_hat, dif_y_hat)])
 }
 
-boot <- function(data, sc_base) {
-  sc_dry_ir <- paste0(sc_base, "_0")
-  sc_dry_ls <- data[sat_cat != "dryland", sc_dry] %>% unique()
-  sc_dry_len <- length(sc_dry_ls)
 
-  #++++++++++++++++++++++++++++++++++++
-  #+ Irrigated data
-  #++++++++++++++++++++++++++++++++++++
+boot <- function(data, sc_base) {
+
   #--- create temporary id ---#
   temp_data <- copy(data)[, row_id := 1:.N]
 
-  #--- sample sc_dry with replacement ---#
-  sc_dry_sampled <- sample(sc_dry_ls, sc_dry_len - 1, replace = TRUE)
+  #++++++++++++++++++++++++++++++++++++
+  #+ Irrigated data (sc that has at least ir records)
+  #++++++++++++++++++++++++++++++++++++
+  ir_sc_ls <-
+    data[sat_cat != "dryland", sc_dry] %>%
+    unique() %>%
+    gsub("_0", "", .)
 
-  #--- sc_dry - row_ids corresponsdence ---#
-  sc_dry_id <-
-    temp_data[sc_dry %in% sc_dry_sampled, .(sc_dry, row_id)] %>%
-    nest_by(sc_dry) %>%
+  ir_sc_len <- length(ir_sc_ls)
+
+  #--- sample sc_dry with replacement ---#
+  ir_sc_sampled <- sample(ir_sc_ls, ir_sc_len - 1, replace = TRUE)
+
+  #++++++++++++++++++++++++++++++++++++
+  #+ Dryland
+  #++++++++++++++++++++++++++++++++++++
+  dry_sc_ls <-
+    data[, .(any_ir = sum(ir == "ir")), by = sc_code] %>%
+    .[any_ir == 0, sc_code]
+
+  drs_sc_len <- length(dry_sc_ls)
+
+  dry_sc_sampled <- sample(dry_sc_ls, drs_sc_len, replace = TRUE)
+
+  #++++++++++++++++++++++++++++++++++++
+  #+ Extract observations
+  #++++++++++++++++++++++++++++++++++++
+  all_sc_sampled <- c(ir_sc_sampled, dry_sc_sampled)
+
+  #--- sc_dry - row_ids correspondence ---#
+  sc_id <-
+    temp_data[sc_code %in% all_sc_sampled, .(sc_code, row_id)] %>%
+    nest_by(sc_code) %>%
     data.table()
+
+  # temp_data[sc_dry_id$data[[1]]$row_id,]
 
   #--- which rows ---#
   row_id_ls <-
     data.table(
-      sc_dry = sc_dry_sampled
+      sc_code = all_sc_sampled
     ) %>%
-    sc_dry_id[., on = "sc_dry"] %>%
+    sc_id[., on = "sc_code"] %>%
     unnest(cols = c(data)) %>%
     .$row_id
 
   #--- get data and renew sc_dry ---#
-  ir_data <-
+  sampled_data <-
     temp_data[row_id_ls, ] %>%
     .[, row_num := rowid(row_id)] %>%
-    .[, sc_dry := paste0(sc_dry, "_", row_num)] %>%
+    #--- renew sc_code ---#
+    # this is necessary to do feols right (need to treat multiple instances of the same county separately)
+    .[, sc_code := paste0(sc_code, "_", row_num)] %>%
     .[, row_num := NULL] %>%
     .[, row_id := NULL]
 
@@ -677,10 +713,11 @@ boot <- function(data, sc_base) {
   #++++++++++++++++++++++++++++++++++++
   data_boot <-
     rbind(
-      ir_data,
-      data[sc_dry == sc_dry_ir, ],
-      data[sat_cat == "dryland", ]
+      sampled_data,
+      data[sc_code == sc_base, ],
+      fill = TRUE
     )
+
   return(data_boot)
 }
 
@@ -813,4 +850,344 @@ test_dif_in_yield <- function(balance_ls, base_q, comp_q, yield_semi_res, sat_te
     }
   ) %>%
     rbindlist()
+}
+
+# /*=================================================*/
+#' # Download and process gridMET data
+# /*=================================================*/
+
+get_grid_MET <- function(var_name, year) {
+  target_url <-
+    paste0(
+      "http://www.northwestknowledge.net/metdata/data/",
+      var_name, "_", year,
+      ".nc"
+    )
+
+  file_name <-
+    paste0(
+      "Data/data-raw/gridMET/",
+      var_name, "_", year,
+      ".nc"
+    )
+
+  if (!file.exists(file_name)) {
+    downloader::download(
+      url = target_url,
+      destfile = file_name,
+      mode = "wb"
+    )
+  }
+}
+
+# /*=================================================*/
+#' # Calculate ET0 from gridMET data
+# /*=================================================*/
+
+get_et0_county_year <- function(county, year) {
+  file_name <-
+    paste0(
+      "Data/data-processed/gMET-county/gMET-",
+      county$sc_code, "-", year,
+      ".rds"
+    )
+
+  if (!file.exists(file_name)) {
+    #--------------------------
+    # collect weather variables in a single data.table
+    #--------------------------
+    temp <-
+      lapply(
+        var_ls,
+        function(x) proess_gm_county(x, year, county)
+      ) %>%
+      rbindlist() %>%
+      dcast(
+        rowid + coverage_fraction + cell + x + y + date ~ var,
+        value.var = "value"
+      ) %>%
+      .[, Jday := as.numeric(date - min(date) + 1)] %>%
+      .[month(date) >= 4, ] %>%
+      .[month(date) <= 9, ] %>%
+      # === day length in second ===#
+      .[, dayl := geosphere::daylength(y, date) * 3600] %>%
+      setnames(
+        c("tmmx", "tmmn"),
+        c("tmax", "tmin"),
+      ) %>%
+      # === Kelvin to Celsius ===#
+      .[, `:=`(
+        tmin = tmin - 273.15,
+        tmax = tmax - 273.15
+      )]
+
+    #--------------------------
+    # get elevation data
+    #--------------------------
+    cells_loc <-
+      temp[, .(cell, x, y)] %>%
+      unique(by = "cell") %>%
+      st_as_sf(coords = c("x", "y")) %>%
+      st_set_crs(gmet_crs) %>%
+      st_transform(crs(elevation))
+
+    elev_data <-
+      terra::extract(elevation, vect(cells_loc)) %>%
+      cbind(cells_loc, .) %>%
+      data.table() %>%
+      .[, .(cell, elevation)]
+
+    county_year_data <- elev_data[temp, on = "cell"]
+
+    saveRDS(county_year_data, file_name)
+  } else {
+    county_year_data <- readRDS(file_name)
+  }
+
+  #--------------------------
+  # calculate et0
+  #--------------------------
+  #--- ASCE_PenmanMonteith global parameters ---#
+  # define constant
+  albedo <- 0.23 # Albedo for grass reference crop (Allen et al. 1998)
+  G <- 0 # Assume soil heat flux is negligible
+  sbc <- 4.903 * 10^(-9) # Stefan-Boltzmann constant (MJ/K^4/m2/day)
+  Gs <- 0.0820 # Solar constant (MJ/m2/min)
+  Cn <- 900 # Default for daily calculations for short-reference grass crop
+  Cd <- 0.34 # Default for daily calculations for short-reference grass crop
+
+  et0_data <-
+    county_year_data %>%
+    # Atmospheric pressure (kPa)
+    .[, AtmP := 101.3 * ((293 - 0.0065 * elevation) / 293)^5.26] %>%
+    # Psychometric constant (kPa/C)
+    .[, psy := 0.000665 * AtmP] %>%
+    # Convert latitude from degrees to radians
+    .[, LatRad := (pi / 180) * y] %>%
+    .[, Tmean := (tmax + tmin) / 2] %>%
+    # Saturation vapour pressure at maximum temperature
+    .[, e0max := 0.6108 * exp((17.27 * tmax) / (tmax + 237.3))] %>%
+    # Saturation vapour pressure at minimum temperature
+    .[, e0min := 0.6108 * exp((17.27 * tmin) / (tmin + 237.3))] %>%
+    # Saturation vapour pressure
+    .[, es := (e0max + e0min) / 2] %>%
+    # Actual vapour pressure
+    .[, ea := (e0min * rmax / 100 + e0max * rmin / 100) / 2] %>%
+    # solar radiation in the required unit
+    .[, Rs := (srad * dayl) / 1000000] %>%
+    # Slope of the saturation vapour pressure curve
+    .[, svp_slope := (4098 * (0.6108 * exp((17.27 * Tmean) / (Tmean + 237.3)))) / ((Tmean + 237.3)^2)] %>%
+    # Inverse relative distance Earth-Sun
+    .[, dr := 1 + 0.033 * cos(((2 * pi) / 365) * Jday)] %>%
+    # Solar decimation (rad)
+    .[, sd := 0.409 * sin(((2 * pi) / 365) * Jday - 1.39)] %>%
+    # Sunset hour angle (rad)
+    .[, ws := acos((-tan(LatRad)) * tan(sd))] %>%
+    # Extraterrestrial radiation (MJ/m^2/day)
+    .[, Ra := ((24 * 60) / pi) * Gs * dr * (ws * sin(LatRad) * sin(sd) + cos(LatRad) * cos(sd) * sin(ws))] %>%
+    # Net shortwave radiation (MJ/m^2/day)
+    .[, Rns := (1 - albedo) * Rs] %>%
+    # Clear-sky solar radiation (MJ/m^2/day)
+    .[, Rs0 := (0.75 + (0.00002 * elevation)) * Ra] %>%
+    # Cloudiness function
+    .[, temp_fcd := 1.35 * (Rs / Rs0) - 0.35] %>%
+    .[, fcd :=
+      ifelse(
+        temp_fcd > 1.0,
+        1.0,
+        ifelse(
+          temp_fcd < 0.05,
+          0.05,
+          temp_fcd
+        )
+      )] %>%
+    # Net longwave radiation (MJ/m^2/day)
+    .[, Rnl := sbc * fcd * (0.34 - 0.14 * sqrt(ea)) * (((tmax + 273.16)^4 + (tmin + 273.16)^4) / 2)] %>%
+    # Net radiation
+    .[, Rn := Rns - Rnl] %>%
+    # Calculate reference evapotranspiration
+    .[, et0 := ((0.408 * svp_slope * (Rn - G)) + psy * (Cn / (Tmean + 273)) * vs * (es - ea)) / (svp_slope + psy * (1 + Cd * vs))]
+
+  #--------------------------
+  # Summarize (daily)
+  #--------------------------
+  return_data <-
+    et0_data[, .(
+      tmin = sum(coverage_fraction * tmin) / sum(coverage_fraction),
+      tmax = sum(coverage_fraction * tmax) / sum(coverage_fraction),
+      prcp = sum(coverage_fraction * pr) / sum(coverage_fraction),
+      et0 = sum(coverage_fraction * et0) / sum(coverage_fraction)
+    ), by = date] %>%
+    .[, sc_code := county$sc_code]
+
+  return(return_data)
+}
+
+# /*=================================================*/
+#' # Extract gridMET data for all the counties
+# /*=================================================*/
+
+proess_gm_county <- function(var_name, year, county) {
+  file_name <-
+    paste0(
+      "Data/data-raw/gridMET/",
+      var_name, "_", year,
+      ".nc"
+    )
+
+  #--- read the raster data ---#
+  temp_rast <- rast(file_name)
+
+  #--------------------------
+  # download gridMEt data
+  #--------------------------
+  temp_data <-
+    #--- extract data for each county ---#
+    exact_extract(
+      temp_rast,
+      st_transform(county, crs(temp_rast)),
+      include_cell = TRUE,
+      include_xy = TRUE,
+    ) %>%
+    #--- list of data.frames into data.table ---#
+    rbindlist(idcol = "rowid") %>%
+    #--- wide to long ---#
+    melt(id.var = c("rowid", "coverage_fraction", "cell", "x", "y")) %>%
+    #--- remove observations with NA values ---#
+    .[!is.na(value), ] %>%
+    #--- get only the numeric part ---#
+    .[, variable := str_sub(variable, -5, -1) %>% as.numeric()] %>%
+    #--- recover dates ---#
+    .[, date := variable + ymd("1900-01-01")] %>%
+    .[, variable := NULL] %>%
+    .[, var := var_name]
+
+  return(temp_data)
+}
+
+#!===========================================================
+#! SSURGO data
+#!===========================================================
+get_ssurgo_props <- function(field, vars) {
+  # Get SSURGO mukeys for polygon intersection
+  download_try <-
+    soilDB::SDA_spatialQuery(
+      field,
+      what = "geom",
+      db = "SSURGO"
+    )
+
+  if ("try-error" %in% class(download_try)) {
+    #* county too large fot a single download
+    print("County too large. Breaking it into pieces and work on them separately.")
+
+    #--- create 9 grids that encompass the county ---#
+    grids <-
+      st_bbox(field) %>%
+      st_as_sfc() %>%
+      st_make_grid(n = c(3, 3))
+
+    #--- crop out the counties using the grids ---#
+    field_parts <-
+      st_intersection(grids, field) %>%
+      st_make_valid() %>%
+      st_as_sf()
+
+    #--- download ssurgo data ---#
+    ssurgo_geom <-
+      lapply(
+        1:nrow(field_parts),
+        \(x) {
+          print(paste0("working on ", x))
+          field_part_w <- field_parts[x, ]
+          download_try <-
+            soilDB::SDA_spatialQuery(
+              field_part_w,
+              what = "geom",
+              db = "SSURGO"
+            ) %>%
+            st_make_valid() %>%
+            st_intersection(field_part_w, .)
+        }
+      ) %>%
+      bind_rows() %>%
+      st_make_valid() %>%
+      dplyr::mutate(
+        area = as.numeric(st_area(.)),
+        area_weight = area / sum(area)
+      )
+
+    #--- summarize the data ---#
+    ssurgo_data_sum <- get_summarized_ssurgo(ssurgo_geom, vars)
+
+  } else { # if the county is not too large
+
+    ssurgo_geom <-
+      download_try %>%
+      st_make_valid() %>%
+      st_intersection(field, .) %>%
+      mutate(
+        area = as.numeric(st_area(.)),
+        area_weight = area / sum(area)
+      )
+
+    #--- summarize the data ---#
+    ssurgo_data_sum <- get_summarized_ssurgo(ssurgo_geom, vars)
+  }
+
+  ssurgo_data_sum[, sc_code := field$sc_code]
+  return(ssurgo_data_sum)
+}
+
+get_summarized_ssurgo <- function(ssurgo_geom, vars) {
+  #--- get soil properties for each mukey ---#
+  mukeydata <-
+    soilDB::get_SDA_property(
+      property = vars,
+      method = "Weighted Average",
+      mukeys = unique(ssurgo_geom$mukey),
+      top_depth = 0,
+      bottom_depth = 150
+    )
+  
+  #--- join with the ssurgo sf ---#
+  ssurgo_data <- left_join(ssurgo_geom, mukeydata, by = "mukey")
+
+  #--- summarize (area-weighted mean) ---#
+  ssurgo_data_sum <-
+    ssurgo_data %>%
+    data.table() %>%
+    .[,
+      lapply(.SD, function(x) weighted.mean(x, w = area_weight, na.rm = TRUE)),
+      .SDcols = vars
+    ] %>%
+    data.table()
+
+  return(ssurgo_data_sum)
+}
+
+#!===========================================================
+#! Quickstat
+#!===========================================================
+get_quickstat_data <- function(year, data_item) {
+  desc <-
+    tidyUSDA::allDataItem %>%
+    grep(pattern = data_item, ., value = TRUE)
+
+  temp_data <-
+    tidyUSDA::getQuickstat(
+      #--- replace API key with yours ---#
+      key = keyring::key_get("usda_nass_qs_api"),
+      program = "SURVEY",
+      data_item = desc,
+      geographic_level = "COUNTY",
+      state = all_states,
+      year = year,
+      geometry = FALSE
+    ) %>%
+    #--- keep only some of the variables ---#
+    dplyr::select(year, county_code, state_fips_code, short_desc, Value) %>%
+    rename("state_code" = "state_fips_code")
+
+  return(temp_data)
 }

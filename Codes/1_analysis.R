@@ -1,24 +1,24 @@
----
-title: "Regression Analysis and Prediction"
-author: "Taro Mieno"
----
-
-# Prepare data
-
-```{r}
+## ----------------------------------------------------------
 #--- read data ---#
 final_data <-
-  here("Shared/Data/ProcessedData/final_data.rds") %>%
+  here("Data/data-processed/final_data.rds") %>%
+  # here::here("../Shared/Data/ProcessedData/final_data.rds") %>%
   readRDS()
 
 #--- Data used for regression analysis ---#
 reg_data <-
   prepare_reg_data(
     data = final_data,
-    sat_thld_m = 9, # saturated thickness has to be at least 9 meters
-    ir_share_thld = 0.75, # at least 75% of total county area has to be overlapped with HPA
-    balance_thld = c(-1200, 200),
+    #--- saturated thickness has to be at least 9 meters ---#
+    sat_thld_m = 9,
+    #--- at least 75% of total county area has to be overlapped with HPA ---#
+    ir_share_thld = 0.75,
+    #--- drop obs with extreme balance ---#
+    balance_thld = c(-200, 1200),
+    #--- number of saturated thickness categories ---#
     sat_cat_num = 3,
+    #--- select states of focus ---#
+    # no observations are dropped with the current set of states
     state_ls =
       list(
         corn = c("CO", "KS", "NE", "NM", "SD", "TX", "WY"),
@@ -33,13 +33,18 @@ reg_data <-
 # ggplot(reg_data$data[[1]]) +
 #   geom_point(aes(y = acres_ratio, x = sat)) +
 #   geom_smooth(aes(y = acres_ratio, x = sat))
-```
 
-# Regression and prediciton
 
-## Yield
+## ----------------------------------------------------------
+# ir_share_data <- main_analysis$share_reg_data[[1]]
+# sat_seq <- main_analysis$sat_seq[[1]]
+# sandtotal_e <- main_analysis$sandtotal_med[[1]]
+# silttotal_e <- main_analysis$silttotal_med[[1]]
+# awc_e <- main_analysis$awc_med[[1]]
 
-```{r}
+# main_analysis$share_reg_data[[1]]
+# main_analysis$share_reg_data[[2]]
+
 main_analysis <-
   reg_data %>%
   rowwise() %>%
@@ -53,16 +58,15 @@ main_analysis <-
     )
   )) %>%
   dplyr::mutate(sat_seq_eval = list(
-    c(15, 45, 75, 105)
+    c(10, 40, 70, 100)
   )) %>%
   dplyr::mutate(share_reg_data = list(
     data %>%
-      .[, comp := sum(ir == "ir" | ir == "nir"), by = .(sc_code, year)] %>%
+      .[, comp := sum(ir == "nir" | ir == "ir"), by = .(sc_code, year)] %>%
       .[comp == 2, ] %>%
       .[, acres_ratio := acres / sum(acres), by = .(sc_code, year)] %>%
       .[ir == "ir" & ir_area_ratio >= 0.75, ] %>%
       .[, balance_avg := mean(balance), by = sc_code]
-      
   )) %>%
   #--- the same sequence used for all the bootstrap iterations ---#
   dplyr::mutate(sat_seq = list(
@@ -106,30 +110,26 @@ main_analysis <-
       rbindlist()
   )) %>%
   dplyr::mutate(share_pred_data = list(
-    share_analysis(share_reg_data, sat_seq, sandtotal_med, silttotal_med, awc_med)
+    share_analysis_gam(
+      share_reg_data,
+      sat_seq,
+      sandtotal_med,
+      silttotal_med,
+      awc_med
+    )
   )) %>%
   dplyr::mutate(avg_yield_pred_data = list(
     get_average_yield(yield_pred_data, share_pred_data)
   ))
 
-saveRDS(main_analysis, "Shared/Results/main_analysis.rds")
-```
+saveRDS(main_analysis, "Results/main_analysis.rds")
 
-```{r}
+
+## ----------------------------------------------------------
 #++++++++++++++++++++++++++++++++++++
 #+ Bootstrap
 #++++++++++++++++++++++++++++++++++++
 set.seed(383954)
-
-# data <- main_analysis$data[[1]]
-
-# temp <- 
-#   data_boot %>%
-#   .[, comp := sum(ir == "ir" | ir == "nir"), by = .(sc_code, year)] %>%
-#   .[comp == 2, ] %>%
-#   .[, acres_ratio := acres / sum(acres), by = .(sc_code, year)] %>%
-#   .[ir == "ir" & ir_area_ratio >= 0.75, ] %>%
-#   .[, balance_avg := mean(balance), by = sc_code]
 
 all_results <-
   main_analysis %>%
@@ -158,7 +158,7 @@ all_results <-
         #--- share analysis ---#
         share_boot_data <-
           boot_data %>%
-          .[, comp := sum(ir == "ir" | ir == "nir"), by = .(sc_code, year)] %>%
+          .[, comp := sum(ir == "nir" | ir == "ir"), by = .(sc_code, year)] %>%
           .[comp == 2, ] %>%
           .[, acres_ratio := acres / sum(acres), by = .(sc_code, year)] %>%
           .[ir == "ir" & ir_area_ratio >= 0.75, ] %>%
@@ -177,8 +177,7 @@ all_results <-
 
         return(list(share_pred_data = share_pred_data, avg_yield_pred_data = avg_yield_pred_data))
       },
-      mc.cores = parallel::detectCores() - 2,
-      mc.preschedule = FALSE
+      mc.cores = parallel::detectCores() - 2
     )
   )) %>%
   dplyr::mutate(
@@ -227,6 +226,5 @@ all_results <-
     avg_yield_sum
   )
 
-saveRDS(all_results, "Shared/Results/all_results.rds")
-```
+saveRDS(all_results, "Results/all_results.rds")
 

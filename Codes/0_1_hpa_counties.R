@@ -1,34 +1,13 @@
----
-title: "Prepare base-county data"
-author: "Taro Mieno"
-output:
-  html_document:
-    number_sections: yes
-    theme: flatly
-    highlight: zenburn
-    toc_float: yes
-    toc: yes
-    toc_depth: 3
-geometry: margin=1in
----
-
-# Identify counties the overlaps with the HPA boundary
-## Read the HPA border shapefile
-
-```{r Read-HPA, cache = TRUE}
+## ----Read-HPA, cache = TRUE-------------------------------------
 hpa <- st_read(here("Data/data-raw/hp_bound2010.shp"))
-```
 
-Map-of-HPA
 
-```{r, eval = FALSE}
-tm_shape(st_simplify(hpa)) +
-  tm_polygons()
-```
+## ---- eval = FALSE----------------------------------------------
+## tm_shape(st_simplify(hpa)) +
+##   tm_polygons()
 
-## Get all the US counties as an sf
 
-```{r Get-US-counties}
+## ----Get-US-counties--------------------------------------------
 (
   US_county <- tigris::counties(cb = TRUE) %>%
     st_as_sf() %>%
@@ -36,39 +15,30 @@ tm_shape(st_simplify(hpa)) +
     rename("state_code" = "STATEFP", "county_code" = "COUNTYFP") %>%
     dplyr::select(state_code, county_code)
 )
-```
 
-## Identify counties that overlaps with `hpa`
 
-```{r Identify-overlap, cache = TRUE}
+## ----Identify-overlap, cache = TRUE-----------------------------
 hpa_counties <- US_county[hpa, ] %>%
   mutate(whole_area = st_area(.) %>% as.numeric())
-```
 
-Map-of-HPA and the intersecting counties
 
-```{r eval = FALSE}
-tm_shape(st_simplify(hpa)) +
-  tm_polygons() +
-  tm_shape(hpa_counties) +
-  tm_polygons(col = "blue", alpha = 0.4)
-```
+## ----eval = FALSE-----------------------------------------------
+## tm_shape(st_simplify(hpa)) +
+##   tm_polygons() +
+##   tm_shape(hpa_counties) +
+##   tm_polygons(col = "blue", alpha = 0.4)
 
-## Find the area of the portion that is intersecting with hpa
-Intersect HPA and counties in HPA 
 
-```{r intersect-HPA-county}
+## ----intersect-HPA-county---------------------------------------
 intersected_portion <-
   st_intersection(hpa, hpa_counties) %>%
   # === get the intersecting area ===#
   mutate(area = st_area(.) %>% as.numeric()) %>%
   data.table() %>%
   .[, .(interesected_area = sum(area)), by = .(state_code, county_code)]
-```
 
-Merge the intersection data
 
-```{r }
+## ---------------------------------------------------------------
 hpa_counties <-
   left_join(
     hpa_counties,
@@ -79,26 +49,17 @@ hpa_counties <-
   mutate(ir_area_ratio = interesected_area / whole_area) %>%
   data.table() %>%
   .[, geometry := NULL]
-```
 
-Histogram of coverage ratio
 
-```{r eval = FALSE}
-hpa_counties$ir_area_ratio %>% hist()
-```
+## ----eval = FALSE-----------------------------------------------
+## hpa_counties$ir_area_ratio %>% hist()
 
-Get the list of the states
 
-```{r }
+## ---------------------------------------------------------------
 hpa_states <- hpa_counties$state_code %>% unique()
-```
 
-# Additional counties 
-Additional state codes:
-these supplement the dryland production data for understanding the impact of drought severity
-on dryland crop production
 
-```{r }
+## ---------------------------------------------------------------
 data(fips_codes)
 
 additional_states <-
@@ -109,21 +70,16 @@ additional_states <-
   .[, state_code]
 
 all_states <- c(hpa_states, additional_states)
-```
 
-# All counties
-**Get the state abbreviation names**
 
-```{r }
+## ---------------------------------------------------------------
 fips_codes <-
   fips_codes %>%
   data.table() %>%
   .[, .(state, state_code, state_name, county_code)]
-```
 
-Get all the counties in the target states 
 
-```{r }
+## ---------------------------------------------------------------
 (
   all_counties <-
     dplyr::filter(US_county, state_code %in% all_states) %>%
@@ -140,24 +96,18 @@ Get all the counties in the target states
     # === keep only the relevant variables ===#
     .[, .(state, state_name, sc_code, ir_area_ratio, geometry, in_hpa)]
 )
-```
 
-Map of all the counties: 
-Note: not all the counties are used in our eventual analysis
 
-```{r map-all-counties, eval = FALSE}
-tm_shape(st_as_sf(all_counties)) +
-  tm_polygons() +
-  tm_shape(
-    tigris::states() %>%
-      filter(STATEFP %in% all_states)
-  ) +
-  tm_borders(col = "red")
-```
+## ----map-all-counties, eval = FALSE-----------------------------
+## tm_shape(st_as_sf(all_counties)) +
+##   tm_polygons() +
+##   tm_shape(
+##     tigris::states() %>%
+##       filter(STATEFP %in% all_states)
+##   ) +
+##   tm_borders(col = "red")
 
-# save the county data
 
-```{r }
+## ---------------------------------------------------------------
 saveRDS(all_counties, here("Data/data-processed/base_counties.rds"))
-```
 

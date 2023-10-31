@@ -22,6 +22,9 @@
 *.zip
 *.Rhistory
 *.docx
-
+data.md
+Data/*
+Results/*
+Shared/*
 
 

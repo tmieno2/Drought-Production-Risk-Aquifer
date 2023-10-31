@@ -1,5 +1,5 @@
 ---
-title: "Assign saturated thickness value "
+title: "Assign saturated thickness values"
 author: "Taro Mieno"
 output:
   html_document:
@@ -12,40 +12,22 @@ output:
 geometry: margin=1in
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(
-  echo = TRUE,
-  cache = FALSE,
-  comment = NA,
-  message = FALSE,
-  warning = FALSE,
-  tidy = FALSE,
-  cache.lazy = FALSE,
-  #--- figure ---#
-  dpi=400,
-  fig.width=7.5,
-  fig.height=5,
-  out.width="750px",
-  out.height="500px"
-)
-```
-
 # Preparation
 Import saturated thickness data
 
 ```{r }
-sat_temp <- raster("/Volumes/Elements/Database/SaturatedThickness/SatThick_19851.tif")
+sat_temp <- raster("Data/data-raw/saturated_thickness/SatThick_19851.tif")
 ```
 
 HPA counties
 
 ```{r }
-hpa_counties <- 
-  here("Shared/Data/ProcessedData/base_counties.rds") %>% 
-  readRDS() %>% 
-  .[in_hpa == 1, ] %>% 
-  st_as_sf() %>% 
-  st_transform(projection(sat_temp)) 
+hpa_counties <-
+  here("Data/data-processed/base_counties.rds") %>%
+  readRDS() %>%
+  .[in_hpa == 1, ] %>%
+  st_as_sf() %>%
+  st_transform(projection(sat_temp))
 ```
 
 Define function to extract saturated thickness for each county
@@ -53,14 +35,14 @@ Define function to extract saturated thickness for each county
 ```{r }
 get_sat <- function(y) {
   # y <- 2000
-  sat_temp <- 
-    paste0("/Volumes/Elements/Database/SaturatedThickness/SatThick_", y, "1.tif") %>% 
+  sat_temp <-
+    paste0("Data/data-raw/saturated_thickness/SatThick_", y, "1.tif") %>%
     raster()
 
-  sat_mean <- 
+  sat_mean <-
     exact_extract(sat_temp, hpa_counties, "mean")
 
-  data_return <- 
+  data_return <-
     data.table(
       sat = sat_mean,
       sc_code = hpa_counties$sc_code,
@@ -74,37 +56,15 @@ get_sat <- function(y) {
 Extract saturated thickness values (parallelized)
 
 ```{r extract-sat, eval = F}
-sat_all <- mclapply(1985:2016, get_sat, mc.cores = 12) %>%
+sat_all <-
+  mclapply(1985:2016, get_sat, mc.cores = 12) %>%
   rbindlist() %>%
-  .[sat < 0, sat := 0] %>% 
-  .[, sat := sat * 3.28084] # meter to feet
+  .[sat < 0, sat := 0]
 ```
 
 # Save the data
 
 ```{r save, eval = F}
-saveRDS(sat_all, here("Shared/Data/ProcessedData/sat_all.rds"))
-```
-
-# Quick visualization
-
-```{r }
-sat_all <- 
-  here("Shared/Data/ProcessedData/sat_all.rds") %>% 
-  readRDS()
-```
-
-Saturate thickness history by county
-
-```{r }
-ggplot(sat_all) +
-  geom_line(aes(y = sat, x = year, group = sc_code))
-```
-
-Histogram 
-
-```{r }
-ggplot(sat_all) +
-  geom_histogram(aes(x = sat))
+saveRDS(sat_all, here("Data/data-processed/sat_all.rds"))
 ```
 

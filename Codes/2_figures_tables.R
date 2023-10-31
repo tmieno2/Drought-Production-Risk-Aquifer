@@ -1,21 +1,11 @@
----
-title: "Create Figures and Tables"
-author: "Taro Mieno"
----
-
-# Preparation
-
-## Load the data and results 
-
-```{r}
+## ---------------------------------------------------------------
 all_results <- readRDS("Results/all_results.rds")
 
 data_corn <- all_results[crop == "corn", data][[1]]
 data_soy <- all_results[crop == "soy", data][[1]]
-```
 
-## Set themes
-```{r}
+
+## ---------------------------------------------------------------
 theme_fig <-
   theme_bw() +
   theme(
@@ -61,13 +51,9 @@ theme_fig <-
     panel.background = element_blank(),
     panel.border = element_rect(fill = NA)
   )
-```
 
-# Summary statistics
 
-## Boxplot of water deficit by year
-
-```{r}
+## ---------------------------------------------------------------
 wd_data <-
   rbind(data_corn[year <= 2016, ], data_soy[year <= 2016, ]) %>%
   .[, .(wd = mean(balance)), by = .(year, crop)] %>%
@@ -201,11 +187,9 @@ ggsave(
   height = 6,
   width = 6
 )
-```
 
-## Saturated Thickness Map
 
-```{r echo = F}
+## ----echo = F---------------------------------------------------
 # === hpa ===#
 hpa_simplified <-
   # here("../Shared/Data/ProcessedData/hp_simplified.shp") %>%
@@ -331,11 +315,9 @@ g_soy <-
 g_map <- g_corn | g_soy
 
 ggsave(file = "Results/Figures/g_map.pdf", g_map, height = 7, width = 6)
-```
 
-# Yield response to water deficit by saturated thickness level (intensive margin) 
 
-```{r}
+## ---------------------------------------------------------------
 # all_results <-  data.table(all_results)
 
 plot_yield_data <-
@@ -521,11 +503,9 @@ g_yield_with_conf <-
 
 ggsave("Results/Figures/g_yield_with_conf_corn.pdf", g_yield_with_conf[crop == "corn", g_fig][[1]], width = 6, height = 3.5)
 ggsave("Results/Figures/g_yield_with_conf_soy.pdf", g_yield_with_conf[crop == "soy", g_fig][[1]], width = 6, height = 3.5)
-```
 
-# The impact of saturated thickness on the share of irrigated production
 
-```{r}
+## ---------------------------------------------------------------
 #++++++++++++++++++++++++++++++++++++
 #+ Share response
 #++++++++++++++++++++++++++++++++++++
@@ -608,11 +588,9 @@ ggsave(
   height = 6,
   width = 6
 )
-```
 
-# Difference in the share of irrigated production (from 100)
 
-```{r}
+## ---------------------------------------------------------------
 plot_data_ir_share <-
   all_results[, .(crop, share_sum)] %>%
   unnest(cols = share_sum) %>%
@@ -652,11 +630,9 @@ ggsave(
   height = 4,
   width = 6
 )
-```
 
-# Total impact of a decline in saturated thickness on average yield
 
-```{r}
+## ---------------------------------------------------------------
 g_total_both <-
   all_results[, .(crop, avg_yield_sum)] %>%
   unnest() %>%
@@ -739,12 +715,9 @@ ggsave(
   height = 6,
   width = 6
 )
-```
 
 
-# Test the significance of the difference in irrigated yield between the aquifer thickness categories
-
-```{r}
+## ---------------------------------------------------------------
 g_dif <-
   all_results[, .(crop, yield_dif_test, sat_text_data)] %>%
   rowwise() %>%
@@ -810,11 +783,9 @@ g_ir_yield_dif <-
   )
 
 cowplot::ggsave2("Results/Figures/g_ir_yield_dif.pdf", g_ir_yield_dif, width = 6, height = 5)
-```
 
-# Testing of the significance of yield difference (average total impact)
 
-```{r}
+## ---------------------------------------------------------------
 g_avg_yield_dif <-
   all_results[, .(crop, avg_yield_sum)] %>%
   unnest(cols = c(avg_yield_sum)) %>%
@@ -861,11 +832,9 @@ g_ay_soy <-
 g_ay <- g_ay_corn / g_ay_soy
 
 ggsave("Results/Figures/g_avg_yield_dif.pdf", g_ay, width = 6, height = 5)
-```
 
-# The impact of water deficit on average yield by aquifer thickness category with confidence interval
 
-```{r}
+## ---------------------------------------------------------------
 g_ay_response <-
   all_results[, .(crop, avg_yield_sum)] %>%
   unnest(cols = c(avg_yield_sum)) %>%
@@ -908,5 +877,4 @@ g_ay_response_soy <-
 g_ay_response <- g_ay_response_corn / g_ay_response_soy
 
 ggsave("Results/Figures/g_avg_yield.pdf", g_ay_response, width = 6, height = 3.5)
-```
 

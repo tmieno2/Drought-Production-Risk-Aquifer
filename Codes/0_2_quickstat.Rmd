@@ -1,52 +1,20 @@
 ---
-title: "Get crop yield and acreage data: Corn and Soybeans"
+title: "Get crop yield and acreage data from USDA-NASS: Corn and Soybeans"
 ---
 
 # Preparation
-Read the counties data 
 
 ```{r }
-base_counties <- readRDS(here("Shared/Data/ProcessedData/base_counties.rds"))
-```
+#--- load the counties ---#
+base_counties <- readRDS(here("Data/data-processed/base_counties.rds"))
 
-Get the list of states
-
-```{r }
+#--- get the list of states ---#
 all_states <-
   base_counties$state_name %>%
   unique() %>%
   toupper()
-```
 
-Define a function to get QuickStat data
-
-```{r }
-get_quickstat_data <- function(year, data_item) {
-  desc <-
-    tidyUSDA::allDataItem %>%
-    grep(pattern = data_item, ., value = TRUE)
-
-  temp_data <-
-    tidyUSDA::getQuickstat(
-      key = key_get("usda_nass_qs_api"),
-      program = "SURVEY",
-      data_item = desc,
-      geographic_level = "COUNTY",
-      state = all_states,
-      year = year,
-      geometry = FALSE
-    ) %>%
-    #--- keep only some of the variables ---#
-    dplyr::select(year, county_code, state_fips_code, short_desc, Value) %>%
-    rename("state_code" = "state_fips_code")
-
-  return(temp_data)
-}
-```
-
-List of items to download
-
-```{r }
+#--- list of items to download ---#
 item_list <-
   c(
     "CORN, GRAIN, IRRIGATED - YIELD, MEASURED IN BU / ACRE",
@@ -59,22 +27,7 @@ item_list <-
     "SOYBEANS, NON-IRRIGATED - ACRES HARVESTED"
   )
 
-# tidyUSDA::allDataItem %>%
-#     grep(pattern = "PLANTED", ., value = TRUE) %>%
-#     grep(pattern = "SOYBEANS", ., value = TRUE) %>%
-#     grep(pattern = "IRRIGATED", ., value = TRUE)
-
-# for (i in 1:length(item_list)) {
-#   desc <-
-#     tidyUSDA::allDataItem %>%
-#     grep(pattern = data_item, ., value = TRUE)
-#   print(desc)
-# }
-```
-
-List of year-item combinations
-
-```{r }
+#--- list of year-item combinations ---#
 par_list <-
   data.table::CJ(
     data_item = item_list,
@@ -100,8 +53,8 @@ nass_data <-
     }
   )
 
-# === save the data ===#
-saveRDS(nass_data, here("Shared/Data/RawData/nass_data_raw.rds"))
+#--- save the data ---#
+saveRDS(nass_data, here("Data/data-raw/nass_data_raw.rds"))
 ```
 
 # Process the nass-data
@@ -109,7 +62,7 @@ saveRDS(nass_data, here("Shared/Data/RawData/nass_data_raw.rds"))
 ```{r process-nass-data}
 (
   nass_data_wide <-
-    here("Shared/Data/RawData/nass_data_raw.rds") %>%
+    here("Data/data-raw/nass_data_raw.rds") %>%
     readRDS() %>%
     # === drop observations with county_code == 998 ===#
     .[county_code != 998, ] %>%
@@ -146,20 +99,9 @@ saveRDS(nass_data, here("Shared/Data/RawData/nass_data_raw.rds"))
 )
 ```
 
-Quick Summary
-
-```{r }
-library(modelsummary)
-datasummary(
-  crop * ir * (Mean + SD)
-  ~ acres + yield,
-  data = nass_data_wide
-)
-```
-
 # Save the data
 
 ```{r eval = F}
-saveRDS(nass_data_wide, here("Shared/Data/ProcessedData/nass_data.rds"))
+saveRDS(nass_data_wide, here("Data/data-processed/nass_data.rds"))
 ```
 

@@ -1,0 +1,30 @@
+# Data Preparation
+
+```{r}
+knitr::purl(here("Codes/0_1_hpa_counties.Rmd"), here("Codes/0_1_hpa_counties.R"))
+knitr::purl(here("Codes/0_2_quickstat.Rmd"), here("Codes/0_2_quickstat.R"))
+knitr::purl(here("Codes/0_3_get_sat.Rmd"), here("Codes/0_3_get_sat.R"))
+knitr::purl(here("Codes/0_4_get_weather.Rmd"), here("Codes/0_4_get_weather.R"))
+knitr::purl(here("Codes/0_5_ssurgo.Rmd"), here("Codes/0_5_ssurgo.R"))
+knitr::purl(here("Codes/0_6_merge_datasets.Rmd"), here("Codes/0_6_merge_datasets.R"))
+```
+
+# Analysis
+
+```{r}
+knitr::purl(here("Codes/1_analysis.Rmd"), here("Codes/1_analysis.R"))
+source(here("Codes/1_analysis.R"))
+```
+
+# Create figures
+
+```{r}
+knitr::purl(here("Codes/2_figures_tables.Rmd"), here("Codes/2_figures_tables.R"))
+source(here("Codes/2_figures_tables.R"))
+```
+
+
+
+
+
+

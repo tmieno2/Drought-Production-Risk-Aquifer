@@ -8,7 +8,7 @@ author: "Taro Mieno"
 ```{r}
 #--- read data ---#
 final_data <-
-  here("Shared/Data/ProcessedData/final_data.rds") %>%
+  here("Data/data-processed/final_data.rds") %>%
   # here::here("../Shared/Data/ProcessedData/final_data.rds") %>%
   readRDS()
 
@@ -21,7 +21,7 @@ reg_data <-
     #--- at least 75% of total county area has to be overlapped with HPA ---#
     ir_share_thld = 0.75,
     #--- drop obs with extreme balance ---#
-    balance_thld = c(-1200, 200),
+    balance_thld = c(-200, 1200),
     #--- number of saturated thickness categories ---#
     sat_cat_num = 3,
     #--- select states of focus ---#
@@ -133,7 +133,7 @@ main_analysis <-
     get_average_yield(yield_pred_data, share_pred_data)
   ))
 
-saveRDS(main_analysis, "Shared/Results/main_analysis.rds")
+saveRDS(main_analysis, "Results/main_analysis.rds")
 ```
 
 ```{r}
@@ -237,6 +237,6 @@ all_results <-
     avg_yield_sum
   )
 
-saveRDS(all_results, "Shared/Results/all_results.rds")
+saveRDS(all_results, "Results/all_results.rds")
 ```
 
