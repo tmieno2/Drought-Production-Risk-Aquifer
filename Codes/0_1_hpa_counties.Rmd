@@ -54,7 +54,7 @@ tm_shape(st_simplify(hpa)) +
   tm_polygons(col = "blue", alpha = 0.4)
 ```
 
-## Find the area of the portion that is intersecting with hpa
+## Find the area of the portion that is intersecting with `hpa`
 Intersect HPA and counties in HPA 
 
 ```{r intersect-HPA-county}

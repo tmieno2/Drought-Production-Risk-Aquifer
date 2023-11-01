@@ -11,6 +11,7 @@
 /Figures/*
 .Rproj.user/*
 .Rproj.user
+.Rhistory
 # *.pdf
 *.log
 *.gz

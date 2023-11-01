@@ -64,6 +64,17 @@ knitr::purl(here("Codes/2_figures_tables.Rmd"), here("Codes/2_figures_tables.R")
 source(here("Codes/2_figures_tables.R"))
 ```
 
+# Appendix
+
+```{r}
+knitr::purl(here("Codes/A_1_state_fe.Rmd"), here("Codes/A_1_state_fe.R"))
+source(here("Codes/A_1_state_fe.R"))
+```
+
+```{r}
+knitr::purl(here("Codes/A_2_spline.Rmd"), here("Codes/A_2_spline.R"))
+source(here("Codes/A_2_spline.R"))
+```
 
 
 

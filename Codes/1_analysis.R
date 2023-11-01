@@ -1,8 +1,7 @@
-## ----------------------------------------------------------
+## ---------------------------------------------------------------
 #--- read data ---#
 final_data <-
   here("Data/data-processed/final_data.rds") %>%
-  # here::here("../Shared/Data/ProcessedData/final_data.rds") %>%
   readRDS()
 
 #--- Data used for regression analysis ---#
@@ -28,23 +27,8 @@ reg_data <-
   data.table() %>%
   setnames("crop_type", "crop")
 
-# saveRDS(reg_data, file = here::here("Shared/Data/reg_data.rds"))
 
-# ggplot(reg_data$data[[1]]) +
-#   geom_point(aes(y = acres_ratio, x = sat)) +
-#   geom_smooth(aes(y = acres_ratio, x = sat))
-
-
-## ----------------------------------------------------------
-# ir_share_data <- main_analysis$share_reg_data[[1]]
-# sat_seq <- main_analysis$sat_seq[[1]]
-# sandtotal_e <- main_analysis$sandtotal_med[[1]]
-# silttotal_e <- main_analysis$silttotal_med[[1]]
-# awc_e <- main_analysis$awc_med[[1]]
-
-# main_analysis$share_reg_data[[1]]
-# main_analysis$share_reg_data[[2]]
-
+## ---------------------------------------------------------------
 main_analysis <-
   reg_data %>%
   rowwise() %>%
@@ -66,7 +50,8 @@ main_analysis <-
       .[comp == 2, ] %>%
       .[, acres_ratio := acres / sum(acres), by = .(sc_code, year)] %>%
       .[ir == "ir" & ir_area_ratio >= 0.75, ] %>%
-      .[, balance_avg := mean(balance), by = sc_code]
+      .[, balance_avg := mean(balance), by = sc_code] %>%
+      .[sat < 180, ]
   )) %>%
   #--- the same sequence used for all the bootstrap iterations ---#
   dplyr::mutate(sat_seq = list(
@@ -125,10 +110,7 @@ main_analysis <-
 saveRDS(main_analysis, "Results/main_analysis.rds")
 
 
-## ----------------------------------------------------------
-#++++++++++++++++++++++++++++++++++++
-#+ Bootstrap
-#++++++++++++++++++++++++++++++++++++
+## ---------------------------------------------------------------
 set.seed(383954)
 
 all_results <-
@@ -162,7 +144,8 @@ all_results <-
           .[comp == 2, ] %>%
           .[, acres_ratio := acres / sum(acres), by = .(sc_code, year)] %>%
           .[ir == "ir" & ir_area_ratio >= 0.75, ] %>%
-          .[, balance_avg := mean(balance), by = sc_code]
+          .[, balance_avg := mean(balance), by = sc_code] %>%
+          .[sat < 180, ]
 
         share_pred_data <-
           share_analysis_boot(
@@ -219,6 +202,7 @@ all_results <-
     crop, data, sat_seq, sat_text_data,
     yield_pred_data,
     yield_dif_test,
+    share_reg_data,
     share_pred_data,
     share_sum,
     avg_yield_pred_data,

@@ -205,42 +205,60 @@ ggsave(
 
 ## Saturated Thickness Map
 
-```{r echo = F}
-# === hpa ===#
+Though not necessary, save the counties and states data so that you do not have to waste time downloading them every time you run this code.
+
+```{r, eval = FALSE}
+all_counties <-
+  tigris::counties() %>%
+  st_simplify(dTolerance = 100) %>%
+  rename(
+    state_code = STATEFP,
+    county_code = COUNTYFP,
+    county_name = NAME
+  ) %>%
+  left_join(., fips_codes, by = c("state_code", "county_code")) %>%
+  dplyr::select(state_code, state, county_code, county_name) %>%
+  mutate(sc_code = paste0(state_code, county_code)) %>%
+  data.table()
+
+saveRDS(all_counties, "Data/data-processed/counties.rds")
+
+all_states <-
+  tigris::states() %>%
+  rename(state_code = STATEFP) %>%
+  left_join(
+    .,
+    unique(data.table(fips_codes), by = "state"),
+    by = "state_code"
+  )
+
+saveRDS(all_states, "Data/data-processed/states.rds")
+```
+
+Simplify HPA boundary to make the figure light-weight for mapping:
+
+```{r}
 hpa_simplified <-
-  # here("../Shared/Data/ProcessedData/hp_simplified.shp") %>%
-  here("Shared/Data/ProcessedData/hp_simplified.shp") %>%
+  here("Data/data-raw/hp_bound2010.shp") %>%
+  st_read() %>%
+  st_simplify(dTolerance = 1000)
+
+saveRDS(hpa_simplified, here("Data/data-processed/hpa_simplified.shp"))
+```
+
+```{r}
+#--- hpa ---#
+hpa_simplified <-
+  here("Data/data-processed/hpa_simplified.shp") %>%
   readRDS()
 
+#--- fips code ---#
 data(fips_codes, package = "tidycensus")
 
-# all_counties <-
-#   tigris::counties() %>%
-#   st_simplify(dTolerance = 100) %>%
-#   rename(
-#     state_code = STATEFP,
-#     county_code = COUNTYFP,
-#     county_name = NAME
-#   ) %>%
-#   left_join(., fips_codes, by = c("state_code", "county_code")) %>%
-#   dplyr::select(state_code, state, county_code, county_name) %>%
-#   mutate(sc_code = paste0(state_code, county_code)) %>%
-#   data.table()
-# saveRDS(all_counties, "Shared/Data/counties.rds")
-
+#--- all relevant counties ---#
 all_counties <- readRDS("Shared/Data/counties.rds")
 
-# all_states <-
-#   tigris::states() %>%
-#   rename(state_code = STATEFP) %>%
-#   left_join(
-#     .,
-#     unique(data.table(fips_codes), by = "state"),
-#     by = "state_code"
-#   )
-
-# saveRDS(all_states, "Shared/Data/states.rds")
-
+#--- all relevant states ---#
 all_states <- readRDS("Shared/Data/states.rds")
 
 states_of_interest <-
@@ -251,7 +269,6 @@ counties_corn_all <-
   all_counties[sc_code %in% unique(data_corn$sc_code), ] %>%
   mutate(type = "Corn") %>%
   st_as_sf()
-
 
 counties_corn_ir <-
   copy(data_corn) %>%
@@ -456,22 +473,6 @@ g_yield_response <-
     align = "v",
     rel_heights = c(0.18 / 2, 0.69 / 2, 0.18 / 2, 0.95 / 2)
   )
-
-# g_yield_response <-
-#   cowplot::plot_grid(
-#     g_wd_corn, g_ir_yield_corn,
-#     ncol = 1,
-#     align = "v",
-#     rel_heights = c(0.15, 0.72)
-#   )
-
-# g_yield_response_soy <-
-#   cowplot::plot_grid(
-#     g_wd_soy, g_ir_yield_soy,
-#     ncol = 1,
-#     align = "v",
-#     rel_heights = c(0.15, 0.72)
-#   )
 
 cowplot::ggsave2("Results/Figures/g_yield_intensive.pdf", g_yield_response, width = 6, height = 6)
 

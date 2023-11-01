@@ -1,0 +1,170 @@
+In the main regresion analysis in the manuscript, state FEs are included. County FEs are not included as it eliminates too much of the variation in aquifer thickness. This appendix compares the impact of aquifer thickness on irrigated share with and without State FEs.
+
+# Regression with and without state fixed effects
+
+```{r}
+all_results <- readRDS(here::here("Results/all_results.rds"))
+```
+
+```{r}
+#++++++++++++++++++++++++++++++++++++
+#+ Formula
+#++++++++++++++++++++++++++++++++++++
+formula_text <- "acres_ratio ~
+    s(sat, k = 4, m = 2) + s(balance_avg, k = 4, m = 2) +
+    sandtotal_r + silttotal_r + awc_r +
+    factor(year)"
+
+share_formula_yfe <- formula(formula_text)
+
+share_formula_sandyfe <-
+  formula_text %>%
+  gsub("factor\\(year\\)", "factor\\(year\\) + factor\\(state_name\\)", .) %>%
+  formula()
+
+share_formula_syfe <-
+  formula_text %>%
+  gsub("factor\\(year\\)", "factor\\(state_year\\)", .) %>%
+  formula()
+
+formula_data <-
+  data.table(
+    formula = c(share_formula_yfe, share_formula_sandyfe, share_formula_syfe),
+    type = c("Year FE", "State and Year FE", "State-Year FE")
+  )
+
+results <-
+  all_results[, .(crop, data)] %>%
+  expand_grid_df(., formula_data) %>%
+  rowwise() %>%
+  dplyr::mutate(ir_share_data = list(
+    data %>%
+      .[, comp := sum(ir == "nir" | ir == "ir"), by = .(sc_code, year)] %>%
+      .[comp == 2, ] %>%
+      .[, acres_ratio := acres / sum(acres), by = .(sc_code, year)] %>%
+      .[ir == "ir" & ir_area_ratio >= 0.75, ] %>%
+      .[, balance_avg := mean(balance), by = sc_code] %>%
+      .[sat < 180, ]
+  )) %>%
+  dplyr::mutate(ir_share_res = list(
+    gam(
+      formula,
+      data = ir_share_data,
+      family = binomial
+    )
+  )) %>%
+  dplyr::mutate(share_pred_data = list(
+    CJ(
+      sat = seq(
+        min(ir_share_data$sat),
+        max(ir_share_data$sat),
+        length = 100
+      ),
+      balance_avg = mean(ir_share_data$balance_avg),
+      awc_r = mean(ir_share_data$awc_r),
+      sandtotal_r = mean(ir_share_data$sandtotal_r),
+      silttotal_r = mean(ir_share_data$silttotal_r),
+      state_year = "Nebraska_2009",
+      state_name = "Nebraska",
+      year = 2009
+    )
+  )) %>%
+  dplyr::mutate(ir_share_hat_data = list(
+    predict(
+      ir_share_res,
+      newdata = share_pred_data,
+      type = "response",
+      se.fit = TRUE
+    )
+  )) %>%
+  dplyr::mutate(share_pred_data = list(
+    dplyr::mutate(
+      share_pred_data,
+      ir_share_hat = ir_share_hat_data$fit,
+      ir_share_hat_se = ir_share_hat_data$se.fit
+    )
+  )) %>%
+  dplyr::select(crop, type, share_pred_data) %>%
+  unnest(cols = c(share_pred_data)) %>%
+  data.table()
+```
+
+```{r}
+g_share_comp <-
+  results[sat <= 150, ] %>%
+  .[, crop := case_when(
+    crop == "corn" ~ "Corn",
+    crop == "soy" ~ "Soybean"
+  )] %>%
+  .[, type := factor(type, levels = c("Year FE", "State and Year FE", "State-Year FE"))] %>%
+  ggplot() +
+  geom_line(aes(y = ir_share_hat, x = sat)) +
+  geom_ribbon(
+    aes(
+      ymin = ir_share_hat - 1.96 * ir_share_hat_se,
+      ymax = ir_share_hat + 1.96 * ir_share_hat_se,
+      x = sat
+    ),
+    alpha = 0.4
+  ) +
+  scale_y_continuous(breaks = seq(0, 1, by = 0.1), limits = c(0.4, 1)) +
+  scale_x_continuous(breaks = seq(10, 150, by = 20)) +
+  xlab("Saturated Thickness (meter)") +
+  ylab("Share of Irrigated Acres") +
+  facet_grid(type ~ crop) +
+  theme_fig +
+  theme(
+    strip.text = element_text(face = "bold"),
+    strip.background = element_blank()
+  )
+
+ggsave(
+  file = "Results/Figures/g_share_comp.pdf",
+  g_share_comp,
+  height = 5,
+  width = 6
+)
+```
+
+# Loss of variation in aquifer thickness 
+
+```{r}
+ir_corn_share_data <- all_results[crop == "corn", share_reg_data][[1]]
+
+sy_demeaan_data <-
+  copy(ir_corn_share_data)[, .(sat = sat - mean(sat)), by = .(state_name, year)] %>%
+  .[, type := "B. Demeaned by State-Year Average"] %>%
+  .[, .(sat, type)]
+
+c_y_demeaan_data <-
+  copy(ir_corn_share_data)[, sat := sat - mean(sat), by = sc_code] %>%
+  .[, .(sat = sat - mean(sat)), by = year] %>%
+  .[, type := "C. Demeaned by County and Yearly Average"] %>%
+  .[, .(sat, type)]
+
+y_demeaan_data <-
+  copy(ir_corn_share_data)[, .(sat = sat - mean(sat)), by = year] %>%
+  .[, type := "A. Demeaned by Yearly Average"] %>%
+  .[, .(sat, type)]
+
+plot_data <- rbind(sy_demeaan_data, c_y_demeaan_data, y_demeaan_data)
+
+g_variation <-
+  ggplot(plot_data) +
+  geom_histogram(aes(x = sat)) +
+  facet_wrap(type ~ ., ncol = 1) +
+  theme_fig +
+  theme(
+    strip.background = element_blank(),
+    strip.text = element_text(hjust = 0, face = "bold")
+  ) +
+  xlab("Aquifer Thickness") +
+  ylab("Count")
+
+ggsave(
+  file = "Results/Figures/g_variation.pdf",
+  g_variation,
+  height = 5,
+  width = 6
+)
+```

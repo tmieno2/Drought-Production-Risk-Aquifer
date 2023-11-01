@@ -1,13 +1,8 @@
-In the main regresion analysis in the manuscript, state FEs are included. County FEs are not included as it eliminates too much of the variation in aquifer thickness. This appendix compares the impact of aquifer thickness on irrigated share with and without State FEs.
-
-# Regression with and without state fixed effects
-
-```{r}
-all_results <- readRDS(here::here("Shared/Results/all_results.rds"))
-```
+## ---------------------------------------------------------------
+all_results <- readRDS(here::here("Results/all_results.rds"))
 
 
-```{r}
+## ---------------------------------------------------------------
 #++++++++++++++++++++++++++++++++++++
 #+ Formula
 #++++++++++++++++++++++++++++++++++++
@@ -33,9 +28,6 @@ formula_data <-
     formula = c(share_formula_yfe, share_formula_sandyfe, share_formula_syfe),
     type = c("Year FE", "State and Year FE", "State-Year FE")
   )
-
-# ggplot(results$ir_share_data[[1]]) +
-#   geom_point(aes(y = acres_ratio, x = sat))
 
 results <-
   all_results[, .(crop, data)] %>%
@@ -91,9 +83,9 @@ results <-
   dplyr::select(crop, type, share_pred_data) %>%
   unnest(cols = c(share_pred_data)) %>%
   data.table()
-```
 
-```{r}
+
+## ---------------------------------------------------------------
 g_share_comp <-
   results[sat <= 150, ] %>%
   .[, crop := case_when(
@@ -123,16 +115,14 @@ g_share_comp <-
   )
 
 ggsave(
-  file = "GitControlled/Writing/Figures/g_share_comp.pdf",
+  file = "Results/Figures/g_share_comp.pdf",
   g_share_comp,
   height = 5,
   width = 6
 )
-```
 
-# Loss of variation in aquifer thickness 
 
-```{r}
+## ---------------------------------------------------------------
 ir_share_data_corn[, sat_m := measurements::conv_unit(sat, "ft", "m")]
 
 sy_demeaan_data <-
@@ -166,9 +156,9 @@ g_variation <-
   ylab("Count")
 
 ggsave(
-  file = "GitControlled/Writing/Figures/g_variation.pdf",
+  file = "Results/Figures/g_variation.pdf",
   g_variation,
   height = 5,
   width = 6
 )
-```
+

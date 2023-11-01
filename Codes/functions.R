@@ -717,7 +717,7 @@ yield_analysis_boot <- function(yield_data, balance_seq, sat_seq_eval, sat_break
 
 #++++++++++++++++++++++++++++++++++++
 #+ Run Irrigation Share Analysis (main)
-#++++++++++++++++++++++++++++++++++++ 
+#++++++++++++++++++++++++++++++++++++
 share_analysis_gam <- function(ir_share_data, sat_seq, sandtotal_e, silttotal_e, awc_e) {
   #++++++++++++++++++++++++++++++++++++
   #+ Debug
@@ -731,8 +731,6 @@ share_analysis_gam <- function(ir_share_data, sat_seq, sandtotal_e, silttotal_e,
   #++++++++++++++++++++++++++++++++++++
   #+ Main
   #++++++++++++++++++++++++++++++++++++
-  ir_share_data <- ir_share_data[sat < 180, ]
-
   #---------------------
   #- define the formula for the flexible part
   #---------------------
@@ -807,8 +805,6 @@ share_analysis_boot <- function(ir_share_data, sat_seq, sandtotal_e, silttotal_e
   #++++++++++++++++++++++++++++++++++++
   #+ Main
   #++++++++++++++++++++++++++++++++++++
-  ir_share_data <- ir_share_data[sat < 180, ]
-
   #---------------------
   #- define the formula for the flexible part
   #---------------------
