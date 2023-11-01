@@ -117,6 +117,7 @@ library(data.table)
 
 
 \begin{document}
+\SweaveOpts{concordance=TRUE}
 \maketitle
 \begin{abstract}
 Aquifer depletion poses a major threat to the ability of farmers, food supply chains, and rural economies globally to use groundwater as a means of adapting to climate variability and change. Empirical research has demonstrated the large differences in drought risk exposure that exist between rainfed and irrigated croplands, but previous work commonly assumes water supply for the latter is unconstrained. In this paper, we evaluate how aquifer depletion affects the resilience of irrigated crop production to drought risk using over 30 years of data on historical corn and soybean yields, production areas, and aquifer conditions for the High Plains region in the United States. We show that aquifer depletion reduces the ability of farmers to sustain irrigated crop yields and production areas in years and locations with large growing season water deficits. Our findings demonstrate that drought-related production losses on irrigated croplands increase non-linearly with aquifer depletion, highlighting the need for proactive aquifer conservation interventions to support adaptation and resilience to future increases in rainfall variability under climate change.
@@ -354,13 +355,13 @@ All data processing and analyses were carried out using R \citep{R}. The codes u
 
 \section*{Acknowledgements}
 
-Funding for the research in this manuscript was provided by the United States Department of Agriculture under contract numbers OCE 58-0111-20-007 and OCE 58-0111-21-007.
-Timothy Foster was supported by Innovate UK award no. 10044695, as part of the UK Research and Innovation and European Commission funded project ``TRANSCEND: Transformational and robust adaptation to water scarcity and climate change under deep uncertainty.'' The funders had no role in study design, data collection and analysis, decision to publish or preparation of the manuscript.
+Funding for the research in this manuscript was provided by the United States Department of Agriculture under contract numbers OCE 58-0111-20-007 and OCE 58-0111-21-007 and the Daugherty Water for Food Global Institute at the University of Nebraska. This research was also supported by Innovate UK award no. 10044695, as part of the UK Research and Innovation and European Commission funded project ``TRANSCEND: Transformational and robust adaptation to water scarcity and climate change under deep uncertainty.'' The funders had no role in study design, data collection and analysis, decision to publish or preparation of the manuscript.
 
 \begin{itemize}
-\item OCE 58-0111-20-007 (TM, SK, NB)
-\item OCE 58-0111-21-007 (TM, SK, NB)
+\item OCE 58-0111-20-007 (TM, SK)
+\item OCE 58-0111-21-007 (TM, SK)
 \item Innovate UK award no. 10044695 (TF)
+\item Daugherty Water for Food Global Institute (SK)
 \end{itemize}
 
 \subsection*{Author Contributions}

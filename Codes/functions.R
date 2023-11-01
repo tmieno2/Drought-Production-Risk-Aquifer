@@ -1141,6 +1141,55 @@ test_dif_in_yield <- function(balance_ls, base_q, comp_q, yield_semi_res, sat_te
     rbindlist()
 }
 
+#!===========================================================
+#! Figure Theme
+#!===========================================================
+theme_fig <-
+  theme_bw() +
+  theme(
+    axis.title.x =
+      element_text(
+        size = 7, angle = 0, hjust = .5, vjust = -0.3, family = "Helvetica"
+      ),
+    axis.title.y =
+      element_text(
+        size = 7, angle = 90, hjust = .5, vjust = .9, family = "Helvetica"
+      ),
+    axis.text.x =
+      element_text(
+        size = 7, angle = 0, hjust = .5, vjust = 1.5, family = "Helvetica"
+      ),
+    axis.text.y =
+      element_text(
+        size = 7, angle = 0, hjust = 1, vjust = 0, family = "Helvetica"
+      ),
+    axis.ticks =
+      element_line(
+        linewidth = 0.3, linetype = "solid"
+      ),
+    axis.ticks.length = unit(.15, "cm"),
+    #--- legend ---#
+    legend.text =
+      element_text(
+        size = 7, angle = 0, hjust = 0, vjust = 0.5, family = "Helvetica"
+      ),
+    legend.title =
+      element_text(
+        size = 7, angle = 0, hjust = 0, vjust = 0, family = "Helvetica"
+      ),
+    legend.key.size = unit(0.5, "cm"),
+    #--- strip (for faceting) ---#
+    strip.text = element_text(size = 7, family = "Helvetica"),
+    #--- plot title ---#
+    plot.title = element_text(family = "Helvetica", face = "bold", size = 7),
+    #--- margin ---#
+    # plot.margin = margin(0, 0, 0, 0, "cm"),
+    #--- panel ---#
+    panel.grid.minor = element_blank(),
+    panel.background = element_blank(),
+    panel.border = element_rect(fill = NA)
+  )
+
 # !===========================================================
 # ! Generic
 # !===========================================================

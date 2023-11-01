@@ -14,54 +14,7 @@ data_corn <- all_results[crop == "corn", data][[1]]
 data_soy <- all_results[crop == "soy", data][[1]]
 ```
 
-## Set themes
-```{r}
-theme_fig <-
-  theme_bw() +
-  theme(
-    axis.title.x =
-      element_text(
-        size = 9, angle = 0, hjust = .5, vjust = -0.3, family = "Times"
-      ),
-    axis.title.y =
-      element_text(
-        size = 9, angle = 90, hjust = .5, vjust = .9, family = "Times"
-      ),
-    axis.text.x =
-      element_text(
-        size = 8, angle = 0, hjust = .5, vjust = 1.5, family = "Times"
-      ),
-    axis.text.y =
-      element_text(
-        size = 8, angle = 0, hjust = 1, vjust = 0, family = "Times"
-      ),
-    axis.ticks =
-      element_line(
-        linewidth = 0.3, linetype = "solid"
-      ),
-    axis.ticks.length = unit(.15, "cm"),
-    #--- legend ---#
-    legend.text =
-      element_text(
-        size = 9, angle = 0, hjust = 0, vjust = 0.5, family = "Times"
-      ),
-    legend.title =
-      element_text(
-        size = 9, angle = 0, hjust = 0, vjust = 0, family = "Times"
-      ),
-    legend.key.size = unit(0.5, "cm"),
-    #--- strip (for faceting) ---#
-    strip.text = element_text(size = 9, family = "Times"),
-    #--- plot title ---#
-    plot.title = element_text(family = "Times", face = "bold", size = 9),
-    #--- margin ---#
-    # plot.margin = margin(0, 0, 0, 0, "cm"),
-    #--- panel ---#
-    panel.grid.minor = element_blank(),
-    panel.background = element_blank(),
-    panel.border = element_rect(fill = NA)
-  )
-```
+
 
 # Summary statistics
 
@@ -317,9 +270,9 @@ g_corn <-
   theme(
     legend.position = "bottom",
     legend.key.width = unit(1, "cm"),
-    plot.title = element_text(size = 9, family = "Times"),
-    legend.title = element_text(family = "Times"),
-    legend.text = element_text(family = "Times")
+    plot.title = element_text(size = 7, family = "Helvetica"),
+    legend.title = element_text(size = 7, family = "Helvetica"),
+    legend.text = element_text(size = 7, family = "Helvetica")
   ) +
   ggtitle("A. Corn")
 
@@ -339,9 +292,9 @@ g_soy <-
   theme(
     legend.position = "bottom",
     legend.key.width = unit(1, "cm"),
-    plot.title = element_text(size = 9, family = "Times"),
-    legend.title = element_text(family = "Times"),
-    legend.text = element_text(family = "Times")
+    plot.title = element_text(size = 7, family = "Helvetica"),
+    legend.title = element_text(size = 7, family = "Helvetica"),
+    legend.text = element_text(size = 7, family = "Helvetica")
   ) +
   ggtitle("B. Soybean")
 
@@ -425,11 +378,7 @@ g_wds <-
         theme_fig +
         xlab("") +
         ylab("") +
-        # scale_x_continuous(breaks = (-2:11)*100) +
         coord_cartesian(xlim = c(-200, 1150))
-      # +
-      # # xlim(NA, max_balance) +
-      # theme_void()
     }
   ))
 
@@ -437,7 +386,6 @@ g_wd_corn <-
   g_wds$g_fig[[1]] +
   ggtitle("A. Corn") +
   theme(
-    plot.title = element_text(size = 9, family = "Times", face = "bold"),
     axis.text.x = element_blank(),
     axis.text.y = element_blank(),
     axis.ticks.x = element_blank(),
@@ -452,7 +400,6 @@ g_wd_soy <-
   g_wds$g_fig[[2]] +
   ggtitle("B. Soybean") +
   theme(
-    plot.title = element_text(size = 9, family = "Times", face = "bold"),
     axis.text.x = element_blank(),
     axis.text.y = element_blank(),
     axis.ticks.x = element_blank(),
@@ -462,7 +409,6 @@ g_wd_soy <-
     panel.border = element_blank(),
     plot.margin = margin(0, 0, -0.5, 0, "cm")
   )
-
 
 g_yield_response <-
   cowplot::plot_grid(
@@ -579,7 +525,6 @@ g_sat_hist <-
         ylab("") +
         coord_cartesian(xlim = c(9, 150)) +
         theme(
-          plot.title = element_text(size = 9, family = "Times", face = "bold"),
           axis.text.x = element_blank(),
           axis.text.y = element_blank(),
           axis.ticks.x = element_blank(),
@@ -643,8 +588,7 @@ g_share_dif <-
   theme_fig +
   theme(
     legend.position = "bottom",
-    strip.background = element_blank(),
-    strip.text = element_text(hjust = 0, face = "bold", family = "Times", size = 9)
+    strip.background = element_blank()
   )
 
 ggsave(
@@ -710,7 +654,6 @@ g_wds <-
         ylab("") +
         coord_cartesian(xlim = c(-200, 1150)) +
         theme(
-          plot.title = element_text(size = 9, family = "Times", face = "bold"),
           axis.text.x = element_blank(),
           axis.text.y = element_blank(),
           axis.ticks.x = element_blank(),
@@ -840,7 +783,6 @@ g_avg_yield_dif <-
       theme_fig +
       theme(
         strip.background = element_blank(),
-        strip.text = element_text(size = 9, family = "Times"),
         panel.spacing.y = unit(1, "cm")
       )
   }))

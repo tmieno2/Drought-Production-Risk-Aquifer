@@ -1,8 +1,8 @@
-## ---------------------------------------------------------------
+## --------------------------------------------------------
 all_results <- readRDS(here::here("Results/all_results.rds"))
 
 
-## ---------------------------------------------------------------
+## --------------------------------------------------------
 #++++++++++++++++++++++++++++++++++++
 #+ Formula
 #++++++++++++++++++++++++++++++++++++
@@ -85,7 +85,7 @@ results <-
   data.table()
 
 
-## ---------------------------------------------------------------
+## --------------------------------------------------------
 g_share_comp <-
   results[sat <= 150, ] %>%
   .[, crop := case_when(
@@ -122,30 +122,30 @@ ggsave(
 )
 
 
-## ---------------------------------------------------------------
-ir_share_data_corn[, sat_m := measurements::conv_unit(sat, "ft", "m")]
+## --------------------------------------------------------
+ir_corn_share_data <- all_results[crop == "corn", share_reg_data][[1]]
 
 sy_demeaan_data <-
-  copy(ir_share_data_corn)[, .(sat_m = sat_m - mean(sat_m)), by = .(state_name, year)] %>%
+  copy(ir_corn_share_data)[, .(sat = sat - mean(sat)), by = .(state_name, year)] %>%
   .[, type := "B. Demeaned by State-Year Average"] %>%
-  .[, .(sat_m, type)]
+  .[, .(sat, type)]
 
 c_y_demeaan_data <-
-  copy(ir_share_data_corn)[, sat_m := sat_m - mean(sat_m), by = sc_code] %>%
-  .[, .(sat_m = sat_m - mean(sat_m)), by = year] %>%
+  copy(ir_corn_share_data)[, sat := sat - mean(sat), by = sc_code] %>%
+  .[, .(sat = sat - mean(sat)), by = year] %>%
   .[, type := "C. Demeaned by County and Yearly Average"] %>%
-  .[, .(sat_m, type)]
+  .[, .(sat, type)]
 
 y_demeaan_data <-
-  copy(ir_share_data_corn)[, .(sat_m = sat_m - mean(sat_m)), by = year] %>%
+  copy(ir_corn_share_data)[, .(sat = sat - mean(sat)), by = year] %>%
   .[, type := "A. Demeaned by Yearly Average"] %>%
-  .[, .(sat_m, type)]
+  .[, .(sat, type)]
 
 plot_data <- rbind(sy_demeaan_data, c_y_demeaan_data, y_demeaan_data)
 
 g_variation <-
   ggplot(plot_data) +
-  geom_histogram(aes(x = sat_m)) +
+  geom_histogram(aes(x = sat)) +
   facet_wrap(type ~ ., ncol = 1) +
   theme_fig +
   theme(

@@ -1,29 +1,29 @@
-## ---------------------------------------------------------------
+## --------------------------------------------------------
 all_results <- readRDS("Results/all_results.rds")
 
 data_corn <- all_results[crop == "corn", data][[1]]
 data_soy <- all_results[crop == "soy", data][[1]]
 
 
-## ---------------------------------------------------------------
+## --------------------------------------------------------
 theme_fig <-
   theme_bw() +
   theme(
     axis.title.x =
       element_text(
-        size = 9, angle = 0, hjust = .5, vjust = -0.3, family = "Times"
+        size = 7, angle = 0, hjust = .5, vjust = -0.3, family = "Helvetica"
       ),
     axis.title.y =
       element_text(
-        size = 9, angle = 90, hjust = .5, vjust = .9, family = "Times"
+        size = 7, angle = 90, hjust = .5, vjust = .9, family = "Helvetica"
       ),
     axis.text.x =
       element_text(
-        size = 8, angle = 0, hjust = .5, vjust = 1.5, family = "Times"
+        size = 7, angle = 0, hjust = .5, vjust = 1.5, family = "Helvetica"
       ),
     axis.text.y =
       element_text(
-        size = 8, angle = 0, hjust = 1, vjust = 0, family = "Times"
+        size = 7, angle = 0, hjust = 1, vjust = 0, family = "Helvetica"
       ),
     axis.ticks =
       element_line(
@@ -33,17 +33,17 @@ theme_fig <-
     #--- legend ---#
     legend.text =
       element_text(
-        size = 9, angle = 0, hjust = 0, vjust = 0.5, family = "Times"
+        size = 7, angle = 0, hjust = 0, vjust = 0.5, family = "Helvetica"
       ),
     legend.title =
       element_text(
-        size = 9, angle = 0, hjust = 0, vjust = 0, family = "Times"
+        size = 7, angle = 0, hjust = 0, vjust = 0, family = "Helvetica"
       ),
     legend.key.size = unit(0.5, "cm"),
     #--- strip (for faceting) ---#
-    strip.text = element_text(size = 9, family = "Times"),
+    strip.text = element_text(size = 7, family = "Helvetica"),
     #--- plot title ---#
-    plot.title = element_text(family = "Times", face = "bold", size = 9),
+    plot.title = element_text(family = "Helvetica", face = "bold", size = 7),
     #--- margin ---#
     # plot.margin = margin(0, 0, 0, 0, "cm"),
     #--- panel ---#
@@ -53,7 +53,7 @@ theme_fig <-
   )
 
 
-## ---------------------------------------------------------------
+## --------------------------------------------------------
 wd_data <-
   rbind(data_corn[year <= 2016, ], data_soy[year <= 2016, ]) %>%
   .[, .(wd = mean(balance)), by = .(year, crop)] %>%
@@ -189,7 +189,7 @@ ggsave(
 )
 
 
-## ---- eval = FALSE----------------------------------------------
+## ----eval = FALSE----------------------------------------
 ## all_counties <-
 ##   tigris::counties() %>%
 ##   st_simplify(dTolerance = 100) %>%
@@ -217,7 +217,7 @@ ggsave(
 ## saveRDS(all_states, "Data/data-processed/states.rds")
 
 
-## ---------------------------------------------------------------
+## --------------------------------------------------------
 hpa_simplified <-
   here("Data/data-raw/hp_bound2010.shp") %>%
   st_read() %>%
@@ -226,7 +226,7 @@ hpa_simplified <-
 saveRDS(hpa_simplified, here("Data/data-processed/hpa_simplified.shp"))
 
 
-## ---------------------------------------------------------------
+## --------------------------------------------------------
 #--- hpa ---#
 hpa_simplified <-
   here("Data/data-processed/hpa_simplified.shp") %>%
@@ -297,9 +297,9 @@ g_corn <-
   theme(
     legend.position = "bottom",
     legend.key.width = unit(1, "cm"),
-    plot.title = element_text(size = 9, family = "Times"),
-    legend.title = element_text(family = "Times"),
-    legend.text = element_text(family = "Times")
+    plot.title = element_text(size = 7, family = "Helvetica"),
+    legend.title = element_text(size = 7, family = "Helvetica"),
+    legend.text = element_text(size = 7, family = "Helvetica")
   ) +
   ggtitle("A. Corn")
 
@@ -319,9 +319,9 @@ g_soy <-
   theme(
     legend.position = "bottom",
     legend.key.width = unit(1, "cm"),
-    plot.title = element_text(size = 9, family = "Times"),
-    legend.title = element_text(family = "Times"),
-    legend.text = element_text(family = "Times")
+    plot.title = element_text(size = 7, family = "Helvetica"),
+    legend.title = element_text(size = 7, family = "Helvetica"),
+    legend.text = element_text(size = 7, family = "Helvetica")
   ) +
   ggtitle("B. Soybean")
 
@@ -330,7 +330,7 @@ g_map <- g_corn | g_soy
 ggsave(file = "Results/Figures/g_map.pdf", g_map, height = 7, width = 6)
 
 
-## ---------------------------------------------------------------
+## --------------------------------------------------------
 # all_results <-  data.table(all_results)
 
 plot_yield_data <-
@@ -403,11 +403,7 @@ g_wds <-
         theme_fig +
         xlab("") +
         ylab("") +
-        # scale_x_continuous(breaks = (-2:11)*100) +
         coord_cartesian(xlim = c(-200, 1150))
-      # +
-      # # xlim(NA, max_balance) +
-      # theme_void()
     }
   ))
 
@@ -415,7 +411,6 @@ g_wd_corn <-
   g_wds$g_fig[[1]] +
   ggtitle("A. Corn") +
   theme(
-    plot.title = element_text(size = 9, family = "Times", face = "bold"),
     axis.text.x = element_blank(),
     axis.text.y = element_blank(),
     axis.ticks.x = element_blank(),
@@ -430,7 +425,6 @@ g_wd_soy <-
   g_wds$g_fig[[2]] +
   ggtitle("B. Soybean") +
   theme(
-    plot.title = element_text(size = 9, family = "Times", face = "bold"),
     axis.text.x = element_blank(),
     axis.text.y = element_blank(),
     axis.ticks.x = element_blank(),
@@ -440,7 +434,6 @@ g_wd_soy <-
     panel.border = element_blank(),
     plot.margin = margin(0, 0, -0.5, 0, "cm")
   )
-
 
 g_yield_response <-
   cowplot::plot_grid(
@@ -502,7 +495,7 @@ ggsave("Results/Figures/g_yield_with_conf_corn.pdf", g_yield_with_conf[crop == "
 ggsave("Results/Figures/g_yield_with_conf_soy.pdf", g_yield_with_conf[crop == "soy", g_fig][[1]], width = 6, height = 3.5)
 
 
-## ---------------------------------------------------------------
+## --------------------------------------------------------
 #++++++++++++++++++++++++++++++++++++
 #+ Share response
 #++++++++++++++++++++++++++++++++++++
@@ -555,7 +548,6 @@ g_sat_hist <-
         ylab("") +
         coord_cartesian(xlim = c(9, 150)) +
         theme(
-          plot.title = element_text(size = 9, family = "Times", face = "bold"),
           axis.text.x = element_blank(),
           axis.text.y = element_blank(),
           axis.ticks.x = element_blank(),
@@ -587,7 +579,7 @@ ggsave(
 )
 
 
-## ---------------------------------------------------------------
+## --------------------------------------------------------
 plot_data_ir_share <-
   all_results[, .(crop, share_sum)] %>%
   unnest(cols = share_sum) %>%
@@ -617,8 +609,7 @@ g_share_dif <-
   theme_fig +
   theme(
     legend.position = "bottom",
-    strip.background = element_blank(),
-    strip.text = element_text(hjust = 0, face = "bold", family = "Times", size = 9)
+    strip.background = element_blank()
   )
 
 ggsave(
@@ -629,7 +620,7 @@ ggsave(
 )
 
 
-## ---------------------------------------------------------------
+## --------------------------------------------------------
 g_total_both <-
   all_results[, .(crop, avg_yield_sum)] %>%
   unnest() %>%
@@ -682,7 +673,6 @@ g_wds <-
         ylab("") +
         coord_cartesian(xlim = c(-200, 1150)) +
         theme(
-          plot.title = element_text(size = 9, family = "Times", face = "bold"),
           axis.text.x = element_blank(),
           axis.text.y = element_blank(),
           axis.ticks.x = element_blank(),
@@ -714,7 +704,7 @@ ggsave(
 )
 
 
-## ---------------------------------------------------------------
+## --------------------------------------------------------
 g_dif <-
   all_results[, .(crop, yield_dif_test, sat_text_data)] %>%
   rowwise() %>%
@@ -782,7 +772,7 @@ g_ir_yield_dif <-
 cowplot::ggsave2("Results/Figures/g_ir_yield_dif.pdf", g_ir_yield_dif, width = 6, height = 5)
 
 
-## ---------------------------------------------------------------
+## --------------------------------------------------------
 g_avg_yield_dif <-
   all_results[, .(crop, avg_yield_sum)] %>%
   unnest(cols = c(avg_yield_sum)) %>%
@@ -807,7 +797,6 @@ g_avg_yield_dif <-
       theme_fig +
       theme(
         strip.background = element_blank(),
-        strip.text = element_text(size = 9, family = "Times"),
         panel.spacing.y = unit(1, "cm")
       )
   }))
@@ -831,7 +820,7 @@ g_ay <- g_ay_corn / g_ay_soy
 ggsave("Results/Figures/g_avg_yield_dif.pdf", g_ay, width = 6, height = 5)
 
 
-## ---------------------------------------------------------------
+## --------------------------------------------------------
 g_ay_response <-
   all_results[, .(crop, avg_yield_sum)] %>%
   unnest(cols = c(avg_yield_sum)) %>%
