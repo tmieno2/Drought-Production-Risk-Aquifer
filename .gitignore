@@ -1,5 +1,7 @@
 /Writing/Manuscript*/*
 /Writing/*cache/*
+/Writing/*.pdf
+/Writing/*.tex
 /Writing/NatureWater/*/*.pdf
 # /Writing/NatureWater/*/*/*.pdf
 /Writing/*files/*

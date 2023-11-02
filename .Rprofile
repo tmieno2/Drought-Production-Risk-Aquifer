@@ -1,3 +1,4 @@
+source("renv/activate.R")
 print('Welcome (back) to the "DroughtRiskAquifer" project.\n')
 
 library(tidyverse)
@@ -29,8 +30,4 @@ library(geosphere)
 #--- source functions ---r
 # source(here::here("Codes/Functions/1_0_functions.R"))
 source(here::here("Codes/functions.R"))
-
-# install.packages("extrafont")
-# library(extrafont)
-# extrafont::font_import()
 
