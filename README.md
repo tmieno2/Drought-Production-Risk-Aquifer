@@ -17,7 +17,7 @@ Create a root folder (the folder that will have all the folders and files). You 
 
 Download the computer programs from the [GitHub repository](https://github.com/tmieno2/Drought-Production-Risk-Aquifer) (https://github.com/tmieno2/Drought-Production-Risk-Aquifer). You can either clone or download the files as a zipped folder into the root folder. If done correctly, the folder system looks like this.
 
-[folder-structure]
+![folder-structure](https://github.com/tmieno2/Drought-Production-Risk-Aquifer/blob/master/Misc/folder-structure.png)
 
 ## Step 2: download datasets
 
