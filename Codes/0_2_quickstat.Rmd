@@ -83,7 +83,7 @@ saveRDS(nass_data, here("Data/data-raw/nass_data_raw.rds"))
       str_detect(short_desc, "acres"),
       "acres", "yield"
     )] %>%
-    # === irrigated or not? ===#
+    # === irrigated or not ===#
     .[, ir := ifelse(
       str_detect(short_desc, "nir"),
       "nir", "ir"

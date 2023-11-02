@@ -1,8 +1,8 @@
-## ---------------------------------------------------------------
+## -------------------------------------------------------------------
 base_counties <- readRDS(here("Data/data-processed/base_counties.rds"))
 
 #' Weather
-weather_data <- readRDS(here("Data/data-processed/summrized_gridMET.rds"))
+weather_data <- readRDS(here("Data/data-processed/summarized_gridMET.rds"))
 
 #' Saturated thickness
 sat_all <- readRDS(here("Data/data-processed/sat_all.rds"))
@@ -14,7 +14,7 @@ nass_data <- readRDS(here("Data/data-processed/nass_data.rds"))
 ssurgo_soil <- readRDS(here("Data/data-processed/ssurgo_soil.rds"))
 
 
-## ---------------------------------------------------------------
+## -------------------------------------------------------------------
 merged_data <-
   base_counties[nass_data, on = c("sc_code")] %>%
   weather_data[., on = c("sc_code", "year")] %>%
@@ -23,7 +23,7 @@ merged_data <-
   ssurgo_soil[, on = "sc_code"]
 
 
-## ---------------------------------------------------------------
+## -------------------------------------------------------------------
 final_data <-
   merged_data %>%
   #--- yield unit conversion (bu/acre to ton/ha)---#
@@ -32,33 +32,25 @@ final_data <-
   # irrigated, but saturated thickness not observed. These
   # observations cannot be used.
   .[!(in_hpa == 0 & ir == "ir"), ] %>%
-  # === if not irrigated, set sat = 0 ===#
-  .[ir == "nir", sat := 0] %>%
-  # === if sat == 0, but indicated irrigated ===#
-  # add 0.1 to distinguish dryland production, where
-  # sat is set at 0 above
-  .[sat == 0 & ir == "ir", sat := sat + 0.01] %>%
-  # === drop if yield or acres are not observed ===#
+  #--- drop if irrigated and year > 2016 ---#
+  # drops irrigated produciton observations that are missing sat (2017, 2018 fow which sat is not observed). This will keep all the dryland production observations beyond 2016 because sat does not have to be observed for the dryland production.
+  .[!(ir == "ir" & year > 2016), ] %>%
+  # === drop if both yield and acres are not observed ===#
   .[!is.na(yield) & !is.na(acres), ] %>%
-  # === if sat is missing, drop ===#
-  #' just 2017 and 2018 data because saturated thickness data
-  #' is observed only until 2016
-  .[!is.na(sat), ] %>%
-  #--- indicator of whether dryland (rainfed) production or not ---#
-  .[, dry_or_not := fifelse(sat == 0, 1, 0)] %>%
-  #--- sc_code and dry_or_not (used for FE regression) ---#
-  .[, sc_dry := paste0(sc_code, "_", dry_or_not)] %>%
+  #--- sc_code and irrigation status (used for FE regression) ---#
+  .[, sc_dry := paste0(sc_code, "_", ir)] %>%
   #--- state-year combination ---#
   .[, state_year := paste0(state_name, "_", year)] %>%
   # === number of observations by state-county code ===#
   .[, num_obs := .N, by = sc_dry] %>%
-  # .[, num_obs := .N, by = sc_code] %>%
   # === keep only if more than 10 observations are available ===#
   .[num_obs >= 10, ] %>%
+  .[, num_obs := NULL] %>%
   # === order (not necessary) ===#
-  .[order(sc_code, year), ]
+  .[order(sc_code, year), ] %>%
+  dplyr::relocate(sc_code, year)
 
 
-## ---------------------------------------------------------------
+## -------------------------------------------------------------------
 saveRDS(final_data, here("Data/data-processed/final_data.rds"))
 

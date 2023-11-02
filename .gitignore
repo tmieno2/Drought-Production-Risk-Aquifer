@@ -19,13 +19,16 @@
 *.bbl
 *.blg
 *.png
-*DS_Store
+*.DS_Store
 *.zip
 *.Rhistory
 *.docx
 data.md
 Data/*
+Data.zip
 Results/*
 Shared/*
+*/metadata.Rmd
+todo.md
 
 

@@ -1,4 +1,4 @@
-## ---------------------------------------------------------------
+## -------------------------------------------------------------------
 # === counties ===#
 counties <-
   here("Data/data-processed/base_counties.rds") %>%
@@ -11,7 +11,7 @@ elevation <-
   rast()
 
 
-## ---------------------------------------------------------------
+## -------------------------------------------------------------------
 # === list of weather variables ===#
 var_ls <-
   c(
@@ -38,7 +38,7 @@ par_data <-
   .[, var_name := as.character(var_name)]
 
 
-## ---------------------------------------------------------------
+## -------------------------------------------------------------------
 # mclapply(
 #   seq_len(nrow(par_data)),
 #   function(x) get_grid_MET(par_data[x, var_name], par_data[x, year]),
@@ -50,7 +50,7 @@ lapply(
 )
 
 
-## ---------------------------------------------------------------
+## -------------------------------------------------------------------
 #--- counties ---#
 counties <- filter(counties, !(state %in% c("MO", "IL", "IN", "IA")))
 
@@ -59,7 +59,7 @@ sample_gmet <- rast(here("Data/data-raw/gridMET/pr_1985.nc"))
 gmet_crs <- crs(sample_gmet)
 
 
-## ---------------------------------------------------------------
+## -------------------------------------------------------------------
 if (!file.exists(here("data/data-processed", "gridMET.rds"))) {
   all_data <-
     mclapply(
@@ -82,7 +82,7 @@ if (!file.exists(here("data/data-processed", "gridMET.rds"))) {
 }
 
 
-## ---------------------------------------------------------------
+## -------------------------------------------------------------------
 #--- read the raw gridMET data ---#
 gm_data <- readRDS(here("Data/data-processed", "gridMET.rds"))
 
@@ -97,18 +97,10 @@ sum_gm_data <-
     # === total et0 ===#
     et0 = sum(et0),
     # === total precip ===#
-    prcp = sum(prcp),
-    # === GDD ===#,
-    gdd = sum(t_min_max_2),
-    # === EDD ===#
-    edd = sum(pmax(0, tmax - 32)),
-    # === number of days above x ===#
-    days_ab_30 = sum(tmax >= 30),
-    # === mean temp ===#
-    mean_temp = mean(tmin + tmax) / 2
+    prcp = sum(prcp)
   ),
   by = .(sc_code, year(date))
   ]
 
-saveRDS(sum_gm_data, here("Data/data-processed", "summrized_gridMET.rds"))
+saveRDS(sum_gm_data, here("Data/data-processed", "summarized_gridMET.rds"))
 

@@ -170,64 +170,51 @@ get_grid_MET <- function(var_name, year) {
 #++++++++++++++++++++++++++++++++++++
 
 get_et0_county_year <- function(county, year) {
-  file_name <-
-    paste0(
-      "Data/data-processed/gMET-county/gMET-",
-      county$sc_code, "-", year,
-      ".rds"
-    )
+  #--------------------------
+  # collect weather variables in a single data.table
+  #--------------------------
+  temp <-
+    lapply(
+      var_ls,
+      function(x) proess_gm_county(x, year, county)
+    ) %>%
+    rbindlist() %>%
+    dcast(
+      rowid + coverage_fraction + cell + x + y + date ~ var,
+      value.var = "value"
+    ) %>%
+    .[, Jday := as.numeric(date - min(date) + 1)] %>%
+    .[month(date) >= 4, ] %>%
+    .[month(date) <= 9, ] %>%
+    # === day length in second ===#
+    .[, dayl := geosphere::daylength(y, date) * 3600] %>%
+    setnames(
+      c("tmmx", "tmmn"),
+      c("tmax", "tmin"),
+    ) %>%
+    # === Kelvin to Celsius ===#
+    .[, `:=`(
+      tmin = tmin - 273.15,
+      tmax = tmax - 273.15
+    )]
 
-  if (!file.exists(file_name)) {
-    #--------------------------
-    # collect weather variables in a single data.table
-    #--------------------------
-    temp <-
-      lapply(
-        var_ls,
-        function(x) proess_gm_county(x, year, county)
-      ) %>%
-      rbindlist() %>%
-      dcast(
-        rowid + coverage_fraction + cell + x + y + date ~ var,
-        value.var = "value"
-      ) %>%
-      .[, Jday := as.numeric(date - min(date) + 1)] %>%
-      .[month(date) >= 4, ] %>%
-      .[month(date) <= 9, ] %>%
-      # === day length in second ===#
-      .[, dayl := geosphere::daylength(y, date) * 3600] %>%
-      setnames(
-        c("tmmx", "tmmn"),
-        c("tmax", "tmin"),
-      ) %>%
-      # === Kelvin to Celsius ===#
-      .[, `:=`(
-        tmin = tmin - 273.15,
-        tmax = tmax - 273.15
-      )]
+  #--------------------------
+  # get elevation data
+  #--------------------------
+  cells_loc <-
+    temp[, .(cell, x, y)] %>%
+    unique(by = "cell") %>%
+    st_as_sf(coords = c("x", "y")) %>%
+    st_set_crs(gmet_crs) %>%
+    st_transform(crs(elevation))
 
-    #--------------------------
-    # get elevation data
-    #--------------------------
-    cells_loc <-
-      temp[, .(cell, x, y)] %>%
-      unique(by = "cell") %>%
-      st_as_sf(coords = c("x", "y")) %>%
-      st_set_crs(gmet_crs) %>%
-      st_transform(crs(elevation))
+  elev_data <-
+    terra::extract(elevation, vect(cells_loc)) %>%
+    cbind(cells_loc, .) %>%
+    data.table() %>%
+    .[, .(cell, elevation)]
 
-    elev_data <-
-      terra::extract(elevation, vect(cells_loc)) %>%
-      cbind(cells_loc, .) %>%
-      data.table() %>%
-      .[, .(cell, elevation)]
-
-    county_year_data <- elev_data[temp, on = "cell"]
-
-    saveRDS(county_year_data, file_name)
-  } else {
-    county_year_data <- readRDS(file_name)
-  }
+  county_year_data <- elev_data[temp, on = "cell"]
 
   #--------------------------
   # calculate et0
@@ -369,10 +356,10 @@ prepare_reg_data <- function(data, sat_thld_m, ir_share_thld, balance_thld, sat_
         #--- balance ---#
         .[balance >= balance_thld[1], ] %>%
         .[balance <= balance_thld[2], ] %>%
-        #--- filter out counties with too low saturated thickness ---#
-        .[sat >= sat_thld_m | sat == 0, ] %>%
+        #--- filter out irrigated observations with too low saturated thickness ---#
+        .[sat >= sat_thld_m | ir == "nir", ] %>%
         #--- keep only if the ratio of irrigable acres is above the threshold ---#
-        .[sat == 0 | (ir == "ir" & ir_area_ratio >= ir_share_thld), ]
+        .[ir == "nir" | (ir == "ir" & ir_area_ratio >= ir_share_thld), ]
     )) %>%
     # === sat breaks for grouping ===#
     #' dryland production will have NA
@@ -481,7 +468,6 @@ semi_ols <- function(semi_formula, c_formula, cluster, data) {
     )
 
   return(list(fe_res = fe_res, gam_res = reg_data_semi$gam_res))
-
 }
 
 #++++++++++++++++++++++++++++++++++++
@@ -510,14 +496,12 @@ semi_ols_fe <- function(semi_formula, c_formula, fe, cluster, data) {
     )
 
   return(list(fe_res = fe_res, gam_res = reg_data_semi$gam_res))
-
 }
 
 #++++++++++++++++++++++++++++++++++++
 #+ Run yield regression (main)
 #++++++++++++++++++++++++++++++++++++
 yield_analysis <- function(yield_data, balance_seq, sat_seq_eval, sat_breaks, sat_text_data, sc_base, bootstrap = FALSE) {
-
   #++++++++++++++++++++++++++++++++++++
   #+ For Debugging
   #++++++++++++++++++++++++++++++++++++
@@ -532,8 +516,8 @@ yield_analysis <- function(yield_data, balance_seq, sat_seq_eval, sat_breaks, sa
   #++++++++++++++++++++++++++++++++++++
   #+ Main
   #++++++++++++++++++++++++++++++++++++
-  sc_dry_0 <- paste0(sc_base, "_1")
-  sc_dry_ir <- paste0(sc_base, "_0")
+  sc_dry_nir <- paste0(sc_base, "_nir")
+  sc_dry_ir <- paste0(sc_base, "_ir")
 
   #---------------------
   #- Regression
@@ -577,7 +561,7 @@ yield_analysis <- function(yield_data, balance_seq, sat_seq_eval, sat_breaks, sa
     ] %>%
     .[is.na(sat_cat), sat_cat := "dryland"] %>%
     # === can be any sc_code (need to shift yield for "average" county) ===#
-    .[, sc_dry := sc_dry_0] %>%
+    .[, sc_dry := sc_dry_nir] %>%
     .[sat != 0, sc_dry := sc_dry_ir] %>%
     # === can be any year (need to shift yield for "average" year) ===#
     .[, year := 2009] %>%
@@ -641,8 +625,8 @@ yield_analysis_boot <- function(yield_data, balance_seq, sat_seq_eval, sat_break
   #++++++++++++++++++++++++++++++++++++
   #+ Main
   #++++++++++++++++++++++++++++++++++++
-  sc_dry_0 <- paste0(sc_base, "_1")
-  sc_dry_ir <- paste0(sc_base, "_0")
+  sc_dry_nir <- paste0(sc_base, "_nir")
+  sc_dry_ir <- paste0(sc_base, "_ir")
 
   #---------------------
   #- Regression
@@ -688,7 +672,7 @@ yield_analysis_boot <- function(yield_data, balance_seq, sat_seq_eval, sat_break
     ] %>%
     .[is.na(sat_cat), sat_cat := "dryland"] %>%
     # === can be any sc_code (need to shift yield for "average" county) ===#
-    .[, sc_dry := sc_dry_0] %>%
+    .[, sc_dry := sc_dry_nir] %>%
     .[sat != 0, sc_dry := sc_dry_ir] %>%
     # === can be any year (need to shift yield for "average" year) ===#
     .[, year := 2009] %>%
@@ -791,7 +775,7 @@ share_analysis_gam <- function(ir_share_data, sat_seq, sandtotal_e, silttotal_e,
 
 #++++++++++++++++++++++++++++++++++++
 #+ Run Irrigation Share Analysis (for bootstrap)
-#++++++++++++++++++++++++++++++++++++ 
+#++++++++++++++++++++++++++++++++++++
 share_analysis_boot <- function(ir_share_data, sat_seq, sandtotal_e, silttotal_e, awc_e) {
   #++++++++++++++++++++++++++++++++++++
   #+ Debug
@@ -933,7 +917,6 @@ get_average_yield <- function(yield_pred_data, share_pred_data) {
 #++++++++++++++++++++++++++++++++++++
 
 boot <- function(data, sc_base) {
-
   #--- create temporary id ---#
   temp_data <- copy(data)[, row_id := 1:.N]
 
@@ -943,7 +926,7 @@ boot <- function(data, sc_base) {
   ir_sc_ls <-
     data[sat_cat != "dryland", sc_dry] %>%
     unique() %>%
-    gsub("_0", "", .)
+    gsub("_ir", "", .)
 
   ir_sc_len <- length(ir_sc_ls)
 
@@ -1024,8 +1007,8 @@ test_dif_in_yield <- function(balance_ls, base_q, comp_q, yield_semi_res, sat_te
   #++++++++++++++++++++++++++++++++++++
   #+ Main
   #++++++++++++++++++++++++++++++++++++
-  sc_dry_0 <- paste0(sc_base, "_1")
-  sc_dry_ir <- paste0(sc_base, "_0")
+  sc_dry_nir <- paste0(sc_base, "_nir")
+  sc_dry_ir <- paste0(sc_base, "_ir")
 
   q_data <-
     sat_text_data %>%
@@ -1141,9 +1124,9 @@ test_dif_in_yield <- function(balance_ls, base_q, comp_q, yield_semi_res, sat_te
     rbindlist()
 }
 
-#!===========================================================
-#! Figure Theme
-#!===========================================================
+# !===========================================================
+# ! Figure Theme
+# !===========================================================
 theme_fig <-
   theme_bw() +
   theme(

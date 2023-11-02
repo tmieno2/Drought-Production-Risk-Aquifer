@@ -1,17 +1,19 @@
-## ---------------------------------------------------------------
-sat_temp <- raster("Data/data-raw/saturated_thickness/SatThick_19851.tif")
+## -------------------------------------------------------------------
+sat_crs <-
+  raster("Data/data-raw/saturated_thickness/SatThick_19851.tif") %>%
+  raster::projection()
 
 
-## ---------------------------------------------------------------
+## -------------------------------------------------------------------
 hpa_counties <-
   here("Data/data-processed/base_counties.rds") %>%
   readRDS() %>%
   .[in_hpa == 1, ] %>%
   st_as_sf() %>%
-  st_transform(projection(sat_temp))
+  st_transform(sat_crs)
 
 
-## ---------------------------------------------------------------
+## -------------------------------------------------------------------
 get_sat <- function(y) {
   # y <- 2000
   sat_temp <-
@@ -32,13 +34,13 @@ get_sat <- function(y) {
 }
 
 
-## ----extract-sat, eval = F--------------------------------------
+## ----extract-sat, eval = F------------------------------------------
 ## sat_all <-
 ##   mclapply(1985:2016, get_sat, mc.cores = 12) %>%
 ##   rbindlist() %>%
 ##   .[sat < 0, sat := 0]
 
 
-## ----save, eval = F---------------------------------------------
+## ----save, eval = F-------------------------------------------------
 ## saveRDS(sat_all, here("Data/data-processed/sat_all.rds"))
 

@@ -1,4 +1,4 @@
-## ---------------------------------------------------------------
+## -------------------------------------------------------------------
 #--- load the counties ---#
 base_counties <- readRDS(here("Data/data-processed/base_counties.rds"))
 
@@ -29,7 +29,7 @@ par_list <-
   )
 
 
-## ----download-nass-data, eval = F-------------------------------
+## ----download-nass-data, eval = F-----------------------------------
 ## nass_data <-
 ##   lapply(
 ##     seq_len(nrow(par_list)),
@@ -49,7 +49,7 @@ par_list <-
 ## saveRDS(nass_data, here("Data/data-raw/nass_data_raw.rds"))
 
 
-## ----process-nass-data------------------------------------------
+## ----process-nass-data----------------------------------------------
 (
   nass_data_wide <-
     here("Data/data-raw/nass_data_raw.rds") %>%
@@ -73,7 +73,7 @@ par_list <-
       str_detect(short_desc, "acres"),
       "acres", "yield"
     )] %>%
-    # === irrigated or not? ===#
+    # === irrigated or not ===#
     .[, ir := ifelse(
       str_detect(short_desc, "nir"),
       "nir", "ir"
@@ -89,6 +89,6 @@ par_list <-
 )
 
 
-## ----eval = F---------------------------------------------------
+## ----eval = F-------------------------------------------------------
 ## saveRDS(nass_data_wide, here("Data/data-processed/nass_data.rds"))
 

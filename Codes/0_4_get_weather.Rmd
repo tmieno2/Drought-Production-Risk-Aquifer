@@ -130,18 +130,10 @@ sum_gm_data <-
     # === total et0 ===#
     et0 = sum(et0),
     # === total precip ===#
-    prcp = sum(prcp),
-    # === GDD ===#,
-    gdd = sum(t_min_max_2),
-    # === EDD ===#
-    edd = sum(pmax(0, tmax - 32)),
-    # === number of days above x ===#
-    days_ab_30 = sum(tmax >= 30),
-    # === mean temp ===#
-    mean_temp = mean(tmin + tmax) / 2
+    prcp = sum(prcp)
   ),
   by = .(sc_code, year(date))
   ]
 
-saveRDS(sum_gm_data, here("Data/data-processed", "summrized_gridMET.rds"))
+saveRDS(sum_gm_data, here("Data/data-processed", "summarized_gridMET.rds"))
 ```

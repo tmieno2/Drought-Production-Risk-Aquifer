@@ -30,7 +30,8 @@ tm_shape(st_simplify(hpa)) +
 
 ```{r Get-US-counties}
 (
-  US_county <- tigris::counties(cb = TRUE) %>%
+  US_county <-
+    tigris::counties(cb = TRUE) %>%
     st_as_sf() %>%
     st_transform(st_crs(hpa)) %>%
     rename("state_code" = "STATEFP", "county_code" = "COUNTYFP") %>%
@@ -95,7 +96,7 @@ hpa_states <- hpa_counties$state_code %>% unique()
 
 # Additional counties 
 Additional state codes:
-these supplement the dryland production data for understanding the impact of drought severity
+these may supplement the dryland production data for understanding the impact of drought severity
 on dryland crop production
 
 ```{r }

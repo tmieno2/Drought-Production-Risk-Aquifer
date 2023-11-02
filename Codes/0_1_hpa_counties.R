@@ -1,15 +1,16 @@
-## ----Read-HPA, cache = TRUE-------------------------------------
+## ----Read-HPA, cache = TRUE-----------------------------------------
 hpa <- st_read(here("Data/data-raw/hp_bound2010.shp"))
 
 
-## ---- eval = FALSE----------------------------------------------
+## ---- eval = FALSE--------------------------------------------------
 ## tm_shape(st_simplify(hpa)) +
 ##   tm_polygons()
 
 
-## ----Get-US-counties--------------------------------------------
+## ----Get-US-counties------------------------------------------------
 (
-  US_county <- tigris::counties(cb = TRUE) %>%
+  US_county <-
+    tigris::counties(cb = TRUE) %>%
     st_as_sf() %>%
     st_transform(st_crs(hpa)) %>%
     rename("state_code" = "STATEFP", "county_code" = "COUNTYFP") %>%
@@ -17,19 +18,19 @@ hpa <- st_read(here("Data/data-raw/hp_bound2010.shp"))
 )
 
 
-## ----Identify-overlap, cache = TRUE-----------------------------
+## ----Identify-overlap, cache = TRUE---------------------------------
 hpa_counties <- US_county[hpa, ] %>%
   mutate(whole_area = st_area(.) %>% as.numeric())
 
 
-## ----eval = FALSE-----------------------------------------------
+## ----eval = FALSE---------------------------------------------------
 ## tm_shape(st_simplify(hpa)) +
 ##   tm_polygons() +
 ##   tm_shape(hpa_counties) +
 ##   tm_polygons(col = "blue", alpha = 0.4)
 
 
-## ----intersect-HPA-county---------------------------------------
+## ----intersect-HPA-county-------------------------------------------
 intersected_portion <-
   st_intersection(hpa, hpa_counties) %>%
   # === get the intersecting area ===#
@@ -38,7 +39,7 @@ intersected_portion <-
   .[, .(interesected_area = sum(area)), by = .(state_code, county_code)]
 
 
-## ---------------------------------------------------------------
+## -------------------------------------------------------------------
 hpa_counties <-
   left_join(
     hpa_counties,
@@ -51,15 +52,15 @@ hpa_counties <-
   .[, geometry := NULL]
 
 
-## ----eval = FALSE-----------------------------------------------
+## ----eval = FALSE---------------------------------------------------
 ## hpa_counties$ir_area_ratio %>% hist()
 
 
-## ---------------------------------------------------------------
+## -------------------------------------------------------------------
 hpa_states <- hpa_counties$state_code %>% unique()
 
 
-## ---------------------------------------------------------------
+## -------------------------------------------------------------------
 data(fips_codes)
 
 additional_states <-
@@ -72,14 +73,14 @@ additional_states <-
 all_states <- c(hpa_states, additional_states)
 
 
-## ---------------------------------------------------------------
+## -------------------------------------------------------------------
 fips_codes <-
   fips_codes %>%
   data.table() %>%
   .[, .(state, state_code, state_name, county_code)]
 
 
-## ---------------------------------------------------------------
+## -------------------------------------------------------------------
 (
   all_counties <-
     dplyr::filter(US_county, state_code %in% all_states) %>%
@@ -98,7 +99,7 @@ fips_codes <-
 )
 
 
-## ----map-all-counties, eval = FALSE-----------------------------
+## ----map-all-counties, eval = FALSE---------------------------------
 ## tm_shape(st_as_sf(all_counties)) +
 ##   tm_polygons() +
 ##   tm_shape(
@@ -108,6 +109,6 @@ fips_codes <-
 ##   tm_borders(col = "red")
 
 
-## ---------------------------------------------------------------
+## -------------------------------------------------------------------
 saveRDS(all_counties, here("Data/data-processed/base_counties.rds"))
 

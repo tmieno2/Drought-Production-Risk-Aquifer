@@ -3,60 +3,10 @@
 \PassOptionsToPackage{hyphens}{url}
 %
 \documentclass[
-]{article}\usepackage[]{graphicx}\usepackage[]{xcolor}
-% maxwidth is the original width if it is less than linewidth
-% otherwise use linewidth (to make sure the graphics do not exceed the margin)
-\makeatletter
-\def\maxwidth{ %
-  \ifdim\Gin@nat@width>\linewidth
-    \linewidth
-  \else
-    \Gin@nat@width
-  \fi
-}
-\makeatother
-
-\definecolor{fgcolor}{rgb}{0.345, 0.345, 0.345}
-\newcommand{\hlnum}[1]{\textcolor[rgb]{0.686,0.059,0.569}{#1}}%
-\newcommand{\hlstr}[1]{\textcolor[rgb]{0.192,0.494,0.8}{#1}}%
-\newcommand{\hlcom}[1]{\textcolor[rgb]{0.678,0.584,0.686}{\textit{#1}}}%
-\newcommand{\hlopt}[1]{\textcolor[rgb]{0,0,0}{#1}}%
-\newcommand{\hlstd}[1]{\textcolor[rgb]{0.345,0.345,0.345}{#1}}%
-\newcommand{\hlkwa}[1]{\textcolor[rgb]{0.161,0.373,0.58}{\textbf{#1}}}%
-\newcommand{\hlkwb}[1]{\textcolor[rgb]{0.69,0.353,0.396}{#1}}%
-\newcommand{\hlkwc}[1]{\textcolor[rgb]{0.333,0.667,0.333}{#1}}%
-\newcommand{\hlkwd}[1]{\textcolor[rgb]{0.737,0.353,0.396}{\textbf{#1}}}%
-\let\hlipl\hlkwb
-
-\usepackage{framed}
-\makeatletter
-\newenvironment{kframe}{%
- \def\at@end@of@kframe{}%
- \ifinner\ifhmode%
-  \def\at@end@of@kframe{\end{minipage}}%
-  \begin{minipage}{\columnwidth}%
- \fi\fi%
- \def\FrameCommand##1{\hskip\@totalleftmargin \hskip-\fboxsep
- \colorbox{shadecolor}{##1}\hskip-\fboxsep
-     % There is no \\@totalrightmargin, so:
-     \hskip-\linewidth \hskip-\@totalleftmargin \hskip\columnwidth}%
- \MakeFramed {\advance\hsize-\width
-   \@totalleftmargin\z@ \linewidth\hsize
-   \@setminipage}}%
- {\par\unskip\endMakeFramed%
- \at@end@of@kframe}
-\makeatother
-
-\definecolor{shadecolor}{rgb}{.97, .97, .97}
-\definecolor{messagecolor}{rgb}{0, 0, 0}
-\definecolor{warningcolor}{rgb}{1, 0, 1}
-\definecolor{errorcolor}{rgb}{1, 0, 0}
-\newenvironment{knitrout}{}{} % an empty environment to be redefined in TeX
-
-\usepackage{alltt}
+]{article}
 \usepackage{amsmath,amssymb}
 \usepackage{lmodern}
-\usepackage[labelfont=bf]{caption} % \caption*{} will create legend (explanatory text)
+\usepackage[labelfont=bf, textfont=footnotesize]{caption} % \caption*{} will create legend (explanatory text)
 \usepackage{iftex}
 \ifPDFTeX
   \usepackage[T1]{fontenc}
@@ -143,7 +93,13 @@
   hidelinks,
   pdfcreator={LaTeX via pandoc}}
 
-
+<<init, include = FALSE>>=
+knitr::opts_chunk$set(
+  echo = FALSE
+)
+library(tidyverse)
+library(data.table)
+@
 
 \title{Aquifer depletion exacerbates agricultural drought losses in the US High Plains}
 
@@ -158,7 +114,9 @@
 \affil[4]{Department of Agricultural Economics, University of Nebraska Lincoln}
 
 \date{}
-\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+
+
+
 \begin{document}
 \maketitle
 \begin{abstract}
@@ -179,43 +137,88 @@ In this paper, we present empirical evidence about how aquifer depletion affects
 \hypertarget{results}{%
 \section{Results}\label{results}}
 
-
+<<load_results, echo = FALSE>>=
+setwd(here::here("Writing"))
+all_results <- readRDS("../Results/all_results.rds")
+@
 
 \hypertarget{impact-intensive}{%
-\subsection{Sensitivity of per-acre crop yields to water deficits}\label{impact-intensive}}
+\subsection{Sensitivity of per-area crop yields to water deficits}\label{impact-intensive}}
 
 Figure \ref{fig:yield-response} shows the estimated crop yield response to water deficit for rainfed production and groundwater-irrigated production at different levels of aquifer thickness categories for corn (panel A) and soybean (panel B). Confidence intervals were not presented to avoid over-crowding the figures. Please see Appendix \ref{reg-conf} for estimated yield response curves with 95 percent confidence interval. The histogram of annual water deficit is presented at the top for each crop. In wetter years with low crop irrigation requirements (i.e., negative values of water deficit), rainfed and irrigated yields are very similar for both corn and soybean. As drought severity increases (i.e., as water deficit increases), rainfed yields of both crops decline significantly whereas irrigated yields are increasing or stable as deficit increases (see Figures \ref{fig:irrigated-yield-ind-corn} and \ref{fig:irrigated-yield-ind-soy} for the 95\% confidence intervals). This result reflects the positive benefits irrigation provides both as a buffer against precipitation variability, and as a means of raising overall yields through increased evapotranspiration and associated biomass accumulation, reductions of heat-related stressors, and other factors \citep{zhu2022untangling, li2020quantifying}.
 
 We now focus on comparing yield response to water deficit among the three aquifer thickness categories (all irrigated). First, for water deficits above around 400mm, yield changes become negative for counties with the lowest levels of aquifer thickness (i.e., 1st quantile in Figure \ref{fig:yield-response}). This likely reflects the restrictions that lower aquifer thickness and associated reductions in well yields place on farmers' ability to fully meet crop water requirements during periods of more severe or extended water deficits \citetext{\citealp[\citet{foster2014modeling}]{rad2020effects}; \citealp{hrozencik2017heterogeneous}}. In contrast, yield continues to increase gradually as water deficit increases beyond 400 mm for counties with the highest level of aquifer thickness.
 
+<<echo = FALSE>>=
+delta_yield_lowest_highest <- 
+  all_results[crop == "corn", yield_dif_test][[1]] %>%
+  .[comp_q == 3, ] %>%  
+  .[which.min(abs(balance -950)), dif_hat] %>%
+  round(digits = 2)
+@
 
+Figure \ref{fig:yield-dif} shows the difference in yield of the second and third (highest) aquifer quantiles relative to the first (lowest) quantile with the 95\% confidence interval for corn and soybean. For corn, in years with water deficit greater than about 700 mm, the highest aquifer thickness group has statistically significantly higher yields than the lowest aquifer thickness group. At an extreme water deficit level of 950 mm (average water deficit in 2012, the most extreme drought in our historical record), the difference in yields between the smallest and largest aquifer thickness groups is \Sexpr{delta_yield_lowest_highest} tonne/ha. Unlike corn, irrigated soybean yields are not statistically distinguishable among the three aquifer thickness groups. This is likely because soybean is not as water demanding a crop as corn, meaning that even counties with lower aquifer thickness can meet the majority of crop water demands as well yield is not a significantly binding constraint on irrigation management decisions.
 
-Figure \ref{fig:yield-dif} shows the difference in yield of the second and third (highest) aquifer quantiles relative to the first (lowest) quantile with the 95\% confidence interval for corn and soybean. For corn, in years with water deficit greater than about 700 mm, the highest aquifer thickness group has statistically significantly higher yields than the lowest aquifer thickness group. At an extreme water deficit level of 950 mm (average water deficit in 2012, the most extreme drought in our historical record), the difference in yields between the smallest and largest aquifer thickness groups is 1.31 tonne/ha. Unlike corn, irrigated soybean yields are not statistically distinguishable among the three aquifer thickness groups. This is likely because soybean is not as water demanding a crop as corn, meaning that even counties with lower aquifer thickness can meet the majority of crop water demands as well yield is not a significantly binding constraint on irrigation management decisions.
+<<num_obs_yield_reg, echo = FALSE>>=
+nobs_corn <- 
+  all_results[crop == "corn", data][[1]] %>% 
+  nrow() %>%
+  format(big.mark=",")
 
-
+nobs_soy <- all_results[crop == "soy", data][[1]] %>% 
+  nrow() %>%
+  format(big.mark=",")
+@
 
 \hypertarget{impact-share}{%
 \subsection{Share of agricultural land under irrigation}\label{impact-share}}
 
 While aquifer thickness has a statistically significant impact on per-area irrigated crop yields in drought conditions (water deficit greater than 700 mm), the magnitude of the yield impact is small when compared to differences between irrigated and rainfed production for the same weather conditions. One explanation for this result is that farmers may choose to retain a smaller proportion of land in irrigated production, so that limited groundwater pumping capacity can be used to adequately buffer crops against drought on land that remains under irrigation. Reductions in irrigated areas as an aquifer is depleted have been demonstrated theoretically \citep{rad2020effects, foster2014modeling, hrozencik2017heterogeneous, deines2020transitions}, but there has been little empirical research on farmers' irrigated area choices or how these are affected by combinations and magnitudes of weather risks and groundwater scarcity.
 
+<<ir_share, echo = FALSE>>=
+corn_share <- all_results[crop == "corn", share_pred_data][[1]]
 
+share_high <-
+  corn_share[which.min(abs(sat - 130)), ir_share_hat] %>%
+  round(digits = 2)
 
-Figure \ref{fig:ir-share} shows the estimated relationship between aquifer thickness and the share of production area that is irrigated for corn and soybean after accounting for spatio-temporal variations in weather conditions and drought risk exposure across the aquifer. Figure \ref{fig:ir-share} demonstrates that aquifer thickness has meaningfully large impacts on the share of irrigated production for both corn and soybean. As aquifer thickness declines, the share of irrigated acres for corn decreases from around 0.89 (89\%) for an average county-level aquifer thickness of 100 m to 0.7 (70\%) for an average county-level aquifer thickness of 10 m (See Appendix \ref{test-dif-share} for formal statistical testings). Reductions in the share of production area under irrigation is also evident for soybean.
+share_low <-
+  corn_share[which.min(abs(sat - 10)), ir_share_hat] %>%
+  round(digits = 2) 
+@
 
+Figure \ref{fig:ir-share} shows the estimated relationship between aquifer thickness and the share of production area that is irrigated for corn and soybean after accounting for spatio-temporal variations in weather conditions and drought risk exposure across the aquifer. Figure \ref{fig:ir-share} demonstrates that aquifer thickness has meaningfully large impacts on the share of irrigated production for both corn and soybean. As aquifer thickness declines, the share of irrigated acres for corn decreases from around \Sexpr{share_high} (\Sexpr{share_high * 100}\%) for an average county-level aquifer thickness of 100 m to \Sexpr{share_low} (\Sexpr{share_low * 100}\%) for an average county-level aquifer thickness of 10 m (See Appendix \ref{test-dif-share} for formal statistical testings). Reductions in the share of production area under irrigation is also evident for soybean.
 
+<<num_obs_share_reg, echo = FALSE>>=
+nobs_corn_share <- 
+  all_results[crop == "corn", share_reg_data][[1]] %>% 
+  nrow() %>%
+  format(big.mark=",")
+
+nobs_soy_share <- 
+  all_results[crop == "soy", share_reg_data][[1]] %>% 
+  nrow() %>%
+  format(big.mark=",")
+@
 
 \hypertarget{aquifer-depletion-increases-overall-drought-related-production-losses-by-up-to-25}{%
 \subsection{\texorpdfstring{Overall drought-related production losses}{Aquifer depletion increases overall drought-related production losses by up to 25\textbackslash\%}}\label{aquifer-depletion-increases-overall-drought-related-production-losses-by-up-to-25}}
 
-
+<<res_at_950, echo = FALSE>>=
+res_at_950 <-
+  all_results[, .(crop, avg_yield_pred_data)] %>%
+  unnest(cols = c(avg_yield_pred_data)) %>%
+  data.table() %>%
+  .[crop == "corn", ] %>%
+  .[(abs(balance - 950)) < 5, ]
+@
 
 
 The overall influence of aquifer depletion on drought-related production losses is a function of both per-area irrigated yield and irrigated area changes highlighted in Sections \ref{impact-intensive} and \ref{impact-share}. Combining both responses, Figure \ref{fig:tot-impact} shows the relationship between water deficit and average per-area production (weighted-average of irrigated and rainfed yields, where the weights are production area shares) for corn and soybean at four values of aquifer thickness: 10, 40, 70, and 100 meters. While similar trends are observed as in Figure \ref{fig:yield-response}, the difference in production loss caused by high water deficits among the aquifer thickness levels are much more pronounced due to lower estimated irrigated area share for smaller aquifer thickness values. For example, for an aquifer thickness of 10 m, reductions in average yields occur for smaller water deficits than are required to trigger reductions in per-area irrigated yields alone. Similarly, the overall magnitude of yield reduction is greater for average yields than for per-area irrigated yields. This is because low aquifer thickness values have a greater estimated share of crop area under rainfed production, which magnifies average yield declines with increasing water deficits. 
 
 Figure \ref{fig:dif-tot-impact} shows the difference in average per-area productivity for 40 m, 70 m, and 100 m aquifer thickness levels relative to an aquifer thickness of 10 m for corn and soybean. For corn, aquifer thickness does not have a significant impact on productivity when water deficits are below about 400 mm. However, beyond this threshold, higher levels of water deficit result in noticeable and statistically significant reductions to average corn production. This reflects the combination of lower irrigated yields under drought conditions, and, more importantly, reduced overall productivity due to smaller share of land under irrigation in areas where aquifer thickness is lower. Similar effects are also observed for soybean, although reductions in average production only occur at a higher deficit threshold (greater than around 600 mm) and are smaller in overall magnitude. For example, for a seasonal water deficit of 950 mm (average water deficit in 2012, the most extreme drought in our historical record), average per-area corn and soybean productivity are about 25\% and 15\% lower, respectively, when differentiating between areas with the 100 m and 10 m aquifer thicknesses.
 
-Figure \ref{fig:tot-impact} and Figure \ref{fig:dif-tot-impact} also demonstrate that impact of aquifer thickness on average per-area production is highly non-linear at high seasonal water deficits. At a water deficit of 950 mm, for example, reducing from 100 m aquifer thickness to 70 m (decline of 30 m) would result in only 0.15 tonne/ha of production loss for corn. This negligible difference in average yield from the decline is due to the insensitivity of the share of irrigated acres to a decline in aquifer thickness when the initial aquifer thickness level is high as can be seen in Figure \ref{fig:ir-share}. Reducing from 70 m aquifer thickness to 40 m (decline of 30 m) would result in 0.95 tonne/ha of production loss for corn, with a further drop from 40 m aquifer thickness to 10 m (decline of 30 m) leading to 1.45 tonne/ha of production loss for corn. Similar but less pronounced effects are also observed for soybean. This non-linear impact of aquifer thickness is due to the influence of aquifer thickness on the share of irrigated corn acres (Figure \ref{fig:ir-share}), which implicitly reflects how aquifer thickness alters well yields and, in turn, farmers' ability to effectively and reliably buffer crops against water deficits during the growing season.
+Figure \ref{fig:tot-impact} and Figure \ref{fig:dif-tot-impact} also demonstrate that impact of aquifer thickness on average per-area production is highly non-linear at high seasonal water deficits. At a water deficit of 950 mm, for example, reducing from 100 m aquifer thickness to 70 m (decline of 30 m) would result in only \Sexpr{round(res_at_950[sat == 100 & crop == "corn", avg_yield] - res_at_950[sat == 70 & crop == "corn", avg_yield], digits = 2)} tonne/ha of production loss for corn. This negligible difference in average yield from the decline is due to the insensitivity of the share of irrigated acres to a decline in aquifer thickness when the initial aquifer thickness level is high as can be seen in Figure \ref{fig:ir-share}. Reducing from 70 m aquifer thickness to 40 m (decline of 30 m) would result in \Sexpr{round(res_at_950[sat == 70 & crop == "corn", avg_yield] - res_at_950[sat == 40 & crop == "corn", avg_yield], digits = 2)} tonne/ha of production loss for corn, with a further drop from 40 m aquifer thickness to 10 m (decline of 30 m) leading to \Sexpr{round(res_at_950[sat == 40 & crop == "corn", avg_yield] - res_at_950[sat == 10 & crop == "corn", avg_yield], digits = 2)} tonne/ha of production loss for corn. Similar but less pronounced effects are also observed for soybean. This non-linear impact of aquifer thickness is due to the influence of aquifer thickness on the share of irrigated corn acres (Figure \ref{fig:ir-share}), which implicitly reflects how aquifer thickness alters well yields and, in turn, farmers' ability to effectively and reliably buffer crops against water deficits during the growing season.
 
 \clearpage
 
@@ -230,7 +233,7 @@ Our findings also provide useful guidance for water managers and policymakers se
 
 Several opportunities exist for future research to build upon the methods and analyses presented here. First, due to the limited resolution of our observational data, we were only able to estimate the impacts of different aquifer thickness categories on drought risk. Availability of sub-county crop yield data, for example from satellite remote sensing and/or in-situ monitoring \citep{edreira2020combining, deines2021million}, would allow models of the continuous effect of aquifer thickness on drought risk to be developed. Unobserved variations in aquifer properties will also introduce noise into the relationships between aquifer thickness, well yields, and drought risk. For example, a thinner aquifer interval composed of coarse sands and gravels may be able to supply comparable or higher well yields than a thicker aquifer dominated by fine sands and silt deposits, and hence offer greater resilience to water deficits despite similar or larger aquifer thickness \citep{butler2013interpretation, korus2020depletion}. These measurement errors in the relationship between aquifer thickness and well yield will lead to attenuation bias \citep{bound1991extent, hyslop2001bias}, suggesting that our analysis is likely to be an underestimate of the true impacts of groundwater depletion on drought risk. Nonetheless, our analysis shows that - even in the presence of these measurement uncertainties - we are still able to identify statistically significant increases in drought risk exposure for irrigated agriculture as a function of declining aquifer thickness. Improved data on spatial variations in aquifer properties and greater monitoring of real-world changes in well capacities alongside traditional water level measurements would help to further refine understanding of patterns of drought vulnerability across the HPA. This would enable more precise estimates to be made of critical tipping points in the resilience of irrigated agriculture to drought, which are needed to effectively design and target groundwater conservation policies.
 
-Second, our analysis considered the effects of aquifer thickness on farmers' decisions to switch from irrigated to rainfed production, but did not assess other potential responses to aquifer depletion such as changing crop types or irrigation management practices. Switching to more drought resistant crops or varieties may enable farmers to maintain irrigated production at lower levels of aquifer thickness, and has been shown to be an important response to increasing agricultural water scarcity and abstraction policies in other studies \citep{bhattarai2021impact, deines2019quantifying, manning2017producer}. Improvements to irrigation scheduling practices and technologies, such as have been implemented as part of the SD6-LEMA (Local Enhanced Management Area) in Kansas \citep{deines2019quantifying, glose2022quantifying} and in parts of Texas \citep{mrad2020peak} and which are proposed as part of California's Sustainable Groundwater Management Act (SGMA) \citep{berbel2019droughts, lubell2020sustainable}, could also help to improve the efficiency of irrigation and, hence, the ability to more effectively meet crop water demands with lower well capacities. Such interventions may reduce - but not eliminate - increases in drought risk caused by lower or declining aquifer thickness, and could also help to mitigate against potential yield losses caused by over-use of water in wetter years via raising awareness of efficiency saving potentials \citep{foster2019assessing} and the importance of conservation \citep{marston2022}. However, risks also exist that irrigation efficiency improvements will increase net extraction, ultimately causing a rebound effect that exacerbates future aquifer depletion and drought risks \citep{grafton2018paradox,perez2021agricultural}. Future research should explore potential strategies that farmers could adopt to lessen the combined impacts of drought and aquifer depletion, alongside efforts to curb unsustainable groundwater extraction and climate change.
+Second, our analysis considered the effects of aquifer thickness on farmers' decisions to switch from irrigated to rainfed production, but did not assess other potential responses to aquifer depletion such as changing crop types or irrigation management practices. Switching to more drought resistant crops or varieties may enable farmers to maintain irrigated production at lower levels of aquifer thickness, and has been shown to be an important response to increasing agricultural water scarcity and abstraction policies in other studies \citep{bhattarai2021impact, deines2019quantifying, manning2017producer}. Improvements to irrigation scheduling practices and technologies, such as have been implemented as part of the SD6-LEMA (Local Enhanced Management Area) in Kansas \citep{deines2019quantifying, glose2022quantifying} and in parts of Texas \citep{mrad2020peak} and which are proposed as part of California's Sustainable Groundwater Management Act (SGMA) \citep{berbel2019droughts, lubell2020sustainable}, could also help to improve the efficiency of irrigation and, hence, the ability to more effectively meet crop water demands with lower well capacities. Such interventions may reduce - but not eliminate - increases in drought risk caused by lower or declining aquifer thickness, and could also help to mitigate against potential yield losses caused by over-use of water in wetter years via raising awareness of efficiency saving potentials \citep{foster2019assessing} and the importance of conservation \citep{marston2022}. However, risks also exist that irrigation efficiency improvements will increase net extraction, ultimately causing a rebound effect that exacerbates future aquifer depletion and drought risks \citep{grafton2018paradox,perez2021agricultural}. Future research should explore potential strategies that farmers could adapt to lessen the combined impacts of drought and aquifer depletion, alongside efforts to curb unsustainable groundwater extraction and climate change.
 
 Finally, we focus on the impacts of aquifer thickness on agricultural resilience to seasonal water deficits. However, where water deficits are distributed unevenly during the season, negative impacts of aquifer depletion may be even larger. This is because reductions in well yields caused by aquifer depletion will constrain farmers' ability to meet peak crop water demands, increasing yield losses compared with if water deficits had been distributed evenly throughout the season \citep{ortiz2019unpacking}. Furthermore, irrigation also has broader benefits for crops such as reducing heat-related stress through cooling of land surface temperatures \citep{adegoke2003impact, bonfils2007empirical, lobell2008effect, zhu2022untangling}. Reductions in aquifer thickness therefore may have other negative impacts on irrigated crop productivity, if constraints to water supply due to aquifer depletion are significant enough to limit cooling benefits of irrigation during the growing season.
 
@@ -250,9 +253,9 @@ Soil characteristics data (sand percentage, silt percentage, and water holding c
 Dataset (SSURGO). Observation units of the SSURGO data are polygons. For each county, the SSURGO polygons were overlaid with the county boundary, and the area-weighted average of the soil variables were calculated.
 
 
-As a proxy for the extent of aquifer depletion we use annual estimates of aquifer thickness generated by existing research \citep{haacker2016water,haacker2023}. These data provide annual estimates of the aquifer thickness at 250m resolution since 1935. Annual aquifer thickness maps were derived based on interpolation of 14,000 to 20,000 individual observations of water levels per year, along with detailed maps of both the land surface elevation and bedrock elevation of the HPA. Aquifer thickness estimates for each year were aggregated to the county level using an area-weighted average to match the resolution of agricultural production data. Aquifer thickness values were only estimated for counties with irrigated yield observations. Furthermore, during the aggregation process, any county that had an aquifer thickness value lower than 9 m was removed before aggregation to reflect the fact that aquifer thicknesses lower than this threshold are not considered to be viable for extraction and therefore it is unlikely these areas contribute groundwater for irrigation production \citep{fenichel2016measuring, haacker2016water, deines2020transitions}. Figure \ref{fig:sat-map} presents the distribution of aquifer thickness across our study area for counties included in corn and soybean analyses. Aquifer thickness levels vary substantially over space and time, which we will exploit in our analysis to quantify how aquifer thickness influences farmers' exposure and responses to drought.
+As a proxy for the extent of aquifer depletion we use annual estimates of aquifer thickness generated by existing research \citep{haacker2016water,haacker2023}. These data provide annual estimates of the aquifer thickness at 250 m resolution since 1935. Annual aquifer thickness maps were derived based on interpolation of 14,000 to 20,000 individual observations of water levels per year, along with detailed maps of both the land surface elevation and bedrock elevation of the HPA. Aquifer thickness estimates for each year were aggregated to the county level using an area-weighted average to match the resolution of agricultural production data. Aquifer thickness values were only estimated for counties with irrigated yield observations. Furthermore, during the aggregation process, any county that had an aquifer thickness value lower than 9 m was removed before aggregation to reflect the fact that aquifer thicknesses lower than this threshold are not considered to be viable for extraction and therefore it is unlikely these areas contribute groundwater for irrigation production \citep{fenichel2016measuring, haacker2016water, deines2020transitions}. Figure \ref{fig:sat-map} presents the distribution of aquifer thickness across our study area for counties included in corn and soybean analyses. Aquifer thickness levels vary substantially over space and time, which we will exploit in our analysis to quantify how aquifer thickness influences farmers' exposure and responses to drought.
 
-These data were combined to form four sets of data for regression analysis: (1) per-acre corn yield ($8,814$ observations), (2) per-acre soybean yield ($5,997$ observations), (3) share of irrigated corn ($2,464$ observations), and (4) share of irrigated soybean ($1,553$ observations).
+These data were combined to form four sets of data for regression analysis: (1) per-area corn yield ($\Sexpr{nobs_corn}$ observations), (2) per-area soybean yield ($\Sexpr{nobs_soy}$ observations), (3) share of irrigated corn ($\Sexpr{nobs_corn_share}$ observations), and (4) share of irrigated soybean ($\Sexpr{nobs_soy_share}$ observations).
 
 \hypertarget{regression-models}{%
 \subsection{Regression Models}\label{regression-models}}
@@ -262,10 +265,10 @@ Aquifer depletion may impact resilience of irrigated crop production to drought 
 To assess the first of these impacts, we quantify the impact of seasonal water deficits (\(D\)) during the growing season (May through September) on county-level rainfed and irrigated yields (\(Y\)) using a hierarchical generalized additive model, where irrigated yield response to seasonal water deficits is conditioned on the level of aquifer thickness (\(A\)) in the county in a given year. Our regression model is given in Equation \eqref{eq:eqn1}, with the same model formulation used for corn and soybean:
 
 \begin{equation}
-Y_{i,t} = \sum_{j=1}^4 \sigma_j C_j + \sum_{j=1}^4 \sum_{k=1}^K \beta_{j,k}\phi_{j,k}(D_{i,t})\cdot C_j  + \alpha_i + \lambda_t + v_{i,t} \label{eq:eqn1}
+Y_{i,t,ir} = \sum_{j=1}^4 \sigma_j C_j + \sum_{j=1}^4 \sum_{k=1}^K \beta_{j,k}\phi_{j,k}(D_{i,t})\cdot C_j  + \alpha_{i,ir} + \lambda_t + v_{i,t,ir} \label{eq:eqn1}
 \end{equation}
 
-where county and year are indicated by subscripts \(i\) and \(t\), respectively, \(Y\) is crop yield, and \(D\) is seasonal water deficit. \(C_j\) is a dummy variable that takes 1 if observation \(i\) is under category \(C_j\), 0 otherwise. The observations are grouped into four categories: rainfed production, and county-years with aquifer thickness falling in the \([0\%-33.3\%)\), \([33.3\%-66.7\%)\), and \([66.7\% - 100\%]\) quantile ranges of aquifer thickness. The three irrigated production groups have about the same number of observations, which ensures statistical stability in estimating yield response to drought by category. Spline functions are used to capture the potential non-linearity of the impact of water deficit on yield in a flexible manner, with \(\sigma_j\) representing the category-specific intercept, \(\phi_{j,k}\) \(k\)th spline basis function, and \(\beta_k\) is its coefficient (see Appendix \ref{spline-basis} for further explanations on how spline-based regression works). $K$ is the total number of spline basis functions. $K = 3$ was chosen for this regression to prevent our estimated response from becoming unrealistically oscillatory while maintaining a good fit based on Bayesian Information Criterion (BIC). To control for time-invariant heterogeneity across counties and yearly shocks, county fixed effects (\(\alpha_i\)) and year fixed effects (\(\lambda_t\)) are also included and standard error estimation is clustered by county.
+where county and year are indicated by subscripts \(i\) and \(t\), respectively, whether rainfed or irrigated is indicated by $ir$,  \(Y\) is crop yield, and \(D\) is seasonal water deficit. \(C_j\) is a dummy variable that takes 1 if observation \(i\) is under category \(C_j\), 0 otherwise. The observations are grouped into four categories: rainfed production, and county-years with aquifer thickness falling in the \([0\%-33.3\%)\), \([33.3\%-66.7\%)\), and \([66.7\% - 100\%]\) quantile ranges of aquifer thickness. The three irrigated production groups have about the same number of observations, which ensures statistical stability in estimating yield response to drought by category. Spline functions are used to capture the potential non-linearity of the impact of water deficit on yield in a flexible manner, with \(\sigma_j\) representing the category-specific intercept, \(\phi_{j,k}\) \(k\)th spline basis function, and \(\beta_k\) is its coefficient (see Appendix \ref{spline-basis} for further explanations on how spline-based regression works). $K$ is the total number of spline basis functions. $K = 3$ was chosen for this regression to prevent our estimated response from becoming unrealistically oscillatory while maintaining a good fit based on Bayesian Information Criterion (BIC). To control for time-invariant heterogeneity across counties and yearly shocks, county-irrigation-status fixed effects $\alpha_{i, ir}$ and year fixed effects $\lambda_t$ are also included. County-irrigation-status fixed effects are used instead of county fixed effects because some counties have both rainfed and irrigated observations, and they need to be distinguished. Standard error estimation is clustered by county.
 
 
 To estimate the additional impact of aquifer thickness on the share of total acres that are irrigated in a county, a fractional logit model under the generalized additive model framework is used in which the impact of aquifer thickness, average water deficit, and their interactions are estimated without the prior requirement to assume any functional forms. This allows for flexible representation of the non-linear relationships between drought risks, aquifer conditions, and agricultural land use, including potential thresholds in farmers' irrigated area choices under water supply constraints that have been noted in prior work \citep{foster2015well, foster2015analysis, hrozencik2017heterogeneous}. The model is given in Equation \eqref{eq:eqn2} below:
@@ -308,14 +311,17 @@ Funding for the research in this manuscript was provided by the United States De
 
 \section*{Figures}
 
+%------------------------
+%- Figure 1
+%------------------------
+
 \begin{figure}[H]
 
 \caption{The impact of water deficit and aquifer thickness on rainfed and irrigated per-area yields of corn and soybean in US High Plains.}
 
 % {\centering \includegraphics[width=6.5in,height=500px,]{../Results/Figures/g_yield_intensive}}
 
-
-\caption*{Irrigated yield responses to water deficits are dissagregated by aquifer thickness level, considering three quantile groups that capture the range of aquifer thickness values in our sample: (i) 9 m to 30.1 m; (ii) 30.1 m to 67.2 m; and (iii) 67.2 m to 215.8 m. The histograms on the top of each panel show the distribution of county-level annual water deficit values included in regressions for each crop. Total number of observations are $8,814$ and $5,997$ for corn and soybean regressions, respectively.}
+\caption*{Note: The solid lines represent per-area irrigated yield responses to water deficits, dissagregated by aquifer thickness level, considering three quantile groups that capture the range of aquifer thickness values in our sample: (i) 9 m to 30.1 m; (ii) 30.1 m to 67.2 m; and (iii) 67.2 m to 215.8 m. The histograms on the top of each panel show the distribution of county-level annual water deficit values included in regressions for each crop. Total number of observations are $\Sexpr{nobs_corn}$ and $\Sexpr{nobs_soy}$ for corn and soybean regressions, respectively.}
 \label{fig:yield-response}
 \end{figure}
 
@@ -329,7 +335,7 @@ Funding for the research in this manuscript was provided by the United States De
 
 % {\centering \includegraphics[width=6in,height=500px,]{../Results/Figures/g_ir_yield_dif}}
 
-\caption*{The solid red lines represent the difference in estimated per-acre irrigated corn (top panels) and soybean (bottom panels) yields for the second and third (largest) aquifer thickness quantiles relative to the first (smallest) aquifer thickness quantile. Shaded area represents 95\% confidence interval.}
+\caption*{Note: The solid red lines represent the difference in estimated per-area irrigated corn (top panels) and soybean (bottom panels) yields for the second and third (largest) aquifer thickness quantiles relative to the first (smallest) aquifer thickness quantile. Shaded area represents 95\% confidence interval.}
 \label{fig:yield-dif}
 \end{figure}
 
@@ -338,43 +344,77 @@ Funding for the research in this manuscript was provided by the United States De
 %------------------------
 
 \begin{figure}[H]
-\caption{The estimated impact of aquifer thickness on the share of agricultural production under irrigation for corn and soybean producing counties in the US High Plains.}
+\caption{The estimated impact of aquifer thickness on the share of agricultural production under irrigation for corn and soybean producing counties in the US High Plains}
 
 % {\centering \includegraphics[width=6in,height=500px,]{../Results/Figures/g_share}}
 
 \label{fig:ir-share}
-\caption*{The solid black line represents the estimated share of irrigated acres. Shaded area represents 95\% confidence interval. The histograms on the top of each panel show the distribution of county-level aquifer thickness values included for each crop. Total number of observations are $2,464$ and $1,553$ for corn and soybean regressions, respectively.}
+\caption*{Note: The solid black line represents the estimated share of irrigated acres. Shaded area represents 95\% confidence interval. The histograms on the top of each panel show the distribution of county-level aquifer thickness values included for each crop. Total number of observations are $\Sexpr{nobs_corn_share}$ and $\Sexpr{nobs_soy_share}$ for corn and soybean regressions, respectively.}
 \end{figure}
 
+%------------------------
+%- Figure 4
+%------------------------
+
 \begin{figure}[H]
+
+\caption{Average productivity of corn and soybean in the US High Plains}
 
 % {\centering \includegraphics[width=6in,height=500px,]{../Results/Figures/g_total_impact}}
-
-\caption{Average productivity of corn and soybean in the US High Plains for different levels of water deficit and aquifer thickness, considering both per-area yield responses and farmers' choices about irrigated area shares in response to different water deficit and aquifer conditions. See Appendix \ref{reg-conf} for estimated average yield response curves with 95\% confidence intervals displayed, which are omitted here for visual clarity.}\label{fig:tot-impact}
+\caption*{Note: The solid lines represent average yield at different levels of water deficit and aquifer thickness, considering both per-area yield responses and farmers' choices about irrigated area shares in response to different water deficit and aquifer conditions. See Appendix \ref{reg-conf} for estimated average yield response curves with 95\% confidence intervals displayed, which are omitted here for visual clarity. The histograms on the top of each panel show the distribution of county-level annual water deficit values included in regressions for each crop.}
+\label{fig:tot-impact}
 \end{figure}
+
+%------------------------
+%- Figure 5
+%------------------------
 
 \begin{figure}[H]
 
+\caption{Difference in average yield of corn and soybean for aquifer thickness levels}
 % {\centering \includegraphics[width=6in,height=500px,]{../Results/Figures/g_avg_yield_dif}}
 
-\caption{Difference in average yield of corn and soybean for aquifer thickness levels of 40 m, 70 m, and 100 m, relative to a baseline aquifer thickness of 10 m. Shaded areas denote 95\% confidence interval, which when greater than zero indicate average yields for the given aquifer thickness level are statistically significantly greater than for an aquifer thickness of 10 m at the 5\% level of significance.}\label{fig:dif-tot-impact}
+\caption*{Note: The solid red lines represent difference in average yield of corn and soybean for aquifer thickness levels of 40 m, 70 m, and 100 m, relative to a baseline aquifer thickness of 10 m. Shaded areas denote 95\% confidence interval, which when greater than zero indicate average yields for the given aquifer thickness level are statistically significantly greater than for an aquifer thickness of 10 m at the 5\% level of significance.}
+\label{fig:dif-tot-impact}
 \end{figure}
 
+%------------------------
+%- Figure 6
+%------------------------
+
 \begin{figure}[H]
+
+\caption{Historical rainfed yield, irrigated yield, and water deficit}
 
 % {\centering \includegraphics[width=750px,height=6in,]{../Results/Figures/g_y_wd_all}}
 
-\caption{Historical rainfed yield, irrigated yield, and water deficit. The blue solid, red solid, and black dotted lines represent irrigated yield, rainfed yield, and water deficit, respectively.}\label{fig:deficit-yield-hist}
+\caption*{Note: The blue solid, red solid, and black dotted lines represent irrigated yield, rainfed yield, and water deficit, respectively.}\label{fig:deficit-yield-hist}
 \end{figure}
+
+%------------------------
+%- Figure 7
+%------------------------
 
 \begin{figure}[H]
 
+\caption{County-average aquifer thickness in 2016}
+
 % {\centering \includegraphics[width=6in,height=500px,]{../Results/Figures/g_map}}
 
-\caption{Map showing county-average aquifer thickness in 2016 for each county included in our corn and soybean regression analyses. Counties highlighted in grey are rainfed only, and the red polygon denotes the boundary of the High Plains Aquifer system}\label{fig:sat-map}
+\caption*{Note: The map shows county-average aquifer thickness in 2016 for each county included in our corn and soybean regression analyses. Counties highlighted in gray are rainfed only, and the red polygon denotes the boundary of the High Plains Aquifer system}\label{fig:sat-map}
 \end{figure}
 
+\clearpage
 
+%==============================================
+%= References
+%==============================================
+
+\bibliography{DRA.bib}
+
+%==============================================
+%= Supplementary Information
+%==============================================
 \clearpage
 
 \hypertarget{appendix-appendix}{%
@@ -391,7 +431,7 @@ First, it is important the majority of groundwater withdrawal regulations that d
 
 Where more restrictive groundwater withdrawal limits have been introduced, for example in some Groundwater Management Districts in Kansas \citep{marston2022, rimvsaite2023groundwater}, these have universally been implemented in the last 5-10 years and therefore have no or only minimal overlap with our study period which extends up to only 2016. The earliest of these groundwater managements in Kansas interventions was the Sheridan 6 Local Enhanced Management Area (LEMA) in Northwest Kansas, which introduced restrictions to farmer groundwater pumping of 11 inches per year on average per 5-year period starting in 2013. While this overlaps with the final 4 years of our study period, the Sheridan 6 LEMA area covers only parts of two counties in Kansas and hence represents a very small proportion of our overall study sample. Additionally, the years 2013-2016 were all characterized by average or above average growing season rainfall (i.e. not drought years). Furthermore, evidence shows that the effect of restrictions introduced by the LEMA has primarily been a reduction in per-area water use, with irrigated crop yields largely unaffected and only small reductions in irrigated areas compared to pre-policy conditions \citep{drysdale2018adaptation, deines2021combining, whittemore2023108408}. These policies therefore would not be expected to confound our results on the impacts of aquifer thickness. 
 
-Finally, we also highlight that areas of the southern HPA, in particular in northern Texas, where the lowest aquifer thickness values are observed have few if any regulatory restrictions on groundwater extraction. This is due to laws that typically provide farmers with absolute rights to use groundwater under their land, coupled with low levels of metering. Research has shown that these conditions have historically limited or constrained potential for implementing extensive and binding pumping restrictions on irrigators in these areas \citep{wheeler2016lessons, closas2018chronicle}, again indicating that regulations are not the binding driver of water use constraints in these areas. As discussed in section \ref{main} of our manuscript, there is extensive evidence pointing to reduced well yields in these areas of the HPA. This evidence ranges from anecdotal and theoretical insights to simulation-based studies. Collectively, they suggest that these restrictions significantly constrain farmers' ability to meet crop water demands during droughts.
+Finally, we also highlight that areas of the southern HPA, in particular in northern Texas, where the lowest aquifer thickness values are observed have few if any regulatory restrictions on groundwater extraction. This is due to laws that typically provide farmers with absolute rights to use groundwater under their land, coupled with low levels of metering. Research has shown that these conditions have historically limited or constrained potential for implementing extensive and binding pumping restrictions on irrigating farmers in these areas \citep{wheeler2016lessons, closas2018chronicle}, again indicating that regulations are not the binding driver of water use constraints in these areas. As discussed in section \ref{main} of our manuscript, there is extensive evidence pointing to reduced well yields in these areas of the HPA. This evidence ranges from anecdotal and theoretical insights to simulation-based studies. Collectively, they suggest that these restrictions significantly constrain farmers' ability to meet crop water demands during droughts.
 
 \hypertarget{reg-conf}{%
 \section{Uncertainties in estimated impacts of water deficit on irrigated and average yield}\label{reg-conf}}
@@ -401,31 +441,46 @@ Finally, we also highlight that areas of the southern HPA, in particular in nort
 
 In the main article, the confidence intervals of the estimated yield responses to water deficit were not presented to enable easier comparison between response curves. This section provides visualization of yield response with the 95 \(\%\) confidence interval to convey the degree of uncertainty in our estimation. Figures \ref{fig:irrigated-yield-ind-corn} and \ref{fig:irrigated-yield-ind-soy} present the impact of water deficit on crop yield by aquifer thickness category with the 95\(\%\) confidence interval for irrigated corn and soybean, respectively. Figure \ref{fig:avg-yield-ind} presents the impact of water deficit on average crop yield (irrigated and rainfed combined) by aquifer thickness category for corn and soybean with the 95\(\%\) confidence interval.
 
+%------------------------
+%- Figure B.1
+%------------------------
+
 \begin{figure}[H]
 
-{\centering \includegraphics[width=6in,height=500px,]{../Results/Figures/g_yield_with_conf_corn} 
+\caption{The impact of water deficit and aquifer thickness on rainfed and irrigated per-area irrigated yields of corn}
 
-}
+{\centering \includegraphics[width=6in,height=500px,]{../Results/Figures/g_yield_with_conf_corn}}
 
-\caption{The impact of water deficit and aquifer thickness on rainfed and irrigated per-area irrigated yields of corn in US High Plains (solid black line) with 95\% confidence interval (grey shaded area)}\label{fig:irrigated-yield-ind-corn}
+\caption*{Note: The solid black lines represent the estimated rainfed and irrigated per-area irrigated yields of corn in US High Plains at different values of water deficit and aquifer thickness. The gray shaded area represents the 95\% confidence interval.}
+\label{fig:irrigated-yield-ind-corn}
 \end{figure}
 
+%------------------------
+%- Figure B.2
+%------------------------
+
 \begin{figure}[H]
 
-{\centering \includegraphics[width=6in,height=500px,]{../Results/Figures/g_yield_with_conf_soy} 
+\caption{The impact of water deficit and aquifer thickness on rainfed and irrigated per-area irrigated yields of soybean}
 
-}
+{\centering \includegraphics[width=6in,height=500px,]{../Results/Figures/g_yield_with_conf_soy}}
 
-\caption{The impact of water deficit and aquifer thickness on rainfed and irrigated per-area irrigated yields of soybean in US High Plains (solid black line) with 95\% confidence interval (grey shaded area)}\label{fig:irrigated-yield-ind-soy}
+\caption*{Note: The solid black lines represent the estimated rainfed and irrigated per-area irrigated yields of soybean in US High Plains at different values of water deficit and aquifer thickness. The gray shaded area represents the 95\% confidence interval.}
+\label{fig:irrigated-yield-ind-soy}
 \end{figure}
 
+%------------------------
+%- Figure B.3
+%------------------------
+
 \begin{figure}[H]
 
-{\centering \includegraphics[width=6.5in,height=500px,]{../Results/Figures/g_avg_yield} 
+\caption{Average productivity of corn and soybean}
 
-}
+{\centering \includegraphics[width=6.5in,height=500px,]{../Results/Figures/g_avg_yield}}
 
-\caption{Average productivity of corn and soybean in the US High Plains for different levels of water deficit and aquifer thickness (solid black line) with 95\% confidence interval (grey shaded area)}\label{fig:avg-yield-ind}
+\caption*{Note: The black solid lines represent average yield of corn (top panel) and soybean (bottom panel) in the US High Plains for different levels of water deficit and aquifer thickness. The gray shaded area represents the 95\% confidence interval.}
+\label{fig:avg-yield-ind}
 \end{figure}
 
 \clearpage
@@ -436,17 +491,27 @@ In the main article, the confidence intervals of the estimated yield responses t
 \setcounter{figure}{0}
 \renewcommand{\thefigure}{C.\arabic{figure}}
 
+<<sat_ref, echo = FALSE>>=
+sat_ref <-
+  readRDS(here::here("Shared/Results/all_results.rds")) %>%
+  .[1, sat_seq] %>%
+  .[[1]] %>%
+  .[length(.)]
+@
 
+Figure \ref{fig:test-sat-share} presents the difference in the estimated share of irrigated acres at different levels of aquifer thickness relative to the aquifer thickness level of \Sexpr{sat_ref} m, which represents a high level of aquifer thickness for our study area that exerts no constraints on water supply for irrigation. Gray shaded areas represented the 95\% confidence intervals for the estimated relationships. Where this range exceeds the red zero line, this indicates that the difference in aquifer thickness (relative to \Sexpr{sat_ref} m baseline) leads to a statistically significant (at 5\% level) reduction in irrigated production area share. 
 
-Figure \ref{fig:test-sat-share} presents the difference in the estimated share of irrigated acres at different levels of aquifer thickness relative to the aquifer thickness level of 100 m, which represents a high level of aquifer thickness for our study area that exerts no constraints on water supply for irrigation. Grey shaded areas represented the 95\% confidence intervals for the estimated relationships. Where this range exceeds the red zero line, this indicates that the difference in aquifer thickness (relative to 100 m baseline) leads to a statistically significant (at 5\% level) reduction in irrigated production area share. 
+%------------------------
+%- Figure C.1
+%------------------------
 
 \begin{figure}[H]
 
-{\centering \includegraphics[width=6.5in,height=500px,]{../Results/Figures/g_share_dif} 
+\caption{Decline in the share of acres that are irrigated}
 
-}
+{\centering \includegraphics[width=6.5in,height=500px,]{../Results/Figures/g_share_dif}}
 
-\caption{Decline in the share of acres that are irrigated as a function of different levels of aquifer thickness relative to a baseline aquifer thickness level of 100 m (black line). The grey shaded areas represent the 95\% confidence interval for this estimated relationship.}\label{fig:test-sat-share}
+\caption*{Note: The solid black lines represent the share of acres that are irrigated as a function of aquifer thickness relative to a baseline aquifer thickness level of \Sexpr{sat_ref} m (black line). The gray shaded areas represent the 95\% confidence interval for this estimated relationship.}\label{fig:test-sat-share}
 \end{figure}
 
 \clearpage
@@ -459,24 +524,35 @@ Figure \ref{fig:test-sat-share} presents the difference in the estimated share o
 
 Figure \ref{fig:variation-left} presents the histogram of aquifer thickness after demeaning these values by removing either their: (A) yearly average, (B) state-year average, or (C) county average values. This analysis is used to gain insights into how much variation in aquifer thickness for identification is left when implementing either: (A) only year fixed effects, (B) state-year fixed effects, or (C) county and year fixed effects. As shown in Figure \ref{fig:variation-left}, including state-year fixed effects does not substantially reduce the total variation in aquifer thickness compared to including only year fixed effects. However, including county fixed effects dramatically reduces the total variation in aquifer thickness, resulting in extremely inaccurate estimates of impacts of aquifer conditions on drought risk (high standard error). For this reason, we included state-year fixed effects in our irrigated production share regression analysis to strike a balance between preserving variability in aquifer thickness data and ensuring controls for other unobserved spatial factors that may influence estimates of the impacts of aquifer conditions on production shares. 
 
+%------------------------
+%- Figure D.1
+%------------------------
+
 \begin{figure}[H]
 
-{\centering \includegraphics[width=6in,height=500px,]{../Results/Figures/g_variation} 
+\caption{Comparison of variations in aquifer thickness after demeaning}
 
-}
+{\centering \includegraphics[width=6in,height=500px,]{../Results/Figures/g_variation}}
 
-\caption{Comparison of variations in aquifer thickness after demeaning by yearly average, state-year average, and county average.}\label{fig:variation-left}
+\caption*{Note: This figure compares the variations in aquifer thickness after demeaning by yearly average (top), state-year average (middle), and county-year average (bottom).}
+\label{fig:variation-left}
+
 \end{figure}
 
-Figure \ref{fig:state-fe-with-without} compares the impact of aquifer thickness on the share of irrigated acres for corn and soybean with different sets of fixed effects. For both corn and soybean, the negative impact of a reduction in aquifer thickness on the share of irrigated acres is virtually the same when using different possible sets of fixed effects. Importantly, adding state-year fixed effects, which control for unobservables at the state-year level, does not alter the estimated impacts of aquifer thickness on share of acres irrigated. This indicates that, even though there may be unobservables that are spatially correlated with aquifer thickness beyond soil characteristics, their correlation may not cause significant bias to our estimation and findings. We note that more detailed assessment of the impacts of including county-fixed effects is beyond the scope of our available datasets, and we defer this matter to future studies where greater temporal variations in aquifer thickness levels may be available to allow incorporation of county-level fixed effects.
+Figure \ref{fig:state-fe-with-without} compares the impact of aquifer thickness on the share of irrigated acres for corn and soybean with different sets of fixed effects. For both corn and soybean, the negative impact of a reduction in aquifer thickness on the share of irrigated acres is virtually the same when using different possible sets of fixed effects. Importantly, adding state-year fixed effects, which control for unobservable factors at the state-year level, does not alter the estimated impacts of aquifer thickness on share of acres irrigated. This indicates that, even though there may be unobservable factors that are spatially correlated with aquifer thickness beyond soil characteristics, their correlation may not cause significant bias to our estimation and findings. We note that more detailed assessment of the impacts of including county-fixed effects is beyond the scope of our available datasets, and we defer this matter to future studies where greater temporal variations in aquifer thickness levels may be available to allow incorporation of county-level fixed effects.
+
+%------------------------
+%- Figure D.2
+%------------------------
 
 \begin{figure}[H]
 
-{\centering \includegraphics[width=6in,height=500px,]{../Results/Figures/g_share_comp} 
+\caption{Comparison of estimated impact of aquifer thickness on the share of irrigated acres with and without state fixed effects}
 
-}
+{\centering \includegraphics[width=6in,height=500px,]{../Results/Figures/g_share_comp}}
 
-\caption{Comparison of estimated impact of aquifer thickness on the share of irrigated acres with and without state fixed effects. Shaded area represents 95\% confidence interval.}\label{fig:state-fe-with-without}
+\caption*{Note: The solid black lines represent the estimated share of irrigated acres for corn and soybean under different types of fixed effects. Gray shaded area represents 95\% confidence interval.}
+\label{fig:state-fe-with-without}
 \end{figure}
 
 \clearpage
@@ -501,28 +577,31 @@ y = \sum_{k=1}^K \beta_k \phi_k(x) + \mu
 
 Where \(\phi_k(\cdot)\) is the \(k\)th spline basis function and \(\beta_k\) is its coefficient. Figure \ref{fig:sp-basis} provides a visual illustration of a series of thin-plate spline basis functions.
 
+%------------------------
+%- Figure E.1
+%------------------------
+
 \begin{figure}[H]
 
-{\centering \includegraphics[width=6in,height=500px,]{../Results/Figures/g_basis} 
+\caption{Example of a series of thin-plate spline basis functions}
 
-}
+{\centering \includegraphics[width=6in,height=500px,]{../Results/Figures/g_basis}}
 
-\caption{Example of a series of thin-plate spline basis functions}\label{fig:sp-basis}
+\label{fig:sp-basis}
 \end{figure}
 
 Different coefficients (or namely weights) given to the spline basis functions result in different shapes of the impact of \(x\) on \(y\). Figure \ref{fig:ex-fx} presents two examples of two different sets of coefficients and their resulting representation of \(f(x)\). In the first case, \(\{\beta_1, \dots, \beta_5\} = \{60, 60, 60, 60, 60\}\). In the second case, \(\{\beta_1, \dots, \beta_5\} = \{20, -20, -40, 40, 60\}\). Among all the possibilities of the combinations of the coefficients, GAM finds the set of coefficient values that fits the data best. Unlike non-parametric regression, a GAM is a linear (in-parameter) model and estimates $\beta_k$ to best fit the observation data.
 
 \begin{figure}[H]
 
+\caption{Example of a function represented by different coefficient values}
+
 {\centering \includegraphics[width=6in,height=500px,]{../Results/Figures/g_il_y} 
 
 }
 
-\caption{Example of a function represented by different coefficient values}\label{fig:ex-fx}
+\label{fig:ex-fx}
 \end{figure}
 
-\clearpage
-
-  \bibliography{DRA.bib}
 
 \end{document}

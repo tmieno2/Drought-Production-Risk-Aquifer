@@ -13,10 +13,12 @@ geometry: margin=1in
 ---
 
 # Preparation
-Import saturated thickness data
+Import saturated thickness data to get the CRS.
 
 ```{r }
-sat_temp <- raster("Data/data-raw/saturated_thickness/SatThick_19851.tif")
+sat_crs <-
+  raster("Data/data-raw/saturated_thickness/SatThick_19851.tif") %>%
+  raster::projection()
 ```
 
 HPA counties
@@ -27,7 +29,7 @@ hpa_counties <-
   readRDS() %>%
   .[in_hpa == 1, ] %>%
   st_as_sf() %>%
-  st_transform(projection(sat_temp))
+  st_transform(sat_crs)
 ```
 
 Define function to extract saturated thickness for each county
