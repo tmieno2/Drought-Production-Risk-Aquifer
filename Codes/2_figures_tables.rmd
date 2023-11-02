@@ -196,23 +196,23 @@ hpa_simplified <-
   st_read() %>%
   st_simplify(dTolerance = 1000)
 
-saveRDS(hpa_simplified, here("Data/data-processed/hpa_simplified.shp"))
+saveRDS(hpa_simplified, here("Data/data-processed/hpa_simplified.rds"))
 ```
 
 ```{r}
 #--- hpa ---#
 hpa_simplified <-
-  here("Data/data-processed/hpa_simplified.shp") %>%
+  here("Data/data-processed/hpa_simplified.rds") %>%
   readRDS()
 
 #--- fips code ---#
 data(fips_codes, package = "tidycensus")
 
 #--- all relevant counties ---#
-all_counties <- readRDS("Shared/Data/counties.rds")
+all_counties <- readRDS("Data/data-processed/counties.rds")
 
 #--- all relevant states ---#
-all_states <- readRDS("Shared/Data/states.rds")
+all_states <- readRDS("Data/data-processed/states.rds")
 
 states_of_interest <-
   dplyr::filter(all_states, state %in% data_corn[, unique(state)])

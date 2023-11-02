@@ -1,9 +1,7 @@
 /Writing/Manuscript*/*
-# /Writing/Figures/*
 /Writing/*cache/*
-/Writing/Earth*/*.pdf
 /Writing/NatureWater/*/*.pdf
-/Writing/NatureWater/*/*/*.pdf
+# /Writing/NatureWater/*/*/*.pdf
 /Writing/*files/*
 /Codes/*cache*/*
 /Codes/*files*/*
@@ -18,7 +16,7 @@
 *.aux
 *.bbl
 *.blg
-*.png
+# *.png
 *.DS_Store
 *.zip
 *.Rhistory

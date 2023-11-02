@@ -493,7 +493,7 @@ In the main article, the confidence intervals of the estimated yield responses t
 
 <<sat_ref, echo = FALSE>>=
 sat_ref <-
-  readRDS(here::here("Shared/Results/all_results.rds")) %>%
+  readRDS(here::here("Results/all_results.rds")) %>%
   .[1, sat_seq] %>%
   .[[1]] %>%
   .[length(.)]
