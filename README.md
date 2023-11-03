@@ -17,7 +17,7 @@ Download the computer programs from this repository. You can either clone or dow
 
 ![folder-structure](https://github.com/tmieno2/Drought-Production-Risk-Aquifer/blob/master/Misc/folder-structure.png)
 
-In the "Data" folder, it has metadata file and a folder named "data-processed," which contains data files to complete steps 2 through 4.
+In the "Data" folder, it has metadata file and a folder named "data-processed," which contains data files to complete steps 2 through 4. Note that the metadata describes all the files beyond what is shared on the GitHub repository. See below for how to obtain the complete set of data files.
 
 As part of the requirement for publication in Nature Water, the same set of data files are also available at the Figshare (DOI: 10.6084/m9.figshare.24492196).
 
