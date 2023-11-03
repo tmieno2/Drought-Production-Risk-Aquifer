@@ -293,7 +293,9 @@ All data processing and analyses were carried out using R \citep{R}. The codes u
 
 \section*{Acknowledgements}
 
-Funding for the research in this manuscript was provided by the United States Department of Agriculture under contract numbers OCE 58-0111-20-007 and OCE 58-0111-21-007 and the Daugherty Water for Food Global Institute at the University of Nebraska. This research was also supported by Innovate UK award no. 10044695, as part of the UK Research and Innovation and European Commission funded project ``TRANSCEND: Transformational and robust adaptation to water scarcity and climate change under deep uncertainty.'' The funders had no role in study design, data collection and analysis, decision to publish or preparation of the manuscript.
+Funding for the research in this manuscript was provided by the United States Department of Agriculture under contract numbers OCE 58-0111-20-007 and OCE 58-0111-21-007 and the Daugherty Water for Food Global Institute at the University of Nebraska. This research was also supported by Innovate UK award no. 10044695, as part of the UK Research and Innovation and European Commission funded project ``TRANSCEND: Transformational and robust adaptation to water scarcity and climate change under deep uncertainty.''
+
+The funders had no role in study design, data collection and analysis, decision to publish or preparation of the manuscript.
 
 \begin{itemize}
 \item OCE 58-0111-20-007 (TM, SK)
@@ -302,10 +304,13 @@ Funding for the research in this manuscript was provided by the United States De
 \item Daugherty Water for Food Global Institute (SK)
 \end{itemize}
 
-\subsection*{Author Contributions}
+\section*{Author Contributions}
 
+T.M. conceived the paper, developed the computer programs for data collection, processing, analysis, and summarization, and wrote the paper.; T.F. conceived and wrote the paper; S.K. wrote the computer programs for data collection and processing; and N.B. conceived and helped improve the framing of the paper. 
 
-\subsection*{Competing Interests Statement}
+\section*{Competing Interests Statement}
+
+The authors declare no competing interests.
 
 \section*{Tables}
 

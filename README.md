@@ -17,19 +17,19 @@ Download the computer programs from this repository. You can either clone or dow
 
 ![folder-structure](https://github.com/tmieno2/Drought-Production-Risk-Aquifer/blob/master/Misc/folder-structure-github.png)
 
-In the "Data" folder, it has metadata file and a folder named "data-processed," which contains data files to complete steps 2 through 4. Note that the metadata describes all the files beyond what is shared on the GitHub repository. See below for how to obtain the complete set of data files.
-
-As part of the requirement for publication in Nature Water, the same set of data files are also available at the Figshare (DOI: 10.6084/m9.figshare.24492196).
+In the "Data" folder, it has metadata file and a folder named "data-processed," which contains minimum data files, which can be used to complete steps 2 through 4 (That is, you can reproduce all the results and figures presented in the article). Note that the metadata describes all the files beyond what is shared on the GitHub repository. See below for how to obtain the complete set of data files.
 
 ## Step 2: Download additional datasets (optional)
 
-The data files that comes with the GitHub repository only allow you to go through steps 2 through 4 (Note, you can still reproduce all the results and figures reported in the article). The raw data files and some of the processed data files were not shared on the GitHub repository due to its size limitation. GitHub repositories are not intended for data storage, rather they are mainly for computer programs. If you are interested in reproducing the entire steps including step 1 (downloading and processing datasets to generate the final analysis data), then you need to download additional data files.
+The data files included in the GitHub repository enable you to carry out steps 2 through 4, which are sufficient to reproduce all the results and figures reported in the article. However, the raw data files and some of the processed data files are not contained within the GitHub repository due to size limitations. GitHub repositories are primarily intended for storing computer programs, not large data sets. If you wish to reproduce the entire process, including step 1 (which involves downloading and processing datasets to generate the final analysis data), you will need to obtain the additional data files.
 
-A complete set of data files used and generated in the project including raw data files is available at this [Dropbox folder](https://www.dropbox.com/scl/fo/bghhwlidmi7wx1ok0az5n/h?rlkey=tgbix1hp7g9np9etlo1z3biyr&dl=0). Importantly, this folder maintains the folder organization and file locations as employed during our project's execution. 
+All the raw datasets (along with metadata and the same set of processed data as shared on this GitHub repository.) required to reproduce the entire steps (from start to finish) of the project are hosted at the Figshare data repository (DOI: 10.6084/m9.figshare.24492196) dedicated for this project. However, note that all the files are dumped into a single repository as Figshare does not allow a folder structure within the repository. Therefore, you need to manually place right files into the right folders if you would like to run our codes. Alternatively, you can modify the files paths in our codes. Some of the datasets that are not essential are not uploaded in this repository due to file size limitation of Figshare. For example, daily gridMET weather datasets are not shared, but they can be downloaded using our codes (they are not **essential** in this sense).
+
+A complete set of data files (all the raw, downloaded, and derived datasets) are available at this [Dropbox folder](https://www.dropbox.com/scl/fo/bghhwlidmi7wx1ok0az5n/h?rlkey=tgbix1hp7g9np9etlo1z3biyr&dl=0). Importantly, this folder maintains the folder organization and file locations as employed during our project's execution. Therefore, you will have the most straightforward experience in reproducing the entire process with this option.
 
 Please note that the **gridMET** folder inside the **data-raw** folder, containing daily weather data files saved by variable-year, is particularly large, weighing in at roughly 37GB. While our codes include a segment to download this data, if you'd prefer bypassing this potentially time-consuming step, downloading the folder directly is an option.
 
-All the downloaded data files should be stored in Data folder (you can replace the data files that came with cloning the GitHub folder as they are identical). 
+All the downloaded data files should be stored in Data folder. You can replace the data files that came with cloning the GitHub folder as they are identical. 
 
 ## Step 3: Install all the R packages
 
