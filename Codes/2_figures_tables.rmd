@@ -161,6 +161,9 @@ ggsave(
 Though not necessary, save the counties and states data so that you do not have to waste time downloading them every time you run this code.
 
 ```{r, eval = FALSE}
+#--- fips code ---#
+data(fips_codes, package = "tidycensus")
+
 all_counties <-
   tigris::counties() %>%
   st_simplify(dTolerance = 100) %>%
