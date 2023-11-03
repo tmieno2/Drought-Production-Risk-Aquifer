@@ -9,9 +9,11 @@ Here is the breakdown of the steps of completing the project.
 3. Conduct analysis and create figures
 4. Produce the manuscript
 
+We refer to these numbers in the rest of the instruction.
+
 ## Step 1: Download codes 
 
-Download the computer programs from this repository. You can either clone or download the files as a zipped folder into the root folder. Then, create a folder named "Results". If done correctly, the folder system looks like this.
+Download the computer programs from this repository. You can either clone or download the files as a zipped folder. You will be using the parent folder as the root folder. Then, create a folder named "Results" in the root folder. If done correctly, the folder system looks like this:
 
 ![folder-structure](https://github.com/tmieno2/Drought-Production-Risk-Aquifer/blob/master/Misc/folder-structure.png)
 
@@ -49,5 +51,5 @@ Open **master.rmd** inside the **Codes** folder.
 + **Reproduce from step 2 on**: Run the codes starting from line 47.
 + **Reproduce from step 3 on**: Run the codes starting from line 53.
 
-Please note that our team utilizes Rmarkdown (.rmd) files for coding. The master.rmd initially converts the Rmarkdown files into R files using `knitr::purl()`, and subsequently `source()` them. If you wish to work on a particular process, refer to the corresponding Rmarkdown file rather than the associated R file. This is because the latter is not as well-organized since `knitr::purl()` strips all the section headers and non-R texts.
+Please note that our team utilizes Rmarkdown (.rmd) files for coding. The master.rmd initially converts the Rmarkdown files into R files using `knitr::purl()`, and subsequently `source()` them for reproduction. If you wish to work on a particular process, refer to the corresponding Rmarkdown file rather than the associated R file. This is because the latter is not as well-organized since `knitr::purl()` strips all the section headers and non-R texts.
 

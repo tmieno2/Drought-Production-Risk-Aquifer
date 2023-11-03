@@ -1,0 +1,129 @@
+---
+title: Metadata
+author: Taro Mieno
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    toc_collapsed: true
+    number_sections: true
+---
+
+# Data/data-raw
+
++ **hp_bound2010.shp**: HPA aquifer boundary with no attribute (shape file)
++ **metadata_elevationdata.nc**: ~ 4km elevation data from the gridMET website (netcdf file)
++ **nass_data_raw.rds** (`data.table`): downloaded from USDA NASS using the R `tidyusda` package (generated in **Codes/0_2_quickstat.Rmd**)
+  + `year`: year
+  + `county_code`: county fips code
+  + `state_code`: state fips code
+  + `short_desc`: description of what `Value` variable represents
+  + `Value`: value  
+
+## data-raw -> girdMET
+
+Files in this folder stores the raw gridMET data saved as netcdf files. They follow the following naming convention:
+
+"weather_variable"_"year.nc"
+
+Single files records daily values for the corresponding variable.
+
+Here are the list of the variables:
+
++ "pr": precipitation
++ "rmin": min relative humidity (%)
++ "rmax": max relative humidity (%)
++ "srad": radiation (W/M^2)
++ "tmmn": tmin (Kelvin)
++ "tmmx": tmax (Kelvin)
++ "vs": wind speed,
++ "pet": evapotranspiration
+
+See **Codes/04_get_weather.Rmd** for the codes to download them.
+
+## data-raw -> saturated_thickness
+
+Files in this folder stores the aquifer thickness data saved as geotif files. They follow the following naming convention:
+
+"SatThick"_"year.tif"
+
+# Data/data-processed
+
++ **base_counties.rds** (`data.table`): boundary and attributes of counties (generated in **0_1_hpa_counties.Rmd**)
+  - `state`: state (abbreviated)
+  - `state_name`: state (full)
+  - `sc_code`: State and County FIPS codes combined into one
+  - `ir_area_ratio`: the ratio of the county area that is overlapping with the HPA
+  - `geometry`: simple feature column reprsenting county boundary
+  - `in_hpa`: whether intersecting with the HPA or not (1 if intersected, 0 otherwise)
++ **gridMET.rds** (`data.table`): daily weather data from gridMET (generated in **0_4_get_weather.Rmd**)
+  + `date`: date 
+  + `tmin`: minimum temperature
+  + `tmax`: maximum temperature
+  + `prcp`: precipitation
+  + `et0`: reference evapotranspiration
+  + `sc_code`: State and County FIPS codes combined into one
++ **nass_data.rds** (`data.table`): **nass_data_raw.rds** reshaped to a long format (generated in **0_2_quickstat.Rmd**)
+  + `sc_code`: State and County FIPS codes combined into one
+  + `year`: year
+  + `crop`: crop type (corn or soybean)
+  + `ir`: irrigated or rainfed ("ir" if irrigated, "nir" if not.)
+  + `acres`: harvested acres
+  + `yield`: crop yield (bu/acre)
++ **sat_all.rds** (`data.table`): aquifer (saturated) thickness  (generated in **0_3_get_sat.Rmd**)
+  + `sat`: aquifer (saturated) thickness level
+  + `sc_code`: State and County FIPS codes combined into one
+  + `year`: year
++ **ssurgo_soil.rds** (`data.table`): SSURGO soil data combined into one (generated in **0_5_ssurgo.Rmd**)
+  + `sc_code`: State and County FIPS codes combined into one
+  + `sandtotal_r`: sand percentage
+  + `silttotal_r`: silt percentage
+  + `awc_r`: water holding capacity
++ **summarized_gridMET.rds** (`data.table`): gridMET data summerized by production season (generated in **0_4_get_weather.Rmd**)
+  + `sc_code`: State and County FIPS codes combined into one
+  + `year`: year
+  + `balance`: water balance (deficit) = `et0` - `prcp`
+  + `et0`: total reference evapotranspiration (mm) during the production season defined as May through September
+  + `prcp`: total precipitation (mm) during the production season defined as May through September
++ **final_data.rds** (`data.table`): dataset for analysis (generated in **0_6_merge_datasets.Rmd**)
+  + `sc_code`: State and County FIPS codes combined into one
+  + `year`: year
+  + `sat`: aquifer (saturated) thickness (m)
+  + `balance`: water balance (defict) = `et0` - `prcp`
+  + `et0`: total reference evapotranspiration (mm) during the production season defined as May through September
+  + `prcp`: total precipitation (mm) during the production season defined as May through September
+  + `state`: abbreviated state name
+  + `state_name`: full state name
+  + `ir_area_ratio`: the ratio of the county area that is overlapping with the HPA
+  + `geometry`: simple feature column reprsenting county boundary
+  + `in_hpa`: whether intersecting with the HPA or not (1 if intersected, 0 otherwise)
+  + `ir`: irrigated or rainfed ("ir" if irrigated, "nir" if not.)
+  + `acres`: harvested acres
+  + `yield`: crop yield (ton/ha)
+  + `sandtotal_r`: sand percentage
+  + `silttotal_r`: silt percentage
+  + `awc_r`: water holding capacity
+  + `sc_dry`: `sc_code`_`ir` (concatenation of `sc_code` and `ir`)
+  + `state_year`: `state`_`year` (concatenation of `state` and `year`)
++ **hpa_simplified.rds** (`sf`): boundary of HPA simplified from **hp_bound2010.shp**, used only for the aquifer thickness map (generated in **2_figures_tables.Rmd**)
++ **states.rds** (`sf`): state boundary, used only for the aquifer thickness map (generated in **2_figures_tables.Rmd**)
++ **counties.rds** (`sf): county boundary, used only for the aquifer thickness map (generated in **2_figures_tables.Rmd**)
+
+```{r, eval = FALSE, echo = FALSE}
+readRDS("Data/data-processed/final_data.rds")
+```
+
+## Data/data-processed/SSURGO
+
+This folder houses a series of SSURGO soil data files. Each file pertains to a single county and contains the same variables as found in **ssurgo_soil.rds**:
+
++ `sc_code`: State and County FIPS codes combined into one
++ `sandtotal_r`: sand percentage
++ `silttotal_r`: silt percentage
++ `awc_r`: water holding capacity
+
+Indeed, `ssurgo_soil.rds` is an aggregation of the files contained in this folder.
+
+Files for individual counties are saved separately due to the instability of the SSURGO website.
+
+

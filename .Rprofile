@@ -26,6 +26,6 @@ library(SPEI)
 library(exactextractr)
 library(geosphere)
 
-#--- source functions ---r
+#--- source functions ---#
 source(here::here("Codes/functions.R"))
 

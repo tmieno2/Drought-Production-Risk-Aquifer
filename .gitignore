@@ -24,7 +24,14 @@
 *.Rhistory
 *.docx
 data.md
-Data/*
+Data/data-raw/*
+Data/data-processed/base_counties.rds
+Data/data-processed/gridMET.rds
+Data/data-processed/nass_data.rds
+Data/data-processed/sat_all.rds
+Data/data-processed/ssurgo_soil.rds
+Data/data-processed/summarized*.rds
+Data/data-processed/SSURGO/*
 Data.zip
 Results/*
 Shared/*
