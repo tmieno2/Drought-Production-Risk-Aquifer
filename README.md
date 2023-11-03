@@ -15,7 +15,7 @@ We refer to these numbers in the rest of the instruction.
 
 Download the computer programs from this repository. You can either clone or download the files as a zipped folder. You will be using the parent folder as the root folder. Then, create a folder named "Results" in the root folder. If done correctly, the folder system looks like this:
 
-![folder-structure](https://github.com/tmieno2/Drought-Production-Risk-Aquifer/blob/master/Misc/folder-structure.png)
+![folder-structure](https://github.com/tmieno2/Drought-Production-Risk-Aquifer/blob/master/Misc/folder-structure-github.png)
 
 In the "Data" folder, it has metadata file and a folder named "data-processed," which contains data files to complete steps 2 through 4. Note that the metadata describes all the files beyond what is shared on the GitHub repository. See below for how to obtain the complete set of data files.
 
