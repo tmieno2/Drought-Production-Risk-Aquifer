@@ -1,6 +1,7 @@
 source("renv/activate.R")
 print('Welcome (back) to the "DroughtRiskAquifer" project.\n')
 
+#--- load packages ---#
 library(tidyverse)
 library(lubridate)
 library(tidycensus)
@@ -25,9 +26,6 @@ library(SPEI)
 library(exactextractr)
 library(geosphere)
 
-# here::i_am("GitControlled/Codes/Functions/1_0_functions.R")
-
 #--- source functions ---r
-# source(here::here("Codes/Functions/1_0_functions.R"))
 source(here::here("Codes/functions.R"))
 

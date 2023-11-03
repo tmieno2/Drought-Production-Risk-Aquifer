@@ -1,4 +1,4 @@
-# Aquifer depletion exacerbates agricultural drought losses in the US High Plains (Nature Water)
+# Aquifer depletion exacerbates agricultural drought losses in the US High Plains
 
 ## Instruction for Reproducing the Results and Figures
 
@@ -32,9 +32,18 @@ All the data files should be stored in the Data folder (which you should create)
 
 ![folder-structure](https://github.com/tmieno2/Drought-Production-Risk-Aquifer/blob/master/Misc/folder-structure-with-data.png)
 
-## Step 3: Run codes
+## Step 3: Install all the R packages
 
-The root folder is set up as an RStudio project. You can open the project on RStudio and open **master.rmd** inside the **Codes** folder.
+The root folder is set up as an RStudio project. 
+
++ Open the project on RStudio
++ Run `renv::restore()` (install the `renv` packages first, if you have not done so). This will install all the R packages used for this project. Note that the packages installed here are specific to this project. See [here](https://rstudio.github.io/renv/articles/renv.html) for an introduction of how to use the `renv` package.
+
+Codes to load the packages are in the **.Rprofile** file. This file is run automatically when you open the project. Since you did not have all the R packages for this project, they were not loaded when you first open the project to set things up as outlined above. So, go to Session -> Restart R to restart an R session, which will run **.Rprofile** again and now you have all the packages loaded. Next time you start the project, you do not have to do anything. The codes are ready to be run.
+
+## Step 4: Run codes
+
+You can open the project on RStudio and open **master.rmd** inside the **Codes** folder.
 
 + **Reproduce every step of the project**: Run the codes from the top (This takes a while and use up lots of storage memory). 
 + **Reproduce from step 2 on**: Run the codes starting from the Analysis section.
