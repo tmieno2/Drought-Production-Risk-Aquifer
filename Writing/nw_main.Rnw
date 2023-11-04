@@ -422,6 +422,7 @@ The authors declare no competing interests.
 %= Supplementary Information
 %==============================================
 \clearpage
+
 \hypertarget{appendix-appendix}{%
 \appendix}
 
@@ -430,7 +431,7 @@ The authors declare no competing interests.
 \renewcommand{\thefigure}{S.\arabic{figure}}
 
 \hypertarget{pathway-reg}{%
-\section{Groundwater management policies as a potential causal pathway}\label{pathway-reg}}
+\section{}\label{pathway-reg}}
 
 Our analysis evaluates the links between aquifer thickness and drought resilience, proposing a causal link between declining aquifer thickness and irrigated production during droughts. In the first section of our manuscript, we propose that this connection is driven by impacts of aquifer thickness on well yields and, hence, farmers ability to use groundwater to fully buffer crops against water deficits during drought. 
 
