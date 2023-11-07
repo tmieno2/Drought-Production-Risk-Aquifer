@@ -9,7 +9,9 @@ Here is the breakdown of the steps of completing the project.
 3. Conduct analysis and create figures (no tables in this article)
 4. Produce the manuscript
 
-We refer to these numbers in the rest of the instruction.
+We refer to these section numbers in the rest of the instruction.
+
+If you have any questions, please contact me at tmieno2@unl.edu.
 
 ## Step 1: Download codes and minimum datasets
 
