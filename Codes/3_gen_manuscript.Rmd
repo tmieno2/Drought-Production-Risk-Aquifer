@@ -1,0 +1,45 @@
+
+```{r}
+master <- readLines(here::here("Writing/nw_manuscript.Rnw"))
+```
+
+# Main
+
+```{r}
+main_end_line <- which(str_detect(master, "%= Supplementary Information")) - 2
+
+end_doc <- which(str_detect(master, "end\\{document\\}"))
+
+main <-
+  master[c(1:main_end_line, end_doc)] %>%
+  #--- this assumes the section ordering is correct and do not change any more ---#
+  gsub("\\\\ref\\{pathway-reg\\}", "A", .) %>%
+  gsub("\\\\ref\\{reg-conf\\}", "B", .) %>%
+  gsub("\\\\ref\\{test-dif-share\\}", "C", .) %>%
+  gsub("\\\\ref\\{spline-basis\\}", "D", .) %>%
+  gsub("\\\\ref\\{county-fe\\}", "E", .) %>%
+  gsub("\\\\ref\\{fig:irrigated-yield-ind-corn\\}", "S.1", .) %>%
+  gsub("\\\\ref\\{fig:irrigated-yield-ind-soy\\}", "S.2", .)
+
+writeLines(main, here::here("Writing/nw_main.Rnw"))
+```
+
+# SI
+
+```{r}
+main_start_line <- which(str_detect(master, "maketitle"))
+
+main_end_line <- which(str_detect(master, "appendix-appendix"))
+
+bib_line <- which(str_detect(master, "DRA.bib"))
+
+si <-
+  master[-c(main_start_line:main_end_line)] %>%
+  gsub("\\\\ref\\{main\\}", "Main", .)
+
+si_end_doc <- which(str_detect(si, "end\\{document\\}"))
+
+si <- c(si[-si_end_doc], master[bib_line], si[si_end_doc])
+
+writeLines(si, here::here("Writing/nw_si.Rnw"))
+```
