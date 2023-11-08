@@ -71,5 +71,5 @@ g_il_2 <-
 
 g_il_y <- g_il_1 / g_il_2
 
-ggsave("Results/Figures/g_il_y.pdf", g_il_y, width = 6, height = 5)
+ggsave("Results/Figures/g_il_y.pdf", g_il_y, width = 6, height = 4)
 ```
